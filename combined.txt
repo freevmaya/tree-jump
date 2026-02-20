@@ -1,0 +1,1122 @@
+# COMBINED PROJECT FILES FOR DEEPSEEK
+# Encoding: UTF-8
+# Processed extensions: .js, .html
+
+# ============================================================
+# FILE: .\index.html
+# TYPE: .HTML
+# ============================================================
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tree Jump — отскоки от дерева</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      overflow: hidden;
+      background: #87CEEB;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      cursor: grab;
+      user-select: none;
+    }
+    body:active { cursor: grabbing; }
+    #canvas-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    canvas { display: block; outline: none; }
+    .hint {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(0,0,0,0.6);
+      background: rgba(255,255,240,0.25);
+      backdrop-filter: blur(4px);
+      padding: 8px 18px;
+      border-radius: 40px;
+      font-size: 15px;
+      font-weight: 500;
+      pointer-events: none;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.3);
+      border: 1px solid rgba(255,255,255,0.3);
+      white-space: nowrap;
+      z-index: 100;
+    }
+    .bounce-indicator {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(4px);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 500;
+      border: 1px solid rgba(255,255,255,0.2);
+      pointer-events: none;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <div class="hint">🖱️ Зажмите левую кнопку и тяните, чтобы вращать дерево</div>
+  <div class="bounce-indicator" id="bounce-counter">🔥 Отскоков: 0</div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+      "@scripts/": "./scripts/"
+    }
+  }
+  </script>
+  <script type="module" src="./scripts/main.js"></script>
+</body>
+</html>
+
+
+# ============================================================
+# FILE: .\scripts\GameState.js
+# TYPE: .JS
+# ============================================================
+
+// scripts/GameState.js
+
+export const GAME_STATE = {
+  PLAYING: 'playing',
+  GAME_OVER: 'gameOver'
+};
+
+export class GameState {
+  constructor() {
+    this.state = GAME_STATE.PLAYING;
+    this.gameOverCallbacks = [];
+    this.resetCallbacks = [];
+  }
+  
+  isPlaying() {
+    return this.state === GAME_STATE.PLAYING;
+  }
+  
+  isGameOver() {
+    return this.state === GAME_STATE.GAME_OVER;
+  }
+  
+  gameOver() {
+    if (this.state !== GAME_STATE.GAME_OVER) {
+      this.state = GAME_STATE.GAME_OVER;
+      this.gameOverCallbacks.forEach(callback => callback());
+    }
+  }
+  
+  reset() {
+    this.state = GAME_STATE.PLAYING;
+    this.resetCallbacks.forEach(callback => callback());
+  }
+  
+  onGameOver(callback) {
+    this.gameOverCallbacks.push(callback);
+  }
+  
+  onReset(callback) {
+    this.resetCallbacks.push(callback);
+  }
+}
+
+
+# ============================================================
+# FILE: .\scripts\constants.js
+# TYPE: .JS
+# ============================================================
+
+// scripts/constants.js
+
+// ========== КОНСТАНТЫ ==========
+// Дерево
+export const TREE_COLOR = 0xA67C52;
+export const TREE_HEIGHT = 70;
+export const TEXTURE_SCALE_Y = 1.5;
+export const MAIN_RADIUS = 1;
+export const MAIN_DIAMETER = MAIN_RADIUS * 2;
+
+// Выступы и площадки на дереве
+export const STICK_OUT = 0.1 * MAIN_DIAMETER;
+export const PLATFORM_RADIUS = MAIN_DIAMETER * 0.4 / 2;
+export const PLATFORM_HEIGHT = 0.02 * MAIN_DIAMETER;
+export const CYLINDER_HALF_HEIGHT = TREE_HEIGHT / 2;
+export const PLATFORM_DENSITY = 0.5;
+export const PLATFORM_COUNT = Math.floor(TREE_HEIGHT * PLATFORM_DENSITY);
+
+// Базовая платформа
+export const BASE_PLATFORM_SIZE = 20;
+export const BASE_PLATFORM_TOP_Y = -2.8 + 0.075;
+
+// Шарик
+export const BALL_RADIUS = 0.15;
+
+// Физика шарика
+export const GRAVITY = -9.8;
+export const BOUNCE_SPEED = 7.5;
+export const MAX_VELOCITY = 15;
+
+// Камера
+export const CAMERA_FOLLOW_SPEED = 0.06;
+export const CAMERA_HEIGHT_OFFSET = 2.8;
+export const CAMERA_START_Y = 0;
+
+// Управление мышью
+export const ROTATION_SPEED = 0.005;
+export const INERTIA = 0.92;
+
+// Цвета
+export const FLOOR_COLOR = 0x1e1b2e;
+export const BASE_PLATFORM_COLOR = 0x4a5568;
+export const BALL_COLOR = 0xff6b6b;
+export const AMBIENT_LIGHT_COLOR = 0x404080;
+export const KEY_LIGHT_COLOR = 0xffffff;
+export const FILL_LIGHT_COLOR = 0x6366f1;
+export const RIM_LIGHT_COLOR = 0x818cf8;
+export const WIREFRAME_COLOR = 0xC4956A;
+
+// Свет
+export const AMBIENT_LIGHT_INTENSITY = 0.5;
+export const KEY_LIGHT_INTENSITY = 1.2;
+export const FILL_LIGHT_INTENSITY = 0.4;
+export const RIM_LIGHT_INTENSITY = 0.6;
+export const RIM_LIGHT_DISTANCE = 12;
+
+// Пути к текстурам
+export const BARK_TEXTURE_PATH = 'textures/bark.jpg';
+
+// Игровые параметры
+export const GAME_OVER_Y_OFFSET = -5; // Смещение относительно камеры для конца игры
+export const RESET_POSITION_X = 0;
+export const RESET_POSITION_Z = MAIN_RADIUS * 1.3;
+export const RESET_POSITION_Y = BASE_PLATFORM_TOP_Y + BALL_RADIUS;
+export const RESET_VELOCITY_Y = BOUNCE_SPEED;
+
+
+# ============================================================
+# FILE: .\scripts\controls\MouseRotationControl.js
+# TYPE: .JS
+# ============================================================
+
+// scripts/controls/MouseRotationControl.js
+import { ROTATION_SPEED, INERTIA } from '../constants.js';
+
+export class MouseRotationControl {
+  constructor(tree, container) {
+    this.tree = tree;
+    this.container = container;
+    this.isDragging = false;
+    this.previousMouseX = 0;
+    this.velocityY = 0;
+    this.rotationSpeed = ROTATION_SPEED;
+    this.inertia = INERTIA;
+    
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onMouseLeave = this.onMouseUp.bind(this);
+  }
+  
+  init() {
+    this.container.addEventListener('mousedown', this.onMouseDown);
+    window.addEventListener('mousemove', this.onMouseMove);
+    window.addEventListener('mouseup', this.onMouseUp);
+    window.addEventListener('mouseleave', this.onMouseLeave);
+  }
+  
+  destroy() {
+    this.container.removeEventListener('mousedown', this.onMouseDown);
+    window.removeEventListener('mousemove', this.onMouseMove);
+    window.removeEventListener('mouseup', this.onMouseUp);
+    window.removeEventListener('mouseleave', this.onMouseLeave);
+  }
+  
+  onMouseDown(e) {
+    this.isDragging = true;
+    this.previousMouseX = e.clientX;
+    this.velocityY = 0;
+  }
+  
+  onMouseMove(e) {
+    if (!this.isDragging) return;
+    const dx = e.clientX - this.previousMouseX;
+    this.velocityY = dx * this.rotationSpeed;
+    this.tree.rotate(this.velocityY);
+    this.previousMouseX = e.clientX;
+  }
+  
+  onMouseUp() {
+    this.isDragging = false;
+  }
+  
+  update() {
+    if (!this.isDragging) {
+      this.velocityY *= this.inertia;
+      if (Math.abs(this.velocityY) > 0.0001) {
+        this.tree.rotate(this.velocityY);
+      }
+    }
+  }
+  
+  reset() {
+    this.isDragging = false;
+    this.velocityY = 0;
+  }
+}
+
+
+# ============================================================
+# FILE: .\scripts\core\CameraController.js
+# TYPE: .JS
+# ============================================================
+
+// scripts/core/CameraController.js
+import * as THREE from 'three';
+import { CAMERA_FOLLOW_SPEED, CAMERA_HEIGHT_OFFSET, CAMERA_START_Y } from '../constants.js';
+
+export class CameraController {
+  constructor(aspectRatio) {
+    this.camera = new THREE.PerspectiveCamera(50, aspectRatio, 0.1, 100);
+    this.camera.position.set(2, CAMERA_START_Y, 9);
+    this.targetY = 0;
+    this.followSpeed = CAMERA_FOLLOW_SPEED;
+    this.heightOffset = CAMERA_HEIGHT_OFFSET;
+  }
+  
+  update(targetY) {
+    this.targetY = targetY + this.heightOffset;
+    this.camera.position.y += (this.targetY - this.camera.position.y) * this.followSpeed;
+    this.camera.lookAt(0, this.camera.position.y, 0);
+  }
+  
+  setPosition(x, y, z) {
+    this.camera.position.set(x, y, z);
+  }
+  
+  getCamera() {
+    return this.camera;
+  }
+  
+  resize(aspectRatio) {
+    this.camera.aspect = aspectRatio;
+    this.camera.updateProjectionMatrix();
+  }
+}
+
+
+# ============================================================
+# FILE: .\scripts\core\RendererManager.js
+# TYPE: .JS
+# ============================================================
+
+// scripts/core/RendererManager.js
+import * as THREE from 'three';
+
+export class RendererManager {
+  constructor(container) {
+    this.container = container;
+    this.renderer = null;
+    this.width = container.clientWidth;
+    this.height = container.clientHeight;
+  }
+  
+  init() {
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    this.renderer.setSize(this.width, this.height);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.0;
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    
+    this.container.appendChild(this.renderer.domElement);
+    return this.renderer;
+  }
+  
+  resize() {
+    this.width = this.container.clientWidth;
+    this.height = this.container.clientHeight;
+    this.renderer.setSize(this.width, this.height);
+  }
+  
+  render(scene, camera) {
+    this.renderer.render(scene, camera);
+  }
+  
+  getRenderer() {
+    return this.renderer;
+  }
+  
+  getAspectRatio() {
+    return this.width / this.height;
+  }
+}
+
+
+# ============================================================
+# FILE: .\scripts\core\SceneManager.js
+# TYPE: .JS
+# ============================================================
+
+// scripts/core/SceneManager.js
+import * as THREE from 'three';
+
+export class SceneManager {
+  constructor() {
+    this.scene = null;
+    this.fogColor = 0xB0E0E6;
+    this.backgroundColor = 0x87CEEB;
+  }
+  
+  init() {
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(this.backgroundColor);
+    this.scene.fog = new THREE.Fog(this.fogColor, 12, 28);
+    return this.scene;
+  }
+  
+  getScene() {
+    return this.scene;
+  }
+  
+  add(object) {
+    this.scene.add(object);
+  }
+  
+  remove(object) {
+    this.scene.remove(object);
+  }
+}
+
+
+# ============================================================
+# FILE: .\scripts\main.js
+# TYPE: .JS
+# ============================================================
+
+// scripts/main.js
+import * as THREE from 'three';
+import { 
+  GRAVITY, BASE_PLATFORM_SIZE, BASE_PLATFORM_COLOR,
+  FLOOR_COLOR, AMBIENT_LIGHT_COLOR, AMBIENT_LIGHT_INTENSITY,
+  KEY_LIGHT_COLOR, KEY_LIGHT_INTENSITY, FILL_LIGHT_COLOR,
+  FILL_LIGHT_INTENSITY, RIM_LIGHT_COLOR, RIM_LIGHT_INTENSITY,
+  RIM_LIGHT_DISTANCE, TREE_HEIGHT, MAIN_RADIUS,
+  GAME_OVER_Y_OFFSET, RESET_POSITION_X, RESET_POSITION_Y,
+  RESET_POSITION_Z, RESET_VELOCITY_Y, CAMERA_START_Y
+} from './constants.js';
+
+import { SceneManager } from './core/SceneManager.js';
+import { RendererManager } from './core/RendererManager.js';
+import { CameraController } from './core/CameraController.js';
+import { Tree } from './models/Tree.js';
+import { Ball } from './models/Ball.js';
+import { BallPhysics } from './physics/BallPhysics.js';
+import { MouseRotationControl } from './controls/MouseRotationControl.js';
+import { GameState, GAME_STATE } from './GameState.js';
+
+class Game {
+  constructor() {
+    this.container = document.getElementById('canvas-container');
+    this.sceneManager = new SceneManager();
+    this.rendererManager = new RendererManager(this.container);
+    this.cameraController = null;
+    this.tree = null;
+    this.ball = null;
+    this.physics = null;
+    this.mouseControl = null;
+    this.bounceCounterElement = document.getElementById('bounce-counter');
+    this.lastTime = performance.now();
+    this.gameState = new GameState();
+    
+    // Хранилище для созданных объектов окружения
+    this.environmentObjects = [];
+    this.lights = [];
+    
+    // Создание UI для конца игры
+    this.createGameOverUI();
+  }
+  
+  createGameOverUI() {
+    // Создаем элемент для отображения конца игры
+    this.gameOverElement = document.createElement('div');
+    this.gameOverElement.style.position = 'fixed';
+    this.gameOverElement.style.top = '50%';
+    this.gameOverElement.style.left = '50%';
+    this.gameOverElement.style.transform = 'translate(-50%, -50%)';
+    this.gameOverElement.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    this.gameOverElement.style.color = 'white';
+    this.gameOverElement.style.padding = '30px 50px';
+    this.gameOverElement.style.borderRadius = '20px';
+    this.gameOverElement.style.fontSize = '32px';
+    this.gameOverElement.style.fontWeight = 'bold';
+    this.gameOverElement.style.textAlign = 'center';
+    this.gameOverElement.style.zIndex = '200';
+    this.gameOverElement.style.backdropFilter = 'blur(5px)';
+    this.gameOverElement.style.border = '2px solid rgba(255, 255, 255, 0.3)';
+    this.gameOverElement.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.5)';
+    this.gameOverElement.style.display = 'none';
+    this.gameOverElement.innerHTML = `
+      <div>💀 ИГРА ОКОНЧЕНА 💀</div>
+      <div style="font-size: 18px; margin-top: 20px; color: #ff6b6b;">Нажмите R для перезапуска</div>
+    `;
+    document.body.appendChild(this.gameOverElement);
+    
+    // Настройка обработчика нажатия клавиши R для перезапуска
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'r' || e.key === 'R') {
+        this.resetGame();
+      }
+    });
+    
+    // Подписка на события состояния игры
+    this.gameState.onGameOver(() => {
+      this.gameOverElement.style.display = 'block';
+      this.mouseControl.destroy(); // Отключаем управление при окончании игры
+    });
+    
+    this.gameState.onReset(() => {
+      this.gameOverElement.style.display = 'none';
+    });
+  }
+  
+  clearEnvironment() {
+    // Удаляем все объекты окружения из сцены
+    const scene = this.sceneManager.getScene();
+    
+    this.environmentObjects.forEach(obj => {
+      if (obj.parent) {
+        scene.remove(obj);
+      }
+    });
+    this.environmentObjects = [];
+    
+    // Удаляем старое дерево
+    if (this.tree && this.tree.mesh) {
+      scene.remove(this.tree.mesh);
+      this.tree = null;
+    }
+    
+    // Удаляем старый шарик
+    if (this.ball && this.ball.mesh) {
+      scene.remove(this.ball.mesh);
+      this.ball = null;
+    }
+    
+    // Освещение не удаляем, оно остается
+  }
+  
+  init() {
+    // Инициализация сцены
+    const scene = this.sceneManager.init();
+    
+    // Инициализация рендерера
+    this.rendererManager.init();
+    
+    // Инициализация камеры
+    this.cameraController = new CameraController(this.rendererManager.getAspectRatio());
+    
+    // Создание освещения (только один раз)
+    this.createLights(scene);
+    
+    // Создание игровых объектов
+    this.createGameObjects();
+    
+    // Запуск анимации
+    this.animate();
+    
+    // Настройка обработчика изменения размера окна
+    window.addEventListener('resize', this.onResize.bind(this));
+  }
+  
+  createGameObjects() {
+    const scene = this.sceneManager.getScene();
+    
+    // Создание дерева
+    this.tree = new Tree(scene);
+    this.tree.init();
+    
+    // Создание шарика
+    this.ball = new Ball(scene);
+    this.ball.init();
+    
+    // Инициализация физики
+    this.physics = new BallPhysics(this.ball, this.tree);
+    
+    // Инициализация управления мышью
+    if (this.mouseControl) {
+      this.mouseControl.destroy();
+    }
+    this.mouseControl = new MouseRotationControl(this.tree, this.container);
+    this.mouseControl.init();
+    
+    // Создание пола и базовой платформы
+    this.createEnvironment(scene);
+  }
+  
+  resetGame() {
+    // Очищаем старое окружение
+    this.clearEnvironment();
+    
+    // Создаем новые игровые объекты с новыми случайными платформами
+    this.createGameObjects();
+    
+    // Сброс камеры
+    this.cameraController.setPosition(2, CAMERA_START_Y, 9);
+    
+    // Сброс состояния игры
+    this.gameState.reset();
+    
+    // Включаем управление обратно
+    this.mouseControl.init();
+  }
+  
+  createLights(scene) {
+    // Очищаем старые источники света
+    this.lights.forEach(light => {
+      if (light.parent) {
+        scene.remove(light);
+      }
+    });
+    this.lights = [];
+    
+    const ambient = new THREE.AmbientLight(AMBIENT_LIGHT_COLOR, AMBIENT_LIGHT_INTENSITY);
+    scene.add(ambient);
+    this.lights.push(ambient);
+    
+    const keyLight = new THREE.DirectionalLight(KEY_LIGHT_COLOR, KEY_LIGHT_INTENSITY);
+    keyLight.position.set(4, 6, 5);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(1024, 1024);
+    keyLight.shadow.camera.near = 0.5;
+    keyLight.shadow.camera.far = 20;
+    keyLight.shadow.camera.left = -5;
+    keyLight.shadow.camera.right = 5;
+    keyLight.shadow.camera.top = 5;
+    keyLight.shadow.camera.bottom = -5;
+    keyLight.shadow.bias = -0.0001;
+    scene.add(keyLight);
+    this.lights.push(keyLight);
+    
+    const fillLight = new THREE.DirectionalLight(FILL_LIGHT_COLOR, FILL_LIGHT_INTENSITY);
+    fillLight.position.set(-3, 2, 3);
+    scene.add(fillLight);
+    this.lights.push(fillLight);
+    
+    const rimLight = new THREE.PointLight(RIM_LIGHT_COLOR, RIM_LIGHT_INTENSITY, RIM_LIGHT_DISTANCE);
+    rimLight.position.set(-2, -1, 4);
+    scene.add(rimLight);
+    this.lights.push(rimLight);
+  }
+  
+  createEnvironment(scene) {
+    // Пол
+    const floorGeometry = new THREE.CircleGeometry(6, 64);
+    const floorMaterial = new THREE.MeshStandardMaterial({
+      color: FLOOR_COLOR,
+      metalness: 0.1,
+      roughness: 0.8,
+    });
+    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -TREE_HEIGHT / 2 - 0.01;
+    floor.receiveShadow = true;
+    scene.add(floor);
+    this.environmentObjects.push(floor);
+    
+    // Базовая платформа
+    const basePlatformGeometry = new THREE.BoxGeometry(BASE_PLATFORM_SIZE, 0.15, BASE_PLATFORM_SIZE);
+    const basePlatformMaterial = new THREE.MeshStandardMaterial({
+      color: BASE_PLATFORM_COLOR,
+      metalness: 0.1,
+      roughness: 0.85,
+    });
+    const basePlatform = new THREE.Mesh(basePlatformGeometry, basePlatformMaterial);
+    basePlatform.position.set(0, -2.8, 0);
+    basePlatform.receiveShadow = true;
+    basePlatform.castShadow = true;
+    scene.add(basePlatform);
+    this.environmentObjects.push(basePlatform);
+  }
+  
+  onResize() {
+    this.rendererManager.resize();
+    this.cameraController.resize(this.rendererManager.getAspectRatio());
+  }
+  
+  updateBounceCounter() {
+    if (this.bounceCounterElement && this.ball) {
+      this.bounceCounterElement.textContent = `🔥 Отскоков: ${this.ball.getBounceCount()}`;
+    }
+  }
+  
+  checkGameOver() {
+    if (!this.gameState.isPlaying() || !this.ball) return;
+    
+    const ballPos = this.ball.getPosition();
+    const cameraY = this.cameraController.getCamera().position.y;
+    
+    // Если шарик упал ниже камеры на заданное смещение
+    if (ballPos.y < cameraY + GAME_OVER_Y_OFFSET) {
+      this.gameState.gameOver();
+    }
+  }
+  
+  animate() {
+    requestAnimationFrame(this.animate.bind(this));
+    
+    const time = performance.now();
+    const dt = (time - this.lastTime) / 1000;
+    this.lastTime = time;
+    
+    if (this.gameState.isPlaying() && this.ball && this.physics) {
+      // Обновление физики только если игра активна
+      this.physics.update(dt);
+      
+      // Обновление вращения мыши
+      if (this.mouseControl) {
+        this.mouseControl.update();
+      }
+      
+      // Проверка конца игры
+      this.checkGameOver();
+    }
+    
+    // Обновление камеры (всегда, чтобы камера не улетала)
+    if (this.ball) {
+      this.cameraController.update(this.ball.getLastBounceY());
+    }
+    
+    // Обновление счетчика отскоков
+    this.updateBounceCounter();
+    
+    // Рендеринг
+    if (this.sceneManager.getScene() && this.cameraController) {
+      this.rendererManager.render(this.sceneManager.getScene(), this.cameraController.getCamera());
+    }
+  }
+}
+
+// Запуск игры
+document.addEventListener('DOMContentLoaded', () => {
+  const game = new Game();
+  game.init();
+});
+
+
+# ============================================================
+# FILE: .\scripts\models\Ball.js
+# TYPE: .JS
+# ============================================================
+
+// scripts/models/Ball.js
+import * as THREE from 'three';
+import { BALL_RADIUS, BALL_COLOR, BASE_PLATFORM_TOP_Y, BOUNCE_SPEED, MAIN_RADIUS } from '../constants.js';
+
+export class Ball {
+  constructor(scene) {
+    this.scene = scene;
+    this.mesh = null;
+    this.velocity = new THREE.Vector3(0, BOUNCE_SPEED, 0);
+    this.lastBounceY = BASE_PLATFORM_TOP_Y;
+    this.bounceCount = 0;
+  }
+  
+  init() {
+    const geometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16);
+    const material = new THREE.MeshStandardMaterial({
+      color: BALL_COLOR,
+      metalness: 0.3,
+      roughness: 0.4,
+    });
+    
+    this.mesh = new THREE.Mesh(geometry, material);
+    this.mesh.position.set(0, BASE_PLATFORM_TOP_Y + BALL_RADIUS, MAIN_RADIUS * 1.3);
+    this.mesh.castShadow = true;
+    this.mesh.receiveShadow = true;
+    
+    this.scene.add(this.mesh);
+    return this.mesh;
+  }
+  
+  setPosition(x, y, z) {
+    this.mesh.position.set(x, y, z);
+  }
+  
+  getPosition() {
+    return this.mesh.position.clone();
+  }
+  
+  getWorldPosition() {
+    const pos = new THREE.Vector3();
+    this.mesh.getWorldPosition(pos);
+    return pos;
+  }
+  
+  setVelocity(y) {
+    this.velocity.y = y;
+  }
+  
+  getVelocity() {
+    return this.velocity.clone();
+  }
+  
+  applyGravity(dt, gravity) {
+    this.velocity.y += gravity * dt;
+  }
+  
+  limitVelocity(maxVelocity) {
+    this.velocity.y = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocity.y));
+  }
+  
+  updatePosition(dt) {
+    this.mesh.position.add(this.velocity.clone().multiplyScalar(dt));
+  }
+  
+  bounce(bounceY, bounceSpeed) {
+    this.mesh.position.y = bounceY + BALL_RADIUS * Math.sign(bounceSpeed);
+    this.velocity.y = bounceSpeed;
+    this.lastBounceY = bounceY;
+    this.bounceCount++;
+    return this.bounceCount;
+  }
+  
+  getLastBounceY() {
+    return this.lastBounceY;
+  }
+  
+  getBounceCount() {
+    return this.bounceCount;
+  }
+  
+  resetBounceCount() {
+    this.bounceCount = 0;
+  }
+}
+
+
+# ============================================================
+# FILE: .\scripts\models\Platform.js
+# TYPE: .JS
+# ============================================================
+
+// scripts/models/Platform.js
+import * as THREE from 'three';
+import { 
+  TREE_COLOR, STICK_OUT, PLATFORM_RADIUS, PLATFORM_HEIGHT, MAIN_RADIUS
+} from '../constants.js';
+
+export class Platform {
+  constructor(parentMesh, theta, y) {
+    this.parentMesh = parentMesh;
+    this.theta = theta;
+    this.y = y;
+    this.group = null;
+    this.box = null;
+    this.platformMesh = null;
+    
+    const boxWidth = STICK_OUT * 3;
+    const boxHeight = STICK_OUT * 0.6;
+    const boxDepth = STICK_OUT * 0.6;
+    
+    this.boxGeometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+    this.platformGeometry = new THREE.CylinderGeometry(PLATFORM_RADIUS, PLATFORM_RADIUS, PLATFORM_HEIGHT, 16);
+    
+    this.material = new THREE.MeshStandardMaterial({
+      color: TREE_COLOR,
+      metalness: 0.0,
+      roughness: 0.9,
+    });
+  }
+  
+  create() {
+    this.group = new THREE.Group();
+    this.group.position.set(MAIN_RADIUS * Math.cos(this.theta), this.y, MAIN_RADIUS * Math.sin(this.theta));
+    this.group.rotation.y = -this.theta;
+    
+    // Создание выступа (бокса)
+    this.box = new THREE.Mesh(this.boxGeometry, this.material);
+    this.box.position.set(-PLATFORM_RADIUS, 0, 0);
+    this.box.castShadow = true;
+    this.group.add(this.box);
+    
+    // Создание площадки
+    this.platformMesh = new THREE.Mesh(this.platformGeometry, this.material);
+    this.platformMesh.position.set(STICK_OUT, 0, 0);
+    this.platformMesh.castShadow = true;
+    this.group.add(this.platformMesh);
+    
+    this.parentMesh.add(this.group);
+    
+    return {
+      mesh: this.platformMesh,
+      group: this.group,
+      localY: this.y
+    };
+  }
+  
+  updateTexture(texture) {
+    if (texture) {
+      this.material.map = texture;
+      this.material.color.setHex(0xffffff);
+      this.material.needsUpdate = true;
+    }
+  }
+}
+
+
+# ============================================================
+# FILE: .\scripts\models\Tree.js
+# TYPE: .JS
+# ============================================================
+
+// scripts/models/Tree.js
+import * as THREE from 'three';
+import { 
+  TREE_COLOR, TREE_HEIGHT, MAIN_RADIUS, STICK_OUT, 
+  PLATFORM_RADIUS, PLATFORM_HEIGHT, PLATFORM_COUNT,
+  CYLINDER_HALF_HEIGHT, WIREFRAME_COLOR, BARK_TEXTURE_PATH
+} from '../constants.js';
+import { Platform } from './Platform.js';
+
+export class Tree {
+  constructor(scene) {
+    this.scene = scene;
+    this.mesh = null;
+    this.platforms = [];
+    this.textureLoader = new THREE.TextureLoader();
+    this.barkTexture = null;
+  }
+  
+  init() {
+    // Создание ствола
+    const cylinderGeometry = new THREE.CylinderGeometry(MAIN_RADIUS * 0.5, MAIN_RADIUS, TREE_HEIGHT, 32);
+    const cylinderMaterial = new THREE.MeshStandardMaterial({
+      color: TREE_COLOR,
+      metalness: 0.0,
+      roughness: 0.9,
+      envMapIntensity: 0,
+    });
+    
+    this.mesh = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
+    this.mesh.castShadow = true;
+    this.mesh.receiveShadow = true;
+    this.mesh.position.set(0, 0, 0);
+    
+    // Добавление подсветки граней
+    this.addWireframe(cylinderGeometry);
+    
+    // Загрузка текстуры
+    this.loadTexture(cylinderMaterial);
+    
+    // Создание платформ
+    this.createPlatforms();
+    
+    this.scene.add(this.mesh);
+    return this.mesh;
+  }
+  
+  addWireframe(geometry) {
+    const wireGeometry = new THREE.EdgesGeometry(geometry, 15);
+    const wireMaterial = new THREE.LineBasicMaterial({
+      color: WIREFRAME_COLOR,
+      transparent: true,
+      opacity: 0.35,
+    });
+    const wireframe = new THREE.LineSegments(wireGeometry, wireMaterial);
+    this.mesh.add(wireframe);
+  }
+  
+  loadTexture(material) {
+    this.textureLoader.load(
+      BARK_TEXTURE_PATH,
+      (tex) => {
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+        tex.repeat.set(2, TREE_HEIGHT / 1.5);
+        material.map = tex;
+        material.color.setHex(0xffffff);
+        material.needsUpdate = true;
+      },
+      undefined,
+      () => console.warn('Текстура не загружена: ' + BARK_TEXTURE_PATH)
+    );
+  }
+  
+  createPlatforms() {
+    // Очищаем массив платформ перед созданием новых
+    this.platforms = [];
+    
+    for (let i = 0; i < PLATFORM_COUNT; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const y = (i / PLATFORM_COUNT * 2 - 1) * CYLINDER_HALF_HEIGHT;
+      
+      const platform = new Platform(this.mesh, theta, y);
+      const platformData = platform.create();
+      this.platforms.push(platformData);
+    }
+  }
+  
+  getPlatforms() {
+    return this.platforms;
+  }
+  
+  rotate(yDelta) {
+    if (this.mesh) {
+      this.mesh.rotation.y += yDelta;
+    }
+  }
+  
+  setRotation(y) {
+    if (this.mesh) {
+      this.mesh.rotation.y = y;
+    }
+  }
+  
+  getRotationY() {
+    return this.mesh ? this.mesh.rotation.y : 0;
+  }
+}
+
+
+# ============================================================
+# FILE: .\scripts\physics\BallPhysics.js
+# TYPE: .JS
+# ============================================================
+
+// scripts/physics/BallPhysics.js
+import * as THREE from 'three';
+import { 
+  BALL_RADIUS, PLATFORM_RADIUS, PLATFORM_HEIGHT, 
+  BASE_PLATFORM_TOP_Y, GRAVITY, BOUNCE_SPEED, MAX_VELOCITY,
+  MAIN_RADIUS
+} from '../constants.js';
+
+export class BallPhysics {
+  constructor(ball, tree) {
+    this.ball = ball;
+    this.tree = tree;
+    this.gravity = GRAVITY;
+    this.bounceSpeed = BOUNCE_SPEED;
+    this.maxVelocity = MAX_VELOCITY;
+    this.baseBounceY = BASE_PLATFORM_TOP_Y;
+  }
+  
+  update(dt) {
+    // Применение гравитации
+    this.ball.applyGravity(dt, this.gravity);
+    this.ball.limitVelocity(this.maxVelocity);
+    this.ball.updatePosition(dt);
+    
+    // Проверка столкновения с базовой платформой
+    this.checkBasePlatformCollision();
+    
+    // Проверка столкновения с платформами на дереве
+    this.checkTreePlatformsCollision();
+  }
+  
+  checkBasePlatformCollision() {
+    const ballPos = this.ball.getPosition();
+    if (ballPos.y - BALL_RADIUS <= this.baseBounceY) {
+      this.ball.bounce(this.baseBounceY, this.bounceSpeed);
+    }
+  }
+  
+  checkTreePlatformsCollision() {
+    const ballPos = this.ball.getPosition();
+    const platforms = this.tree.getPlatforms();
+    
+    // Обновление мировой матрицы дерева
+    this.tree.mesh.updateMatrixWorld(true);
+    
+    for (const platformData of platforms) {
+      const worldPos = new THREE.Vector3();
+      platformData.mesh.getWorldPosition(worldPos);
+      const platformWorldY = worldPos.y;
+      const platformTop = platformWorldY + PLATFORM_HEIGHT / 2;
+      const platformBottom = platformWorldY - PLATFORM_HEIGHT / 2;
+      
+      const dx = ballPos.x - worldPos.x;
+      const dz = ballPos.z - worldPos.z;
+      const distance2D = Math.sqrt(dx * dx + dz * dz);
+      
+      // Проверка горизонтального расстояния
+      if (distance2D < PLATFORM_RADIUS + BALL_RADIUS) {
+        
+        // Проверка столкновения с ВЕРХНЕЙ поверхностью платформы
+        if (ballPos.y - BALL_RADIUS <= platformTop && 
+            ballPos.y + BALL_RADIUS >= platformTop &&
+            ballPos.y > platformTop &&
+            this.ball.velocity.y < 0) {
+          
+          // Отскок от верхней поверхности (летим вверх)
+          this.ball.bounce(platformTop, this.bounceSpeed);
+          break;
+        }
+        
+        // Проверка столкновения с НИЖНЕЙ поверхностью платформы
+        if (ballPos.y + BALL_RADIUS >= platformBottom && 
+            ballPos.y - BALL_RADIUS <= platformBottom &&
+            ballPos.y < platformBottom &&
+            this.ball.velocity.y > 0) {
+          
+          // Отскок от нижней поверхности - летим ВНИЗ (отрицательная скорость)
+          this.ball.bounce(platformBottom, -this.bounceSpeed);
+          break;
+        }
+      }
+    }
+  }
+  
+  setGravity(gravity) {
+    this.gravity = gravity;
+  }
+  
+  setBounceSpeed(speed) {
+    this.bounceSpeed = speed;
+  }
+}
+
+
+# ============================================================
+# FILE: .\scripts\utils\MathUtils.js
+# TYPE: .JS
+# ============================================================
+
+// scripts/utils/MathUtils.js
+
+export class MathUtils {
+  static clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+  
+  static lerp(start, end, amount) {
+    return start + (end - start) * amount;
+  }
+  
+  static randomRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+  
+  static degreesToRadians(degrees) {
+    return degrees * Math.PI / 180;
+  }
+  
+  static radiansToDegrees(radians) {
+    return radians * 180 / Math.PI;
+  }
+}
+
+

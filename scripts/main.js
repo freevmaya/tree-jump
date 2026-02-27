@@ -324,7 +324,7 @@ class Game {
     
     // Создание шарика
     this.ball = new Ball(scene);
-    this.ball.init();
+    this.ball.init(this.tree);
     
     // Инициализация физики с передачей gameState
     this.physics = new BallPhysics(this.ball, this.tree, this.gameState);
@@ -420,7 +420,7 @@ class Game {
   
   createEnvironment(scene) {
     // Пол
-    const floorGeometry = new THREE.CircleGeometry(6, 64);
+    const floorGeometry = new THREE.CircleGeometry(100, 64);
     const floorMaterial = new THREE.MeshStandardMaterial({
       color: FLOOR_COLOR,
       metalness: 0.1,

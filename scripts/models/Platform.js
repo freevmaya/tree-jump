@@ -20,7 +20,7 @@ export class Platform {
     const boxDepth = STICK_OUT * 0.6;
     
     this.boxGeometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
-    this.platformGeometry = new THREE.CylinderGeometry(PLATFORM_RADIUS, PLATFORM_RADIUS, PLATFORM_HEIGHT, 16);
+    this.platformGeometry = new THREE.CylinderGeometry(PLATFORM_RADIUS, PLATFORM_RADIUS * 0.6, PLATFORM_HEIGHT, 16);
     
     // Выбираем цвет в зависимости от типа платформы
     const platformColor = isKiller ? PLATFORM_KILLER_COLOR : PLATFORM_NORMAL_COLOR;
@@ -33,9 +33,9 @@ export class Platform {
     });
   }
   
-  create() {
+  create(distance) {
     this.group = new THREE.Group();
-    this.group.position.set(MAIN_RADIUS * Math.cos(this.theta), this.y, MAIN_RADIUS * Math.sin(this.theta));
+    this.group.position.set(distance * Math.cos(this.theta), this.y, distance * Math.sin(this.theta));
     this.group.rotation.y = -this.theta;
     
     // Создание выступа (бокса)

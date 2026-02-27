@@ -9,9 +9,13 @@ export class Ball {
     this.velocity = new THREE.Vector3(0, BOUNCE_SPEED, 0);
     this.lastBounceY = BASE_PLATFORM_TOP_Y;
     this.bounceCount = 0;
+    this.k_distance = 1.3;
+    this.tree = null;
   }
   
-  init() {
+  init(tree) {
+
+    this.tree = tree;
     const geometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16);
     const material = new THREE.MeshStandardMaterial({
       color: BALL_COLOR,
@@ -20,7 +24,7 @@ export class Ball {
     });
     
     this.mesh = new THREE.Mesh(geometry, material);
-    this.mesh.position.set(0, BASE_PLATFORM_TOP_Y + BALL_RADIUS, MAIN_RADIUS * 1.3);
+    this.mesh.position.set(0, BASE_PLATFORM_TOP_Y + BALL_RADIUS, this.tree.maxRadius * this.k_distance);
     this.mesh.castShadow = true;
     this.mesh.receiveShadow = true;
     
@@ -29,7 +33,7 @@ export class Ball {
   }
   
   setPosition(x, y, z) {
-    this.mesh.position.set(x, y, z);
+    this.mesh.position.set(x, y, this.tree.calcDistance(y) * this.k_distance);
   }
   
   getPosition() {
@@ -59,7 +63,8 @@ export class Ball {
   }
   
   updatePosition(dt) {
-    this.mesh.position.add(this.velocity.clone().multiplyScalar(dt));
+    let v = this.getPosition().add(this.velocity.clone().multiplyScalar(dt));
+    this.setPosition(v.x, v.y, v.z);
   }
   
   bounce(bounceY, bounceSpeed) {

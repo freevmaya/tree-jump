@@ -16,11 +16,13 @@ export class Tree {
     this.textureLoader = new THREE.TextureLoader();
     this.barkTexture = null;
     this.targetRotation = 0;
+    this.minRadius = MAIN_RADIUS * 0.5;
+    this.maxRadius = MAIN_RADIUS;
   }
   
   init() {
     // Создание ствола
-    const cylinderGeometry = new THREE.CylinderGeometry(MAIN_RADIUS * 0.5, MAIN_RADIUS, TREE_HEIGHT, 32);
+    const cylinderGeometry = new THREE.CylinderGeometry(this.minRadius, this.maxRadius, TREE_HEIGHT, 32);
     const cylinderMaterial = new THREE.MeshStandardMaterial({
       color: TREE_COLOR,
       metalness: 0.0,
@@ -72,6 +74,11 @@ export class Tree {
       () => console.warn('Текстура не загружена: ' + BARK_TEXTURE_PATH)
     );
   }
+
+  calcDistance(y) {
+    let k = (TREE_HEIGHT - (CYLINDER_HALF_HEIGHT + y)) / TREE_HEIGHT; 
+    return this.minRadius * (1 - k) + this.maxRadius * k;
+  }
   
   createPlatforms() {
     // Очищаем массив платформ перед созданием новых
@@ -100,10 +107,10 @@ export class Tree {
       const y = base_y + (i / PLATFORM_COUNT * 2 - 1) * (CYLINDER_HALF_HEIGHT - base_y);
 
       let theta = (Math.random() - 0.5)  * Math.PI * 2;
-      isKiller = platformTypes[i]; // Определяем тип платформы
+      isKiller = false;// platformTypes[i]; // Определяем тип платформы
 
       const platform = new Platform(this.mesh, theta, y, isKiller);
-      const platformData = platform.create();
+      const platformData = platform.create(this.calcDistance(y));
       this.platforms.push(platformData);
     }
     

@@ -1,10 +1,10 @@
 *Общая концепция для кодинга*
 
-Придерживайся объектно ориентированной концепции.
+Придерживайся объектно ориентированной концепции и событийной модели.
 Придерживаться изначальных именований классов, методов, функций, констант, переменных и не переименовывать при модификации.
-При модификации показывай весь код файла
 Если требуется создать отдельный класс и код его больше 100 строк, создавай его в отдельном файле
 Константы должны быть написаны в ВЕРХНЕМ РЕГИСТРЕ
+Важно: При модификации показывай весь код изменяемого файла!
 
 # COMBINED PROJECT FILES FOR DEEPSEEK
 # Encoding: UTF-8
@@ -28,6 +28,104 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <!-- Custom CSS -->
   <link rel="stylesheet" href="./styles/main.css">
+  
+  <!-- Дополнительные стили для новых модальных окон -->
+  <style>
+    /* Стили для модального окна победы */
+    .victory-modal {
+      background: linear-gradient(135deg, #1a5f7a, #157145);
+      color: #fff;
+    }
+    .victory-header {
+      border-bottom: 2px solid gold;
+    }
+    .victory-star {
+      animation: pulse 1.5s infinite;
+      display: inline-block;
+      margin: 0 5px;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .victory-stats .stat-value {
+      color: gold;
+      font-size: 2.5rem;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+    .victory-message {
+      color: #ffd700;
+      font-size: 1.2rem;
+      margin-top: 15px;
+    }
+    .victory-footer {
+      border-top: 1px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .pause-header {
+      border-bottom: 2px solid #3498db;
+    }
+    .pause-message {
+      color: #3498db;
+      font-size: 1.3rem;
+      margin: 20px 0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .pause-tree {
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    .pause-controls {
+      margin: 20px 0;
+      text-align: left;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 15px;
+      border-radius: 8px;
+    }
+    .pause-shortcut {
+      margin: 10px 0;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .key {
+      display: inline-block;
+      background: #2c3e50;
+      border: 2px solid #3498db;
+      color: #3498db;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-family: monospace;
+      font-weight: bold;
+      min-width: 60px;
+      text-align: center;
+    }
+    .btn-resume {
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 10px 30px;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+    }
+    .btn-resume:hover {
+      background: #2ecc71;
+      transform: scale(1.05);
+      color: white;
+    }
+    .pause-footer {
+      border-top: 1px solid #3498db;
+      gap: 10px;
+    }
+  </style>
 </head>
 <body>
   <!-- Основной контейнер игры -->
@@ -110,6 +208,87 @@
     </div>
   </div>
 
+  <!-- Bootstrap модальное окно для Victory (Победа) -->
+  <div class="modal fade" id="victoryModal" tabindex="-1" aria-labelledby="victoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content victory-modal">
+        <div class="modal-header victory-header">
+          <h5 class="modal-title" id="victoryModalLabel">
+            <i class="bi bi-trophy-fill"></i> ПОБЕДА!
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <i class="bi bi-star-fill victory-star" style="font-size: 4rem; color: gold; margin-bottom: 20px;"></i>
+          <i class="bi bi-star-fill victory-star" style="font-size: 3rem; color: gold; margin-bottom: 20px;"></i>
+          <i class="bi bi-star-fill victory-star" style="font-size: 4rem; color: gold; margin-bottom: 20px;"></i>
+          
+          <!-- Статистика игры -->
+          <div class="stats-container victory-stats">
+            <div class="row">
+              <div class="col-6">
+                <div class="stat-value" id="victoryBounceCount">0</div>
+                <div class="stat-label">Отскоков</div>
+              </div>
+              <div class="col-6">
+                <div class="stat-value" id="victoryHeight">0</div>
+                <div class="stat-label">Высота</div>
+              </div>
+            </div>
+          </div>
+          
+          <p class="modal-subtitle victory-message">
+            <i class="bi bi-emoji-sunglasses"></i> Вы достигли вершины дерева!
+          </p>
+          <p class="modal-subtitle">
+            <i class="bi bi-arrow-up-circle"></i> Нажмите R для новой игры
+          </p>
+        </div>
+        <div class="modal-footer justify-content-center victory-footer">
+          <button type="button" class="btn btn-restart" id="victoryRestartButton">
+            <i class="bi bi-arrow-repeat"></i> Новая игра
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap модальное окно для Pause (Пауза) -->
+  <div class="modal fade" id="pauseModal" tabindex="-1" aria-labelledby="pauseModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content pause-modal">
+        <div class="modal-header pause-header">
+          <h5 class="modal-title" id="pauseModalLabel">
+            <i class="bi bi-pause-circle-fill"></i> ПАУЗА
+          </h5>
+        </div>
+        <div class="modal-body text-center">
+          
+          <p class="modal-subtitle pause-message">
+            Игра приостановлена
+          </p>
+          
+          <div class="pause-controls">
+            <div class="pause-shortcut">
+              <span class="key">ESC</span> - продолжить игру
+            </div>
+            <div class="pause-shortcut">
+              <span class="key">R</span> - начать заново
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center pause-footer">
+          <button type="button" class="btn btn-resume" id="resumeButton">
+            <i class="bi bi-play-fill"></i> Продолжить
+          </button>
+          <button type="button" class="btn btn-restart" id="pauseRestartButton">
+            <i class="bi bi-arrow-repeat"></i> Новая игра
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Подключаем Bootstrap JS глобально -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
@@ -139,13 +318,18 @@
 
 export const GAME_STATE = {
   PLAYING: 'playing',
-  GAME_OVER: 'gameOver'
+  PAUSED: 'paused',
+  GAME_OVER: 'gameOver',
+  VICTORY: 'victory'
 };
 
 export class GameState {
   constructor() {
     this.state = GAME_STATE.PLAYING;
-    this.gameOverCallbacks = [];
+    this._gameOverCallbacks = [];
+    this._victoryCallbacks = [];
+    this.pauseCallbacks = [];
+    this.resumeCallbacks = [];
     this.resetCallbacks = [];
   }
   
@@ -153,15 +337,47 @@ export class GameState {
     return this.state === GAME_STATE.PLAYING;
   }
   
+  isPaused() {
+    return this.state === GAME_STATE.PAUSED;
+  }
+  
   isGameOver() {
     return this.state === GAME_STATE.GAME_OVER;
   }
   
+  isVictory() {
+    return this.state === GAME_STATE.VICTORY;
+  }
+  
   gameOver() {
-    if (this.state !== GAME_STATE.GAME_OVER) {
+    if (this.state !== GAME_STATE.GAME_OVER && this.state !== GAME_STATE.VICTORY) {
       this.state = GAME_STATE.GAME_OVER;
-      console.log("GameState.gameOver() вызван, колбэков:", this.gameOverCallbacks.length);
-      this.gameOverCallbacks.forEach(callback => callback());
+      console.log("GameState.gameOver() вызван, колбэков:", this._gameOverCallbacks.length);
+      this._gameOverCallbacks.forEach(callback => callback());
+    }
+  }
+  
+  victory() {
+    if (this.state !== GAME_STATE.VICTORY && this.state !== GAME_STATE.GAME_OVER) {
+      this.state = GAME_STATE.VICTORY;
+      console.log("GameState.victory() вызван, колбэков:", this._victoryCallbacks.length);
+      this._victoryCallbacks.forEach(callback => callback());
+    }
+  }
+  
+  pause() {
+    if (this.state === GAME_STATE.PLAYING) {
+      this.state = GAME_STATE.PAUSED;
+      console.log("GameState.pause() вызван, колбэков:", this.pauseCallbacks.length);
+      this.pauseCallbacks.forEach(callback => callback());
+    }
+  }
+  
+  resume() {
+    if (this.state === GAME_STATE.PAUSED) {
+      this.state = GAME_STATE.PLAYING;
+      console.log("GameState.resume() вызван, колбэков:", this.resumeCallbacks.length);
+      this.resumeCallbacks.forEach(callback => callback());
     }
   }
   
@@ -172,7 +388,19 @@ export class GameState {
   }
   
   onGameOver(callback) {
-    this.gameOverCallbacks.push(callback);
+    this._gameOverCallbacks.push(callback);
+  }
+  
+  onVictory(callback) {
+    this._victoryCallbacks.push(callback);
+  }
+  
+  onPause(callback) {
+    this.pauseCallbacks.push(callback);
+  }
+  
+  onResume(callback) {
+    this.resumeCallbacks.push(callback);
   }
   
   onReset(callback) {
@@ -191,7 +419,7 @@ export class GameState {
 // ========== КОНСТАНТЫ ==========
 // Дерево
 export const TREE_COLOR = 0xA67C52;
-export const TREE_HEIGHT = 70;
+export const TREE_HEIGHT = 30;
 export const TEXTURE_SCALE_Y = 1.5;
 export const MAIN_RADIUS = 1;
 export const MAIN_DIAMETER = MAIN_RADIUS * 2;
@@ -206,7 +434,7 @@ export const PLATFORM_COUNT = Math.floor(TREE_HEIGHT * PLATFORM_DENSITY);
 
 // Базовая платформа
 export const BASE_PLATFORM_SIZE = 20;
-export const BASE_PLATFORM_TOP_Y = -2.8 + 0.075;
+export const BASE_PLATFORM_TOP_Y = -CYLINDER_HALF_HEIGHT;
 
 // Шарик
 export const BALL_RADIUS = 0.15;
@@ -219,15 +447,15 @@ export const MAX_VELOCITY = 15;
 // Камера
 export const CAMERA_FOLLOW_SPEED = 0.06;
 export const CAMERA_HEIGHT_OFFSET = 2.8;
-export const CAMERA_START_Y = 0;
+export const CAMERA_START_Y = -CYLINDER_HALF_HEIGHT;
 
 // Управление мышью
-export const ROTATION_SPEED = 0.05;
+export const ROTATION_SPEED = 0.03;
 export const ROTATION_SMOOTH = 0.5;
 export const INERTIA = 0.92;
 
 // Цвета
-export const FLOOR_COLOR = 0x1e1b2e;
+export const FLOOR_COLOR = 0x4a5568;
 export const BASE_PLATFORM_COLOR = 0x4a5568;
 export const BALL_COLOR = 0xff6b6b;
 export const AMBIENT_LIGHT_COLOR = 0x404080;
@@ -279,7 +507,7 @@ export class JoystickControl {
     this.startX = 0;
     this.currentX = 0;
     this.normalizedDirect = 0;
-    this.rotationSpeed = ROTATION_SPEED * 2; // Увеличим скорость для джойстика
+    this.rotationSpeed = ROTATION_SPEED * 3; // Увеличим скорость для джойстика
     this.inertia = INERTIA;
     
     // Границы движения джойстика
@@ -749,44 +977,29 @@ class Game {
     this.environmentObjects = [];
     this.lights = [];
     
-    // Инициализация Bootstrap модального окна
-    this.initGameOverModal();
+    // Инициализация Bootstrap модальных окон
+    this.initModals();
   }
   
-  initGameOverModal() {
-    // Получаем элемент модального окна
-    this.gameOverModalElement = document.getElementById('gameOverModal');
+  initModals() {
+    this.initGameOverModal();
+    this.initVictoryModal();
+    this.initPauseModal();
     
-    if (this.gameOverModalElement && bootstrap) {
-      // Создаем экземпляр Bootstrap модального окна
-      this.gameOverModal = new bootstrap.Modal(this.gameOverModalElement, {
-        backdrop: 'static', // Запрещаем закрытие по клику вне модального окна
-        keyboard: false // Запрещаем закрытие по ESC
-      });
-      
-      // Обработчик для кнопки рестарта
-      const restartBtn = document.getElementById('restartButton');
-      if (restartBtn) {
-        restartBtn.addEventListener('click', () => {
-          this.resetGame();
-        });
-      }
-      
-      // Обработчик для закрытия модального окна (если пользователь нажмет X)
-      this.gameOverModalElement.addEventListener('hidden.bs.modal', () => {
-        // Если игра закончена и модальное окно закрыли, но не через рестарт
-        if (this.gameState.isGameOver()) {
-          this.resetGame();
-        }
-      });
-    } else {
-      console.warn('Bootstrap модальное окно не найдено или Bootstrap не загружен');
-    }
-    
-    // Настройка обработчика нажатия клавиши R для перезапуска
+    // Настройка обработчика нажатия клавиш
     window.addEventListener('keydown', (e) => {
+      // Перезапуск по клавише R (в любом состоянии)
       if (e.key === 'r' || e.key === 'R') {
         this.resetGame();
+      }
+      
+      // Пауза по ESC (только если игра активна и не на паузе)
+      if (e.key === 'Escape') {
+        if (this.gameState.isPlaying()) {
+          this.gameState.pause();
+        } else if (this.gameState.isPaused()) {
+          this.gameState.resume();
+        }
       }
     });
     
@@ -795,10 +1008,43 @@ class Game {
       console.log("Game Over callback вызван");
       this.showGameOverModal();
       if (this.mouseControl) {
-        this.mouseControl.destroy(); // Отключаем управление при окончании игры
+        this.mouseControl.destroy();
       }
       if (this.joystickControl) {
-        this.joystickControl.destroy(); // Отключаем джойстик
+        this.joystickControl.destroy();
+      }
+    });
+    
+    this.gameState.onVictory(() => {
+      console.log("Victory callback вызван");
+      this.showVictoryModal();
+      if (this.mouseControl) {
+        this.mouseControl.destroy();
+      }
+      if (this.joystickControl) {
+        this.joystickControl.destroy();
+      }
+    });
+    
+    this.gameState.onPause(() => {
+      console.log("Pause callback вызван");
+      this.showPauseModal();
+      if (this.mouseControl) {
+        this.mouseControl.destroy();
+      }
+      if (this.joystickControl) {
+        this.joystickControl.destroy();
+      }
+    });
+    
+    this.gameState.onResume(() => {
+      console.log("Resume callback вызван");
+      this.hidePauseModal();
+      if (this.mouseControl) {
+        this.mouseControl.init();
+      }
+      if (this.joystickControl) {
+        // Джойстик не нужно реинициализировать, он сам восстанавливается
       }
     });
     
@@ -807,7 +1053,98 @@ class Game {
       if (this.gameOverModal) {
         this.gameOverModal.hide();
       }
+      if (this.victoryModal) {
+        this.victoryModal.hide();
+      }
+      if (this.pauseModal) {
+        this.pauseModal.hide();
+      }
     });
+  }
+  
+  initGameOverModal() {
+    // Получаем элемент модального окна Game Over
+    this.gameOverModalElement = document.getElementById('gameOverModal');
+    
+    if (this.gameOverModalElement && bootstrap) {
+      // Создаем экземпляр Bootstrap модального окна
+      this.gameOverModal = new bootstrap.Modal(this.gameOverModalElement, {
+        backdrop: 'static',
+        keyboard: false
+      });
+      
+      // Обработчик для кнопки рестарта в Game Over
+      const restartBtn = document.getElementById('restartButton');
+      if (restartBtn) {
+        restartBtn.addEventListener('click', () => {
+          this.resetGame();
+        });
+      }
+      
+      // Обработчик для закрытия модального окна
+      this.gameOverModalElement.addEventListener('hidden.bs.modal', () => {
+        if (this.gameState.isGameOver()) {
+          this.resetGame();
+        }
+      });
+    }
+  }
+  
+  initVictoryModal() {
+    // Получаем элемент модального окна Victory
+    this.victoryModalElement = document.getElementById('victoryModal');
+    
+    if (this.victoryModalElement && bootstrap) {
+      // Создаем экземпляр Bootstrap модального окна
+      this.victoryModal = new bootstrap.Modal(this.victoryModalElement, {
+        backdrop: 'static',
+        keyboard: false
+      });
+      
+      // Обработчик для кнопки рестарта в Victory
+      const victoryRestartBtn = document.getElementById('victoryRestartButton');
+      if (victoryRestartBtn) {
+        victoryRestartBtn.addEventListener('click', () => {
+          this.resetGame();
+        });
+      }
+      
+      // Обработчик для закрытия модального окна
+      this.victoryModalElement.addEventListener('hidden.bs.modal', () => {
+        if (this.gameState.isVictory()) {
+          this.resetGame();
+        }
+      });
+    }
+  }
+  
+  initPauseModal() {
+    // Получаем элемент модального окна Pause
+    this.pauseModalElement = document.getElementById('pauseModal');
+    
+    if (this.pauseModalElement && bootstrap) {
+      // Создаем экземпляр Bootstrap модального окна
+      this.pauseModal = new bootstrap.Modal(this.pauseModalElement, {
+        backdrop: 'static',
+        keyboard: false
+      });
+      
+      // Обработчик для кнопки продолжения
+      const resumeBtn = document.getElementById('resumeButton');
+      if (resumeBtn) {
+        resumeBtn.addEventListener('click', () => {
+          this.gameState.resume();
+        });
+      }
+      
+      // Обработчик для кнопки рестарта в паузе
+      const pauseRestartBtn = document.getElementById('pauseRestartButton');
+      if (pauseRestartBtn) {
+        pauseRestartBtn.addEventListener('click', () => {
+          this.resetGame();
+        });
+      }
+    }
   }
   
   showGameOverModal() {
@@ -827,6 +1164,38 @@ class Game {
     // Показываем модальное окно
     if (this.gameOverModal) {
       this.gameOverModal.show();
+    }
+  }
+  
+  showVictoryModal() {
+    // Обновляем статистику в модальном окне победы
+    const victoryBounceElement = document.getElementById('victoryBounceCount');
+    const victoryHeightElement = document.getElementById('victoryHeight');
+    
+    if (victoryBounceElement && this.ball) {
+      victoryBounceElement.textContent = this.ball.getBounceCount();
+    }
+    
+    if (victoryHeightElement && this.ball) {
+      const ballPos = this.ball.getPosition();
+      victoryHeightElement.textContent = ballPos.y.toFixed(1) + 'м';
+    }
+    
+    // Показываем модальное окно
+    if (this.victoryModal) {
+      this.victoryModal.show();
+    }
+  }
+  
+  showPauseModal() {
+    if (this.pauseModal) {
+      this.pauseModal.show();
+    }
+  }
+  
+  hidePauseModal() {
+    if (this.pauseModal) {
+      this.pauseModal.hide();
     }
   }
   
@@ -958,16 +1327,16 @@ class Game {
     this.lights.push(ambient);
     
     const keyLight = new THREE.DirectionalLight(KEY_LIGHT_COLOR, KEY_LIGHT_INTENSITY);
-    keyLight.position.set(4, 6, 5);
+    keyLight.position.set(20, 20, 20);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.set(1024, 1024);
     keyLight.shadow.camera.near = 0.5;
-    keyLight.shadow.camera.far = 20;
-    keyLight.shadow.camera.left = -5;
-    keyLight.shadow.camera.right = 5;
-    keyLight.shadow.camera.top = 5;
-    keyLight.shadow.camera.bottom = -5;
-    keyLight.shadow.bias = -0.0001;
+    keyLight.shadow.camera.far = 1000;
+    keyLight.shadow.camera.left = -20;
+    keyLight.shadow.camera.right = 20;
+    keyLight.shadow.camera.top = 20;
+    keyLight.shadow.camera.bottom = -20;
+    keyLight.shadow.bias = 0;
     scene.add(keyLight);
     this.lights.push(keyLight);
     
@@ -992,24 +1361,26 @@ class Game {
     });
     const floor = new THREE.Mesh(floorGeometry, floorMaterial);
     floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -TREE_HEIGHT / 2 - 0.01;
+    floor.position.y = -TREE_HEIGHT / 2;
     floor.receiveShadow = true;
     scene.add(floor);
     this.environmentObjects.push(floor);
+
     
+    /*
     // Базовая платформа
-    const basePlatformGeometry = new THREE.BoxGeometry(BASE_PLATFORM_SIZE, 0.15, BASE_PLATFORM_SIZE);
+    const basePlatformGeometry = new THREE.BoxGeometry(BASE_PLATFORM_SIZE, 0.01, BASE_PLATFORM_SIZE);
     const basePlatformMaterial = new THREE.MeshStandardMaterial({
       color: BASE_PLATFORM_COLOR,
       metalness: 0.1,
       roughness: 0.85,
     });
     const basePlatform = new THREE.Mesh(basePlatformGeometry, basePlatformMaterial);
-    basePlatform.position.set(0, -2.8, 0);
+    basePlatform.position.set(0, -TREE_HEIGHT / 2, 0);
     basePlatform.receiveShadow = true;
     basePlatform.castShadow = true;
     scene.add(basePlatform);
-    this.environmentObjects.push(basePlatform);
+    this.environmentObjects.push(basePlatform);*/
   }
   
   onResize() {
@@ -1043,8 +1414,8 @@ class Game {
     const dt = (time - this.lastTime) / 1000;
     this.lastTime = time;
     
+    // Обновление физики только если игра активна (не на паузе и не закончена)
     if (this.gameState.isPlaying() && this.ball && this.physics) {
-      // Обновление физики только если игра активна
       this.tree.update();
       this.physics.update(dt);
       
@@ -1060,6 +1431,15 @@ class Game {
       
       // Проверка конца игры
       this.checkGameOver();
+    } else if (this.gameState.isPaused()) {
+      // На паузе ничего не обновляем, но дерево может продолжать вращаться по инерции?
+      // Для чистоты эксперимента - останавливаем всё
+      if (this.mouseControl) {
+        this.mouseControl.velocityY = 0;
+      }
+      if (this.joystickControl) {
+        this.joystickControl.normalizedDirect = 0;
+      }
     }
     
     // Обновление камеры (всегда, чтобы камера не улетала)
@@ -1070,7 +1450,7 @@ class Game {
     // Обновление счетчика отскоков
     this.updateBounceCounter();
     
-    // Рендеринг
+    // Рендеринг (всегда, чтобы видеть паузу)
     if (this.sceneManager.getScene() && this.cameraController) {
       this.rendererManager.render(this.sceneManager.getScene(), this.cameraController.getCamera());
     }
@@ -1265,7 +1645,7 @@ export class Platform {
       const angle = (i / spikeCount) * Math.PI * 2;
       
       // Создаем конус (пирамидку) для шипа
-      const spikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.2, spikeHeight, 8);
+      const spikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.1, spikeHeight, 8);
       const spike = new THREE.Mesh(spikeGeometry, spikeMaterial);
       
       // Позиционируем шип на краю платформы
@@ -1282,7 +1662,7 @@ export class Platform {
     }
     
     // Добавляем один центральный шип для большей угрозы
-    const centerSpikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.25, spikeHeight * 1.2, 8);
+    const centerSpikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.1, spikeHeight * 1.2, 8);
     const centerSpike = new THREE.Mesh(centerSpikeGeometry, spikeMaterial);
     centerSpike.position.set(STICK_OUT, PLATFORM_HEIGHT / 2 + spikeHeight * 1.2 / 2, 0);
     centerSpike.castShadow = true;
@@ -1417,12 +1797,16 @@ export class Tree {
       platformTypes[randomIndex] = true;
     }
     
+    let base_y = CYLINDER_HALF_HEIGHT / PLATFORM_COUNT;
     // Создаем платформы с соответствующими типами
     for (let i = 0; i < PLATFORM_COUNT; i++) {
-      const theta = -Math.sin(i / PLATFORM_COUNT * 8) * Math.PI * 2;
-      const y = (i / PLATFORM_COUNT * 2 - 1) * CYLINDER_HALF_HEIGHT;
-      
-      const isKiller = platformTypes[i]; // Определяем тип платформы
+
+      let isKiller = false;
+      const y = base_y + (i / PLATFORM_COUNT * 2 - 1) * (CYLINDER_HALF_HEIGHT - base_y);
+
+      let theta = (Math.random() - 0.5)  * Math.PI * 2;
+      isKiller = platformTypes[i]; // Определяем тип платформы
+
       const platform = new Platform(this.mesh, theta, y, isKiller);
       const platformData = platform.create();
       this.platforms.push(platformData);
@@ -1467,7 +1851,7 @@ import * as THREE from 'three';
 import { 
   BALL_RADIUS, PLATFORM_RADIUS, PLATFORM_HEIGHT, 
   BASE_PLATFORM_TOP_Y, GRAVITY, BOUNCE_SPEED, MAX_VELOCITY,
-  MAIN_RADIUS
+  MAIN_RADIUS, TREE_HEIGHT, CYLINDER_HALF_HEIGHT
 } from '../constants.js';
 // Импортируем GameState для проверки состояния (опционально)
 import { GameState, GAME_STATE } from '../GameState.js';
@@ -1480,7 +1864,7 @@ export class BallPhysics {
     this.gravity = GRAVITY;
     this.bounceSpeed = BOUNCE_SPEED;
     this.maxVelocity = MAX_VELOCITY;
-    this.baseBounceY = BASE_PLATFORM_TOP_Y;
+    this.baseBounceY = -TREE_HEIGHT / 2;
   }
   
   update(dt) {
@@ -1510,6 +1894,20 @@ export class BallPhysics {
     // Обновление мировой матрицы дерева
     this.tree.mesh.updateMatrixWorld(true);
     
+    // Находим самую верхнюю платформу
+    let highestPlatform = null;
+    let highestY = -Infinity;
+    
+    for (const platformData of platforms) {
+      const worldPos = new THREE.Vector3();
+      platformData.mesh.getWorldPosition(worldPos);
+      
+      if (worldPos.y > highestY) {
+        highestY = worldPos.y;
+        highestPlatform = platformData;
+      }
+    }
+    
     for (const platformData of platforms) {
       const worldPos = new THREE.Vector3();
       platformData.mesh.getWorldPosition(worldPos);
@@ -1529,6 +1927,13 @@ export class BallPhysics {
             ballPos.y + BALL_RADIUS >= platformTop &&
             ballPos.y > platformTop &&
             this.ball.velocity.y < 0) {
+          
+          // Проверка на ПОБЕДУ: если это самая верхняя платформа
+          if (platformData === highestPlatform) {
+            console.log("ПОБЕДА! Достигнута верхняя платформа!");
+            this.gameState.victory();
+            return;
+          }
           
           // Если это платформа-убийца - заканчиваем игру (ТОЛЬКО ПРИ УДАРЕ СВЕРХУ)
           if (platformData.isKiller) {

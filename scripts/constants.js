@@ -10,8 +10,8 @@ export const MAIN_DIAMETER = MAIN_RADIUS * 2;
 
 // Выступы и площадки на дереве
 export const STICK_OUT = 0.1 * MAIN_DIAMETER;
-export const PLATFORM_RADIUS = MAIN_DIAMETER * 0.4 / 2;
-export const PLATFORM_HEIGHT = 0.02 * MAIN_DIAMETER;
+export const PLATFORM_RADIUS = 0.5;
+export const PLATFORM_HEIGHT = 0.4;
 export const CYLINDER_HALF_HEIGHT = TREE_HEIGHT / 2;
 export const PLATFORM_DENSITY = 0.8;
 export const PLATFORM_COUNT = Math.floor(TREE_HEIGHT * PLATFORM_DENSITY);
@@ -39,7 +39,7 @@ export const ROTATION_SMOOTH = 0.5;
 export const INERTIA = 0.92;
 
 // Цвета
-export const FLOOR_COLOR = 0x4a5568;
+export const FLOOR_COLOR = 0x332211;
 export const BASE_PLATFORM_COLOR = 0x4a5568;
 export const BALL_COLOR = 0xff6b6b;
 export const AMBIENT_LIGHT_COLOR = 0x404080;
@@ -47,6 +47,7 @@ export const KEY_LIGHT_COLOR = 0xffffff;
 export const FILL_LIGHT_COLOR = 0x6366f1;
 export const RIM_LIGHT_COLOR = 0x818cf8;
 export const WIREFRAME_COLOR = 0xC4956A;
+export const BACKGROUND_COLOR = 0x113344;
 
 // Свет
 export const AMBIENT_LIGHT_INTENSITY = 0.5;

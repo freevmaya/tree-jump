@@ -1,11 +1,15 @@
 // scripts/core/SceneManager.js
 import * as THREE from 'three';
 
+import { 
+  BACKGROUND_COLOR
+} from '../constants.js';
+
 export class SceneManager {
   constructor() {
     this.scene = null;
-    this.fogColor = 0xB0E0E6;
-    this.backgroundColor = 0x87CEEB;
+    this.fogColor = BACKGROUND_COLOR;
+    this.backgroundColor = BACKGROUND_COLOR;
   }
   
   init() {

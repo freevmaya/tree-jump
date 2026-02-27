@@ -11,9 +11,9 @@ export const MAIN_DIAMETER = MAIN_RADIUS * 2;
 // Выступы и площадки на дереве
 export const STICK_OUT = 0.1 * MAIN_DIAMETER;
 export const PLATFORM_RADIUS = 0.5;
-export const PLATFORM_HEIGHT = 0.4;
+export const PLATFORM_HEIGHT = 0.2;
 export const CYLINDER_HALF_HEIGHT = TREE_HEIGHT / 2;
-export const PLATFORM_DENSITY = 0.8;
+export const PLATFORM_DENSITY = 0.6;
 export const PLATFORM_COUNT = Math.floor(TREE_HEIGHT * PLATFORM_DENSITY);
 
 // Базовая платформа
@@ -58,6 +58,8 @@ export const RIM_LIGHT_DISTANCE = 12;
 
 // Пути к текстурам
 export const BARK_TEXTURE_PATH = 'textures/bark.jpg';
+export const PLATFORM_TEXTURE_PATH = 'textures/platform.jpg';
+export const KILLER_PLATFORM_TEXTURE_PATH = 'textures/killer_platform.jpg';
 
 // Игровые параметры
 export const GAME_OVER_Y_OFFSET = -5; // Смещение относительно камеры для конца игры
@@ -71,4 +73,4 @@ export const PLATFORM_NORMAL_COLOR = 0xA67C52; // Используем суще�
 export const PLATFORM_KILLER_COLOR = 0xFF3333; // Ярко-красный для платформ-убийц
 
 // Процент платформ-убийц
-export const KILLER_PLATFORM_PERCENTAGE = 0.1; // 20%
+export const KILLER_PLATFORM_PERCENTAGE = 0.1; // 10%

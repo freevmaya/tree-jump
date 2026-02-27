@@ -7,13 +7,13 @@ import {
   KILLER_PLATFORM_PERCENTAGE, ROTATION_SMOOTH
 } from '../constants.js';
 import { Platform } from './Platform.js';
+import { textureLoader } from '../utils/TextureLoader.js';
 
 export class Tree {
   constructor(scene) {
     this.scene = scene;
     this.mesh = null;
     this.platforms = [];
-    this.textureLoader = new THREE.TextureLoader();
     this.barkTexture = null;
     this.targetRotation = 0;
     this.minRadius = MAIN_RADIUS * 0.5;
@@ -38,7 +38,7 @@ export class Tree {
     // Добавление подсветки граней
     this.addWireframe(cylinderGeometry);
     
-    // Загрузка текстуры
+    // Загрузка текстуры с помощью утилиты
     this.loadTexture(cylinderMaterial);
     
     // Создание платформ
@@ -60,18 +60,28 @@ export class Tree {
   }
   
   loadTexture(material) {
-    this.textureLoader.load(
+    // Используем утилиту для загрузки текстуры
+    textureLoader.loadTexture(
       BARK_TEXTURE_PATH,
-      (tex) => {
-        tex.colorSpace = THREE.SRGBColorSpace;
-        tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-        tex.repeat.set(2, TREE_HEIGHT / 1.5);
-        material.map = tex;
+      (texture) => {
+        // Настройки текстуры для дерева
+        texture.repeat.set(2, TREE_HEIGHT / 1.5);
+        material.map = texture;
         material.color.setHex(0xffffff);
         material.needsUpdate = true;
+        this.barkTexture = texture;
       },
-      undefined,
-      () => console.warn('Текстура не загружена: ' + BARK_TEXTURE_PATH)
+      (error) => {
+        console.warn('Текстура не загружена: ' + BARK_TEXTURE_PATH);
+        // Создаем текстуру-заглушку
+        const fallbackTexture = textureLoader.createFallbackTexture(0xA67C52);
+        material.map = fallbackTexture;
+        material.needsUpdate = true;
+      },
+      {
+        repeat: { x: 2, y: TREE_HEIGHT / 1.5 },
+        anisotropy: 16
+      }
     );
   }
 
@@ -84,7 +94,7 @@ export class Tree {
     // Очищаем массив платформ перед созданием новых
     this.platforms = [];
     
-    // Рассчитываем количество платформ-убийц (20%)
+    // Рассчитываем количество платформ-убийц (10% согласно константе)
     const killerCount = Math.floor(PLATFORM_COUNT * KILLER_PLATFORM_PERCENTAGE);
     
     // Создаем массив булевых значений для определения типа каждой платформы
@@ -102,19 +112,17 @@ export class Tree {
     let base_y = CYLINDER_HALF_HEIGHT / PLATFORM_COUNT;
     // Создаем платформы с соответствующими типами
     for (let i = 0; i < PLATFORM_COUNT; i++) {
-
-      let isKiller = false;
       const y = base_y + (i / PLATFORM_COUNT * 2 - 1) * (CYLINDER_HALF_HEIGHT - base_y);
-
       let theta = (Math.random() - 0.5)  * Math.PI * 2;
-      isKiller = false;// platformTypes[i]; // Определяем тип платформы
+      const isKiller = platformTypes[i]; // Используем реальные типы
 
       const platform = new Platform(this.mesh, theta, y, isKiller);
       const platformData = platform.create(this.calcDistance(y));
+      
       this.platforms.push(platformData);
     }
     
-    console.log(`Создано платформ: всего ${PLATFORM_COUNT}, убийц: ${killerCount}`); // Для отладки
+    console.log(`Создано платформ: всего ${PLATFORM_COUNT}, убийц: ${killerCount}`);
   }
   
   getPlatforms() {

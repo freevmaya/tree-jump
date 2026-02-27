@@ -1,11 +1,11 @@
 // scripts/models/Skybox.js
 import * as THREE from 'three';
+import { textureLoader } from '../utils/TextureLoader.js';
 
 export class Skybox {
   constructor(scene) {
     this.scene = scene;
     this.skybox = null;
-    this.textureLoader = new THREE.CubeTextureLoader();
   }
 
   init() {
@@ -20,11 +20,15 @@ export class Skybox {
       'textures/skybox/back.jpg'     // зад
     ];
 
-    // Загружаем кубическую текстуру
-    const cubeTexture = this.textureLoader.load(
+    // Используем CubeTextureLoader для загрузки всех текстур
+    const cubeTextureLoader = new THREE.CubeTextureLoader();
+    
+    cubeTextureLoader.load(
       textures,
-      () => {
+      (cubeTexture) => {
         console.log('Skybox текстуры успешно загружены');
+        cubeTexture.colorSpace = THREE.SRGBColorSpace;
+        this.scene.background = cubeTexture;
       },
       undefined,
       (error) => {
@@ -33,12 +37,8 @@ export class Skybox {
         this.createFallbackSkybox();
       }
     );
-
-    // Устанавливаем кубическую текстуру как фон сцены
-    // Это самый простой способ создать skybox в Three.js
-    this.scene.background = cubeTexture;
     
-    return cubeTexture;
+    return this.scene.background;
   }
   
   // Создаем запасной вариант skybox на случай отсутствия текстур

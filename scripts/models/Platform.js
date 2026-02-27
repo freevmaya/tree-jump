@@ -1,9 +1,11 @@
 // scripts/models/Platform.js
 import * as THREE from 'three';
 import { 
-  TREE_COLOR, STICK_OUT, PLATFORM_RADIUS, PLATFORM_HEIGHT, 
-  MAIN_RADIUS, PLATFORM_NORMAL_COLOR, PLATFORM_KILLER_COLOR
+  STICK_OUT, PLATFORM_RADIUS, PLATFORM_HEIGHT, 
+  PLATFORM_NORMAL_COLOR, PLATFORM_KILLER_COLOR,
+  PLATFORM_TEXTURE_PATH, KILLER_PLATFORM_TEXTURE_PATH
 } from '../constants.js';
+import { textureLoader } from '../utils/TextureLoader.js';
 
 export class Platform {
   constructor(parentMesh, theta, y, isKiller = false) {
@@ -14,13 +16,14 @@ export class Platform {
     this.group = null;
     this.box = null;
     this.platformMesh = null;
+    this.texture = null;
     
     const boxWidth = STICK_OUT * 3;
     const boxHeight = STICK_OUT * 0.6;
     const boxDepth = STICK_OUT * 0.6;
     
     this.boxGeometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
-    this.platformGeometry = new THREE.CylinderGeometry(PLATFORM_RADIUS, PLATFORM_RADIUS * 0.6, PLATFORM_HEIGHT, 16);
+    this.platformGeometry = new THREE.CylinderGeometry(PLATFORM_RADIUS, PLATFORM_RADIUS * 0.9, PLATFORM_HEIGHT, 16);
     
     // Выбираем цвет в зависимости от типа платформы
     const platformColor = isKiller ? PLATFORM_KILLER_COLOR : PLATFORM_NORMAL_COLOR;
@@ -42,13 +45,18 @@ export class Platform {
     this.box = new THREE.Mesh(this.boxGeometry, this.material);
     this.box.position.set(-PLATFORM_RADIUS, 0, 0);
     this.box.castShadow = true;
+    this.box.receiveShadow = true;
     this.group.add(this.box);
     
     // Создание площадки
     this.platformMesh = new THREE.Mesh(this.platformGeometry, this.material);
     this.platformMesh.position.set(STICK_OUT, 0, 0);
     this.platformMesh.castShadow = true;
+    this.platformMesh.receiveShadow = true;
     this.group.add(this.platformMesh);
+    
+    // Загружаем текстуру для платформы
+    this.loadTexture();
     
     // Добавляем шипы для платформ-убийц
     if (this.isKiller) {
@@ -65,10 +73,42 @@ export class Platform {
     };
   }
   
+  loadTexture() {
+    const texturePath = this.isKiller ? KILLER_PLATFORM_TEXTURE_PATH : PLATFORM_TEXTURE_PATH;
+    
+    textureLoader.loadTexture(
+      texturePath,
+      (texture) => {
+        // Настраиваем текстуру для платформы
+        texture.repeat.set(2, 1); // Повторяем текстуру 2 раза по X
+        
+        // Применяем текстуру к материалу
+        this.material.map = texture;
+        this.material.color.setHex(0xffffff); // Сбрасываем цвет на белый для корректного отображения текстуры
+        this.material.needsUpdate = true;
+        this.texture = texture;
+      },
+      (error) => {
+        console.warn(`Не удалось загрузить текстуру для платформы: ${texturePath}`);
+        // Если не удалось загрузить текстуру, создаем заглушку
+        if (this.isKiller) {
+          this.material.map = textureLoader.createKillerTexture();
+        } else {
+          this.material.map = textureLoader.createWoodTexture();
+        }
+        this.material.needsUpdate = true;
+      },
+      {
+        repeat: { x: 2, y: 1 },
+        anisotropy: 8
+      }
+    );
+  }
+  
   addSpikes() {
     const spikeCount = 6; // Количество шипов
     const spikeRadius = PLATFORM_RADIUS * 0.7; // Радиус размещения шипов
-    const spikeHeight = PLATFORM_HEIGHT * 3; // Высота шипа
+    const spikeHeight = PLATFORM_HEIGHT * 0.4; // Высота шипа
     
     // Создаем материал для шипов (более яркий красный)
     const spikeMaterial = new THREE.MeshStandardMaterial({
@@ -77,6 +117,18 @@ export class Platform {
       metalness: 0.1,
       roughness: 0.3
     });
+    
+    // Загружаем текстуру для шипов
+    textureLoader.loadTexture(
+      'textures/spike.jpg',
+      (texture) => {
+        spikeMaterial.map = texture;
+        spikeMaterial.needsUpdate = true;
+      },
+      () => {
+        // Игнорируем ошибку, используем цвет
+      }
+    );
     
     for (let i = 0; i < spikeCount; i++) {
       // Угол для размещения шипа по кругу
@@ -132,5 +184,31 @@ export class Platform {
       this.material.color.setHex(0xffffff);
       this.material.needsUpdate = true;
     }
+  }
+  
+  /**
+   * Обновляет параметры текстуры платформы
+   * @param {Object} options - параметры текстуры
+   */
+  updateTextureOptions(options = {}) {
+    if (this.texture) {
+      if (options.repeat) {
+        this.texture.repeat.set(options.repeat.x || 1, options.repeat.y || 1);
+      }
+      if (options.offset) {
+        this.texture.offset.set(options.offset.x || 0, options.offset.y || 0);
+      }
+      this.texture.needsUpdate = true;
+    }
+  }
+  
+  /**
+   * Удаляет платформу и освобождает ресурсы
+   */
+  dispose() {
+    if (this.group) {
+      this.group.removeFromParent();
+    }
+    // Материалы и геометрии удаляются автоматически сборщиком мусора
   }
 }

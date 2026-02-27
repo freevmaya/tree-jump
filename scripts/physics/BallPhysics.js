@@ -17,6 +17,7 @@ export class BallPhysics {
     this.bounceSpeed = BOUNCE_SPEED;
     this.maxVelocity = MAX_VELOCITY;
     this.baseBounceY = -TREE_HEIGHT / 2;
+    this.victoryY = TREE_HEIGHT / 2; // Высота вершины дерева
   }
   
   update(dt) {
@@ -25,11 +26,24 @@ export class BallPhysics {
     this.ball.limitVelocity(this.maxVelocity);
     this.ball.updatePosition(dt);
     
+    // Проверка достижения вершины дерева (победа)
+    this.checkVictory();
+    
     // Проверка столкновения с базовой платформой
     this.checkBasePlatformCollision();
     
     // Проверка столкновения с платформами на дереве
     this.checkTreePlatformsCollision();
+  }
+  
+  checkVictory() {
+    const ballPos = this.ball.getPosition();
+    
+    // Если шарик достиг высоты вершины дерева (с учетом радиуса)
+    if (ballPos.y + BALL_RADIUS >= this.victoryY) {
+      console.log("ПОБЕДА! Шарик достиг вершины дерева!");
+      this.gameState.victory();
+    }
   }
   
   checkBasePlatformCollision() {
@@ -45,20 +59,6 @@ export class BallPhysics {
     
     // Обновление мировой матрицы дерева
     this.tree.mesh.updateMatrixWorld(true);
-    
-    // Находим самую верхнюю платформу
-    let highestPlatform = null;
-    let highestY = -Infinity;
-    
-    for (const platformData of platforms) {
-      const worldPos = new THREE.Vector3();
-      platformData.mesh.getWorldPosition(worldPos);
-      
-      if (worldPos.y > highestY) {
-        highestY = worldPos.y;
-        highestPlatform = platformData;
-      }
-    }
     
     for (const platformData of platforms) {
       const worldPos = new THREE.Vector3();
@@ -80,16 +80,9 @@ export class BallPhysics {
             ballPos.y > platformTop &&
             this.ball.velocity.y < 0) {
           
-          // Проверка на ПОБЕДУ: если это самая верхняя платформа
-          if (platformData === highestPlatform) {
-            console.log("ПОБЕДА! Достигнута верхняя платформа!");
-            this.gameState.victory();
-            return;
-          }
-          
           // Если это платформа-убийца - заканчиваем игру (ТОЛЬКО ПРИ УДАРЕ СВЕРХУ)
           if (platformData.isKiller) {
-            console.log("Платформа-убийца! Игра окончена (удар сверху). gameState:", this.gameState);
+            console.log("Платформа-убийца! Игра окончена (удар сверху).");
             this.gameState.gameOver();
             return; // Прерываем проверку
           }

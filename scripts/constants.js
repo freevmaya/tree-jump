@@ -3,7 +3,7 @@
 // ========== КОНСТАНТЫ ==========
 // Дерево
 export const TREE_COLOR = 0xA67C52;
-export const TREE_HEIGHT = 30;
+export const TREE_HEIGHT = 10;
 export const TEXTURE_SCALE_Y = 1.5;
 export const MAIN_RADIUS = 1;
 export const MAIN_DIAMETER = MAIN_RADIUS * 2;
@@ -24,8 +24,8 @@ export const BASE_PLATFORM_TOP_Y = -CYLINDER_HALF_HEIGHT;
 export const BALL_RADIUS = 0.15;
 
 // Физика шарика
-export const GRAVITY = -9.8;
-export const BOUNCE_SPEED = 7.5;
+export const GRAVITY = -7.5;
+export const BOUNCE_SPEED = 7;
 export const MAX_VELOCITY = 15;
 
 // Камера
@@ -62,7 +62,7 @@ export const PLATFORM_TEXTURE_PATH = 'textures/platform.jpg';
 export const KILLER_PLATFORM_TEXTURE_PATH = 'textures/killer_platform.jpg';
 
 // Игровые параметры
-export const GAME_OVER_Y_OFFSET = -5; // Смещение относительно камеры для конца игры
+export const GAME_OVER_Y_OFFSET = -7; // Смещение относительно камеры для конца игры
 export const RESET_POSITION_X = 0;
 export const RESET_POSITION_Z = MAIN_RADIUS * 1.3;
 export const RESET_POSITION_Y = BASE_PLATFORM_TOP_Y + BALL_RADIUS;

@@ -110,16 +110,50 @@ export class Tree {
     }
     
     let base_y = CYLINDER_HALF_HEIGHT / PLATFORM_COUNT;
+    let previousTheta = null; // Переменная для хранения предыдущего угла
+    
     // Создаем платформы с соответствующими типами
     for (let i = 0; i < PLATFORM_COUNT; i++) {
       const y = base_y + (i / PLATFORM_COUNT * 2 - 1) * (CYLINDER_HALF_HEIGHT - base_y);
-      let theta = (Math.random() - 0.5)  * Math.PI * 2;
+      
+      // Генерируем угол с проверкой на минимальное отличие от предыдущего
+      let theta;
+      const MIN_ANGLE_DIFF = Math.PI / 3; // Минимальная разница в 60 градусов
+      
+      if (previousTheta === null) {
+        // Для первой платформы - случайный угол
+        theta = (Math.random() - 0.5) * Math.PI * 2;
+      } else {
+        // Для последующих - генерируем угол, отличающийся от предыдущего не менее чем на MIN_ANGLE_DIFF
+        let attempts = 0;
+        const maxAttempts = 100; // Предотвращаем бесконечный цикл
+        
+        do {
+          theta = (Math.random() - 0.5) * Math.PI * 2;
+          attempts++;
+          
+          // Если не получается найти подходящий угол за много попыток,
+          // добавляем MIN_ANGLE_DIFF к предыдущему углу со случайным направлением
+          if (attempts > maxAttempts) {
+            const direction = Math.random() > 0.5 ? 1 : -1;
+            theta = previousTheta + direction * MIN_ANGLE_DIFF;
+            // Нормализуем угол в диапазон [-PI, PI]
+            while (theta > Math.PI) theta -= Math.PI * 2;
+            while (theta < -Math.PI) theta += Math.PI * 2;
+            break;
+          }
+        } while (Math.abs(theta - previousTheta) < MIN_ANGLE_DIFF);
+      }
+      
       const isKiller = platformTypes[i]; // Используем реальные типы
-
+      
       const platform = new Platform(this.mesh, theta, y, isKiller);
       const platformData = platform.create(this.calcDistance(y));
       
       this.platforms.push(platformData);
+      
+      // Сохраняем текущий угол для следующей итерации
+      previousTheta = theta;
     }
     
     console.log(`Создано платформ: всего ${PLATFORM_COUNT}, убийц: ${killerCount}`);

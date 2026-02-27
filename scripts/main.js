@@ -19,9 +19,11 @@ import { BallPhysics } from './physics/BallPhysics.js';
 import { MouseRotationControl } from './controls/MouseRotationControl.js';
 import { JoystickControl } from './controls/JoystickControl.js';
 import { GameState, GAME_STATE } from './GameState.js';
+import { Crystal } from './models/Crystal.js';
 
 // Bootstrap доступен глобально через window.bootstrap
 const bootstrap = window.bootstrap;
+
 
 class Game {
   constructor() {
@@ -36,6 +38,7 @@ class Game {
     this.joystickControl = null;
     this.bounceCounterElement = document.getElementById('bounce-counter');
     this.lastTime = performance.now();
+    this.crystal = null;
     
     // Создаем gameState
     this.gameState = new GameState();
@@ -289,6 +292,12 @@ class Game {
       this.ball = null;
     }
     
+    // Удаляем кристалл
+    if (this.crystal) {
+      this.crystal.dispose();
+      this.crystal = null;
+    }
+    
     // Освещение не удаляем, оно остается
   }
   
@@ -322,6 +331,9 @@ class Game {
     this.tree = new Tree(scene);
     this.tree.init();
     
+    // Создание кристалла на вершине дерева
+    this.createCrystal();
+    
     // Создание шарика
     this.ball = new Ball(scene);
     this.ball.init(this.tree);
@@ -352,9 +364,15 @@ class Game {
   
   resetGame() {
     console.log("Сброс игры...");
-    
+  
     // Очищаем старое окружение
     this.clearEnvironment();
+    
+    // Удаляем кристалл
+    if (this.crystal) {
+      this.crystal.dispose();
+      this.crystal = null;
+    }
     
     // Создаем новые игровые объекты с новыми случайными платформами
     this.createGameObjects();
@@ -509,6 +527,9 @@ class Game {
       }
     }
     
+    // Обновление кристалла
+    this.updateCrystal(dt);
+    
     // Обновление камеры (всегда, чтобы камера не улетала)
     if (this.ball) {
       this.cameraController.update(this.ball.getLastBounceY());
@@ -520,6 +541,31 @@ class Game {
     // Рендеринг (всегда, чтобы видеть паузу)
     if (this.sceneManager.getScene() && this.cameraController) {
       this.rendererManager.render(this.sceneManager.getScene(), this.cameraController.getCamera());
+    }
+  }
+
+  createCrystal() {
+    if (!this.tree) return;
+    
+    // Удаляем старый кристалл если есть
+    if (this.crystal) {
+      this.crystal.dispose();
+      this.crystal = null;
+    }
+    
+    // Создаем кристалл на вершине дерева
+    this.crystal = new Crystal(
+      this.sceneManager.getScene(),
+      this.tree
+    );
+    this.crystal.init();
+    
+    console.log("Кристалл создан на вершине дерева");
+  }
+
+  updateCrystal(dt) {
+    if (this.crystal && this.gameState.isPlaying()) {
+      this.crystal.update(dt);
     }
   }
 }

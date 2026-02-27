@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { 
   BALL_RADIUS, PLATFORM_RADIUS, PLATFORM_HEIGHT, 
   BASE_PLATFORM_TOP_Y, GRAVITY, BOUNCE_SPEED, MAX_VELOCITY,
-  MAIN_RADIUS
+  MAIN_RADIUS, TREE_HEIGHT, CYLINDER_HALF_HEIGHT
 } from '../constants.js';
 // Импортируем GameState для проверки состояния (опционально)
 import { GameState, GAME_STATE } from '../GameState.js';
@@ -16,7 +16,7 @@ export class BallPhysics {
     this.gravity = GRAVITY;
     this.bounceSpeed = BOUNCE_SPEED;
     this.maxVelocity = MAX_VELOCITY;
-    this.baseBounceY = BASE_PLATFORM_TOP_Y;
+    this.baseBounceY = -TREE_HEIGHT / 2;
   }
   
   update(dt) {
@@ -46,6 +46,20 @@ export class BallPhysics {
     // Обновление мировой матрицы дерева
     this.tree.mesh.updateMatrixWorld(true);
     
+    // Находим самую верхнюю платформу
+    let highestPlatform = null;
+    let highestY = -Infinity;
+    
+    for (const platformData of platforms) {
+      const worldPos = new THREE.Vector3();
+      platformData.mesh.getWorldPosition(worldPos);
+      
+      if (worldPos.y > highestY) {
+        highestY = worldPos.y;
+        highestPlatform = platformData;
+      }
+    }
+    
     for (const platformData of platforms) {
       const worldPos = new THREE.Vector3();
       platformData.mesh.getWorldPosition(worldPos);
@@ -65,6 +79,13 @@ export class BallPhysics {
             ballPos.y + BALL_RADIUS >= platformTop &&
             ballPos.y > platformTop &&
             this.ball.velocity.y < 0) {
+          
+          // Проверка на ПОБЕДУ: если это самая верхняя платформа
+          if (platformData === highestPlatform) {
+            console.log("ПОБЕДА! Достигнута верхняя платформа!");
+            this.gameState.victory();
+            return;
+          }
           
           // Если это платформа-убийца - заканчиваем игру (ТОЛЬКО ПРИ УДАРЕ СВЕРХУ)
           if (platformData.isKiller) {

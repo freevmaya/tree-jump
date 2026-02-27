@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Tree Jump — отскоки от дерева</title>
   
   <!-- Bootstrap CSS -->
@@ -11,11 +11,132 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <!-- Custom CSS -->
   <link rel="stylesheet" href="./styles/main.css">
+  
+  <!-- Дополнительные стили для новых модальных окон -->
+  <style>
+    /* Стили для модального окна победы */
+    .victory-modal {
+      background: linear-gradient(135deg, #1a5f7a, #157145);
+      color: #fff;
+    }
+    .victory-header {
+      border-bottom: 2px solid gold;
+    }
+    .victory-star {
+      animation: pulse 1.5s infinite;
+      display: inline-block;
+      margin: 0 5px;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .victory-stats .stat-value {
+      color: gold;
+      font-size: 2.5rem;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+    .victory-message {
+      color: #ffd700;
+      font-size: 1.2rem;
+      margin-top: 15px;
+    }
+    .victory-footer {
+      border-top: 1px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .pause-header {
+      border-bottom: 2px solid #3498db;
+    }
+    .pause-message {
+      color: #3498db;
+      font-size: 1.3rem;
+      margin: 20px 0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .pause-tree {
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    .pause-controls {
+      margin: 20px 0;
+      text-align: left;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 15px;
+      border-radius: 8px;
+    }
+    .pause-shortcut {
+      margin: 10px 0;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .key {
+      display: inline-block;
+      background: #2c3e50;
+      border: 2px solid #3498db;
+      color: #3498db;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-family: monospace;
+      font-weight: bold;
+      min-width: 60px;
+      text-align: center;
+    }
+    .btn-resume {
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 10px 30px;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+    }
+    .btn-resume:hover {
+      background: #2ecc71;
+      transform: scale(1.05);
+      color: white;
+    }
+    .pause-footer {
+      border-top: 1px solid #3498db;
+      gap: 10px;
+    }
+  </style>
 </head>
 <body>
-  <div id="canvas-container"></div>
+  <!-- Основной контейнер игры -->
+  <div id="game-container">
+    <!-- Верхний блок с игрой (85%) -->
+    <div id="game-canvas-container">
+      <div id="canvas-container"></div>
+    </div>
+    
+    <!-- Нижний блок с джойстиком (15%) -->
+    <div id="joystick-container">
+      <div class="joystick-area">
+        <div class="joystick-instruction">
+          <i class="bi bi-arrow-left-right"></i> Вращайте дерево
+        </div>
+        <div class="joystick-pad" id="joystick-pad">
+          <div class="joystick-thumb" id="joystick-thumb">
+            <i class="bi bi-arrows-move"></i>
+          </div>
+        </div>
+        <div class="joystick-hint">
+          Ведите мышью или пальцем по площадке
+        </div>
+      </div>
+    </div>
+  </div>
   
-  <!-- Подсказка -->
+  <!-- Подсказка в игре -->
   <div class="hint">
     <i class="bi bi-mouse"></i> Зажмите левую кнопку и тяните, чтобы вращать дерево
   </div>
@@ -63,6 +184,87 @@
         </div>
         <div class="modal-footer justify-content-center">
           <button type="button" class="btn btn-restart" id="restartButton">
+            <i class="bi bi-arrow-repeat"></i> Новая игра
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap модальное окно для Victory (Победа) -->
+  <div class="modal fade" id="victoryModal" tabindex="-1" aria-labelledby="victoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content victory-modal">
+        <div class="modal-header victory-header">
+          <h5 class="modal-title" id="victoryModalLabel">
+            <i class="bi bi-trophy-fill"></i> ПОБЕДА!
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <i class="bi bi-star-fill victory-star" style="font-size: 4rem; color: gold; margin-bottom: 20px;"></i>
+          <i class="bi bi-star-fill victory-star" style="font-size: 3rem; color: gold; margin-bottom: 20px;"></i>
+          <i class="bi bi-star-fill victory-star" style="font-size: 4rem; color: gold; margin-bottom: 20px;"></i>
+          
+          <!-- Статистика игры -->
+          <div class="stats-container victory-stats">
+            <div class="row">
+              <div class="col-6">
+                <div class="stat-value" id="victoryBounceCount">0</div>
+                <div class="stat-label">Отскоков</div>
+              </div>
+              <div class="col-6">
+                <div class="stat-value" id="victoryHeight">0</div>
+                <div class="stat-label">Высота</div>
+              </div>
+            </div>
+          </div>
+          
+          <p class="modal-subtitle victory-message">
+            <i class="bi bi-emoji-sunglasses"></i> Вы достигли вершины дерева!
+          </p>
+          <p class="modal-subtitle">
+            <i class="bi bi-arrow-up-circle"></i> Нажмите R для новой игры
+          </p>
+        </div>
+        <div class="modal-footer justify-content-center victory-footer">
+          <button type="button" class="btn btn-restart" id="victoryRestartButton">
+            <i class="bi bi-arrow-repeat"></i> Новая игра
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap модальное окно для Pause (Пауза) -->
+  <div class="modal fade" id="pauseModal" tabindex="-1" aria-labelledby="pauseModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content pause-modal">
+        <div class="modal-header pause-header">
+          <h5 class="modal-title" id="pauseModalLabel">
+            <i class="bi bi-pause-circle-fill"></i> ПАУЗА
+          </h5>
+        </div>
+        <div class="modal-body text-center">
+          
+          <p class="modal-subtitle pause-message">
+            Игра приостановлена
+          </p>
+          
+          <div class="pause-controls">
+            <div class="pause-shortcut">
+              <span class="key">ESC</span> - продолжить игру
+            </div>
+            <div class="pause-shortcut">
+              <span class="key">R</span> - начать заново
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center pause-footer">
+          <button type="button" class="btn btn-resume" id="resumeButton">
+            <i class="bi bi-play-fill"></i> Продолжить
+          </button>
+          <button type="button" class="btn btn-restart" id="pauseRestartButton">
             <i class="bi bi-arrow-repeat"></i> Новая игра
           </button>
         </div>

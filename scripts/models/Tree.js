@@ -92,12 +92,16 @@ export class Tree {
       platformTypes[randomIndex] = true;
     }
     
+    let base_y = CYLINDER_HALF_HEIGHT / PLATFORM_COUNT;
     // Создаем платформы с соответствующими типами
     for (let i = 0; i < PLATFORM_COUNT; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const y = (i / PLATFORM_COUNT * 2 - 1) * CYLINDER_HALF_HEIGHT;
-      
-      const isKiller = platformTypes[i]; // Определяем тип платформы
+
+      let isKiller = false;
+      const y = base_y + (i / PLATFORM_COUNT * 2 - 1) * (CYLINDER_HALF_HEIGHT - base_y);
+
+      let theta = (Math.random() - 0.5)  * Math.PI * 2;
+      isKiller = platformTypes[i]; // Определяем тип платформы
+
       const platform = new Platform(this.mesh, theta, y, isKiller);
       const platformData = platform.create();
       this.platforms.push(platformData);

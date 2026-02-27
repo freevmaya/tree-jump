@@ -83,7 +83,7 @@ export class Platform {
       const angle = (i / spikeCount) * Math.PI * 2;
       
       // Создаем конус (пирамидку) для шипа
-      const spikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.2, spikeHeight, 8);
+      const spikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.1, spikeHeight, 8);
       const spike = new THREE.Mesh(spikeGeometry, spikeMaterial);
       
       // Позиционируем шип на краю платформы
@@ -100,7 +100,7 @@ export class Platform {
     }
     
     // Добавляем один центральный шип для большей угрозы
-    const centerSpikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.25, spikeHeight * 1.2, 8);
+    const centerSpikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.1, spikeHeight * 1.2, 8);
     const centerSpike = new THREE.Mesh(centerSpikeGeometry, spikeMaterial);
     centerSpike.position.set(STICK_OUT, PLATFORM_HEIGHT / 2 + spikeHeight * 1.2 / 2, 0);
     centerSpike.castShadow = true;

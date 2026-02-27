@@ -3,7 +3,7 @@
 // ========== КОНСТАНТЫ ==========
 // Дерево
 export const TREE_COLOR = 0xA67C52;
-export const TREE_HEIGHT = 70;
+export const TREE_HEIGHT = 30;
 export const TEXTURE_SCALE_Y = 1.5;
 export const MAIN_RADIUS = 1;
 export const MAIN_DIAMETER = MAIN_RADIUS * 2;
@@ -18,7 +18,7 @@ export const PLATFORM_COUNT = Math.floor(TREE_HEIGHT * PLATFORM_DENSITY);
 
 // Базовая платформа
 export const BASE_PLATFORM_SIZE = 20;
-export const BASE_PLATFORM_TOP_Y = -2.8 + 0.075;
+export const BASE_PLATFORM_TOP_Y = -CYLINDER_HALF_HEIGHT;
 
 // Шарик
 export const BALL_RADIUS = 0.15;
@@ -31,15 +31,15 @@ export const MAX_VELOCITY = 15;
 // Камера
 export const CAMERA_FOLLOW_SPEED = 0.06;
 export const CAMERA_HEIGHT_OFFSET = 2.8;
-export const CAMERA_START_Y = 0;
+export const CAMERA_START_Y = -CYLINDER_HALF_HEIGHT;
 
 // Управление мышью
-export const ROTATION_SPEED = 0.05;
+export const ROTATION_SPEED = 0.03;
 export const ROTATION_SMOOTH = 0.5;
 export const INERTIA = 0.92;
 
 // Цвета
-export const FLOOR_COLOR = 0x1e1b2e;
+export const FLOOR_COLOR = 0x4a5568;
 export const BASE_PLATFORM_COLOR = 0x4a5568;
 export const BALL_COLOR = 0xff6b6b;
 export const AMBIENT_LIGHT_COLOR = 0x404080;
@@ -70,4 +70,4 @@ export const PLATFORM_NORMAL_COLOR = 0xA67C52; // Используем суще�
 export const PLATFORM_KILLER_COLOR = 0xFF3333; // Ярко-красный для платформ-убийц
 
 // Процент платформ-убийц
-export const KILLER_PLATFORM_PERCENTAGE = 0.2; // 20%
+export const KILLER_PLATFORM_PERCENTAGE = 0.1; // 20%

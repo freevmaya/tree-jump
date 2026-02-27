@@ -17,6 +17,7 @@ import { Tree } from './models/Tree.js';
 import { Ball } from './models/Ball.js';
 import { BallPhysics } from './physics/BallPhysics.js';
 import { MouseRotationControl } from './controls/MouseRotationControl.js';
+import { JoystickControl } from './controls/JoystickControl.js';
 import { GameState, GAME_STATE } from './GameState.js';
 
 // Bootstrap доступен глобально через window.bootstrap
@@ -32,6 +33,7 @@ class Game {
     this.ball = null;
     this.physics = null;
     this.mouseControl = null;
+    this.joystickControl = null;
     this.bounceCounterElement = document.getElementById('bounce-counter');
     this.lastTime = performance.now();
     
@@ -42,44 +44,29 @@ class Game {
     this.environmentObjects = [];
     this.lights = [];
     
-    // Инициализация Bootstrap модального окна
-    this.initGameOverModal();
+    // Инициализация Bootstrap модальных окон
+    this.initModals();
   }
   
-  initGameOverModal() {
-    // Получаем элемент модального окна
-    this.gameOverModalElement = document.getElementById('gameOverModal');
+  initModals() {
+    this.initGameOverModal();
+    this.initVictoryModal();
+    this.initPauseModal();
     
-    if (this.gameOverModalElement && bootstrap) {
-      // Создаем экземпляр Bootstrap модального окна
-      this.gameOverModal = new bootstrap.Modal(this.gameOverModalElement, {
-        backdrop: 'static', // Запрещаем закрытие по клику вне модального окна
-        keyboard: false // Запрещаем закрытие по ESC
-      });
-      
-      // Обработчик для кнопки рестарта
-      const restartBtn = document.getElementById('restartButton');
-      if (restartBtn) {
-        restartBtn.addEventListener('click', () => {
-          this.resetGame();
-        });
-      }
-      
-      // Обработчик для закрытия модального окна (если пользователь нажмет X)
-      this.gameOverModalElement.addEventListener('hidden.bs.modal', () => {
-        // Если игра закончена и модальное окно закрыли, но не через рестарт
-        if (this.gameState.isGameOver()) {
-          this.resetGame();
-        }
-      });
-    } else {
-      console.warn('Bootstrap модальное окно не найдено или Bootstrap не загружен');
-    }
-    
-    // Настройка обработчика нажатия клавиши R для перезапуска
+    // Настройка обработчика нажатия клавиш
     window.addEventListener('keydown', (e) => {
+      // Перезапуск по клавише R (в любом состоянии)
       if (e.key === 'r' || e.key === 'R') {
         this.resetGame();
+      }
+      
+      // Пауза по ESC (только если игра активна и не на паузе)
+      if (e.key === 'Escape') {
+        if (this.gameState.isPlaying()) {
+          this.gameState.pause();
+        } else if (this.gameState.isPaused()) {
+          this.gameState.resume();
+        }
       }
     });
     
@@ -88,7 +75,43 @@ class Game {
       console.log("Game Over callback вызван");
       this.showGameOverModal();
       if (this.mouseControl) {
-        this.mouseControl.destroy(); // Отключаем управление при окончании игры
+        this.mouseControl.destroy();
+      }
+      if (this.joystickControl) {
+        this.joystickControl.destroy();
+      }
+    });
+    
+    this.gameState.onVictory(() => {
+      console.log("Victory callback вызван");
+      this.showVictoryModal();
+      if (this.mouseControl) {
+        this.mouseControl.destroy();
+      }
+      if (this.joystickControl) {
+        this.joystickControl.destroy();
+      }
+    });
+    
+    this.gameState.onPause(() => {
+      console.log("Pause callback вызван");
+      this.showPauseModal();
+      if (this.mouseControl) {
+        this.mouseControl.destroy();
+      }
+      if (this.joystickControl) {
+        this.joystickControl.destroy();
+      }
+    });
+    
+    this.gameState.onResume(() => {
+      console.log("Resume callback вызван");
+      this.hidePauseModal();
+      if (this.mouseControl) {
+        this.mouseControl.init();
+      }
+      if (this.joystickControl) {
+        // Джойстик не нужно реинициализировать, он сам восстанавливается
       }
     });
     
@@ -97,7 +120,98 @@ class Game {
       if (this.gameOverModal) {
         this.gameOverModal.hide();
       }
+      if (this.victoryModal) {
+        this.victoryModal.hide();
+      }
+      if (this.pauseModal) {
+        this.pauseModal.hide();
+      }
     });
+  }
+  
+  initGameOverModal() {
+    // Получаем элемент модального окна Game Over
+    this.gameOverModalElement = document.getElementById('gameOverModal');
+    
+    if (this.gameOverModalElement && bootstrap) {
+      // Создаем экземпляр Bootstrap модального окна
+      this.gameOverModal = new bootstrap.Modal(this.gameOverModalElement, {
+        backdrop: 'static',
+        keyboard: false
+      });
+      
+      // Обработчик для кнопки рестарта в Game Over
+      const restartBtn = document.getElementById('restartButton');
+      if (restartBtn) {
+        restartBtn.addEventListener('click', () => {
+          this.resetGame();
+        });
+      }
+      
+      // Обработчик для закрытия модального окна
+      this.gameOverModalElement.addEventListener('hidden.bs.modal', () => {
+        if (this.gameState.isGameOver()) {
+          this.resetGame();
+        }
+      });
+    }
+  }
+  
+  initVictoryModal() {
+    // Получаем элемент модального окна Victory
+    this.victoryModalElement = document.getElementById('victoryModal');
+    
+    if (this.victoryModalElement && bootstrap) {
+      // Создаем экземпляр Bootstrap модального окна
+      this.victoryModal = new bootstrap.Modal(this.victoryModalElement, {
+        backdrop: 'static',
+        keyboard: false
+      });
+      
+      // Обработчик для кнопки рестарта в Victory
+      const victoryRestartBtn = document.getElementById('victoryRestartButton');
+      if (victoryRestartBtn) {
+        victoryRestartBtn.addEventListener('click', () => {
+          this.resetGame();
+        });
+      }
+      
+      // Обработчик для закрытия модального окна
+      this.victoryModalElement.addEventListener('hidden.bs.modal', () => {
+        if (this.gameState.isVictory()) {
+          this.resetGame();
+        }
+      });
+    }
+  }
+  
+  initPauseModal() {
+    // Получаем элемент модального окна Pause
+    this.pauseModalElement = document.getElementById('pauseModal');
+    
+    if (this.pauseModalElement && bootstrap) {
+      // Создаем экземпляр Bootstrap модального окна
+      this.pauseModal = new bootstrap.Modal(this.pauseModalElement, {
+        backdrop: 'static',
+        keyboard: false
+      });
+      
+      // Обработчик для кнопки продолжения
+      const resumeBtn = document.getElementById('resumeButton');
+      if (resumeBtn) {
+        resumeBtn.addEventListener('click', () => {
+          this.gameState.resume();
+        });
+      }
+      
+      // Обработчик для кнопки рестарта в паузе
+      const pauseRestartBtn = document.getElementById('pauseRestartButton');
+      if (pauseRestartBtn) {
+        pauseRestartBtn.addEventListener('click', () => {
+          this.resetGame();
+        });
+      }
+    }
   }
   
   showGameOverModal() {
@@ -117,6 +231,38 @@ class Game {
     // Показываем модальное окно
     if (this.gameOverModal) {
       this.gameOverModal.show();
+    }
+  }
+  
+  showVictoryModal() {
+    // Обновляем статистику в модальном окне победы
+    const victoryBounceElement = document.getElementById('victoryBounceCount');
+    const victoryHeightElement = document.getElementById('victoryHeight');
+    
+    if (victoryBounceElement && this.ball) {
+      victoryBounceElement.textContent = this.ball.getBounceCount();
+    }
+    
+    if (victoryHeightElement && this.ball) {
+      const ballPos = this.ball.getPosition();
+      victoryHeightElement.textContent = ballPos.y.toFixed(1) + 'м';
+    }
+    
+    // Показываем модальное окно
+    if (this.victoryModal) {
+      this.victoryModal.show();
+    }
+  }
+  
+  showPauseModal() {
+    if (this.pauseModal) {
+      this.pauseModal.show();
+    }
+  }
+  
+  hidePauseModal() {
+    if (this.pauseModal) {
+      this.pauseModal.hide();
     }
   }
   
@@ -183,12 +329,22 @@ class Game {
     // Инициализация физики с передачей gameState
     this.physics = new BallPhysics(this.ball, this.tree, this.gameState);
     
-    // Инициализация управления мышью
+    // Инициализация управления мышью (для верхнего блока)
     if (this.mouseControl) {
       this.mouseControl.destroy();
     }
     this.mouseControl = new MouseRotationControl(this.tree, this.container);
     this.mouseControl.init();
+    
+    // Инициализация управления джойстиком (для нижнего блока)
+    if (this.joystickControl) {
+      this.joystickControl.destroy();
+    }
+    const joystickPad = document.getElementById('joystick-pad');
+    const joystickThumb = document.getElementById('joystick-thumb');
+    if (joystickPad && joystickThumb) {
+      this.joystickControl = new JoystickControl(this.tree, joystickPad, joystickThumb);
+    }
     
     // Создание пола и базовой платформы
     this.createEnvironment(scene);
@@ -217,6 +373,11 @@ class Game {
     if (this.gameState) {
       this.gameState.reset();
     }
+    
+    // Сброс джойстика
+    if (this.joystickControl) {
+      this.joystickControl.reset();
+    }
   }
   
   createLights(scene) {
@@ -233,16 +394,16 @@ class Game {
     this.lights.push(ambient);
     
     const keyLight = new THREE.DirectionalLight(KEY_LIGHT_COLOR, KEY_LIGHT_INTENSITY);
-    keyLight.position.set(4, 6, 5);
+    keyLight.position.set(20, 20, 20);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.set(1024, 1024);
     keyLight.shadow.camera.near = 0.5;
-    keyLight.shadow.camera.far = 20;
-    keyLight.shadow.camera.left = -5;
-    keyLight.shadow.camera.right = 5;
-    keyLight.shadow.camera.top = 5;
-    keyLight.shadow.camera.bottom = -5;
-    keyLight.shadow.bias = -0.0001;
+    keyLight.shadow.camera.far = 1000;
+    keyLight.shadow.camera.left = -20;
+    keyLight.shadow.camera.right = 20;
+    keyLight.shadow.camera.top = 20;
+    keyLight.shadow.camera.bottom = -20;
+    keyLight.shadow.bias = 0;
     scene.add(keyLight);
     this.lights.push(keyLight);
     
@@ -267,24 +428,26 @@ class Game {
     });
     const floor = new THREE.Mesh(floorGeometry, floorMaterial);
     floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -TREE_HEIGHT / 2 - 0.01;
+    floor.position.y = -TREE_HEIGHT / 2;
     floor.receiveShadow = true;
     scene.add(floor);
     this.environmentObjects.push(floor);
+
     
+    /*
     // Базовая платформа
-    const basePlatformGeometry = new THREE.BoxGeometry(BASE_PLATFORM_SIZE, 0.15, BASE_PLATFORM_SIZE);
+    const basePlatformGeometry = new THREE.BoxGeometry(BASE_PLATFORM_SIZE, 0.01, BASE_PLATFORM_SIZE);
     const basePlatformMaterial = new THREE.MeshStandardMaterial({
       color: BASE_PLATFORM_COLOR,
       metalness: 0.1,
       roughness: 0.85,
     });
     const basePlatform = new THREE.Mesh(basePlatformGeometry, basePlatformMaterial);
-    basePlatform.position.set(0, -2.8, 0);
+    basePlatform.position.set(0, -TREE_HEIGHT / 2, 0);
     basePlatform.receiveShadow = true;
     basePlatform.castShadow = true;
     scene.add(basePlatform);
-    this.environmentObjects.push(basePlatform);
+    this.environmentObjects.push(basePlatform);*/
   }
   
   onResize() {
@@ -318,8 +481,8 @@ class Game {
     const dt = (time - this.lastTime) / 1000;
     this.lastTime = time;
     
+    // Обновление физики только если игра активна (не на паузе и не закончена)
     if (this.gameState.isPlaying() && this.ball && this.physics) {
-      // Обновление физики только если игра активна
       this.tree.update();
       this.physics.update(dt);
       
@@ -328,8 +491,22 @@ class Game {
         this.mouseControl.update();
       }
       
+      // Обновление джойстика
+      if (this.joystickControl) {
+        this.joystickControl.update();
+      }
+      
       // Проверка конца игры
       this.checkGameOver();
+    } else if (this.gameState.isPaused()) {
+      // На паузе ничего не обновляем, но дерево может продолжать вращаться по инерции?
+      // Для чистоты эксперимента - останавливаем всё
+      if (this.mouseControl) {
+        this.mouseControl.velocityY = 0;
+      }
+      if (this.joystickControl) {
+        this.joystickControl.normalizedDirect = 0;
+      }
     }
     
     // Обновление камеры (всегда, чтобы камера не улетала)
@@ -340,7 +517,7 @@ class Game {
     // Обновление счетчика отскоков
     this.updateBounceCounter();
     
-    // Рендеринг
+    // Рендеринг (всегда, чтобы видеть паузу)
     if (this.sceneManager.getScene() && this.cameraController) {
       this.rendererManager.render(this.sceneManager.getScene(), this.cameraController.getCamera());
     }

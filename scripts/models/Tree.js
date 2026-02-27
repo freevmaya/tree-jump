@@ -3,7 +3,8 @@ import * as THREE from 'three';
 import { 
   TREE_COLOR, TREE_HEIGHT, MAIN_RADIUS, STICK_OUT, 
   PLATFORM_RADIUS, PLATFORM_HEIGHT, PLATFORM_COUNT,
-  CYLINDER_HALF_HEIGHT, WIREFRAME_COLOR, BARK_TEXTURE_PATH
+  CYLINDER_HALF_HEIGHT, WIREFRAME_COLOR, BARK_TEXTURE_PATH,
+  KILLER_PLATFORM_PERCENTAGE, ROTATION_SMOOTH
 } from '../constants.js';
 import { Platform } from './Platform.js';
 
@@ -14,6 +15,7 @@ export class Tree {
     this.platforms = [];
     this.textureLoader = new THREE.TextureLoader();
     this.barkTexture = null;
+    this.targetRotation = 0;
   }
   
   init() {
@@ -75,14 +77,33 @@ export class Tree {
     // Очищаем массив платформ перед созданием новых
     this.platforms = [];
     
+    // Рассчитываем количество платформ-убийц (20%)
+    const killerCount = Math.floor(PLATFORM_COUNT * KILLER_PLATFORM_PERCENTAGE);
+    
+    // Создаем массив булевых значений для определения типа каждой платформы
+    const platformTypes = new Array(PLATFORM_COUNT).fill(false);
+    
+    // Случайно выбираем индексы для платформ-убийц
+    for (let i = 0; i < killerCount; i++) {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * PLATFORM_COUNT);
+      } while (platformTypes[randomIndex] === true); // Ищем свободный индекс
+      platformTypes[randomIndex] = true;
+    }
+    
+    // Создаем платформы с соответствующими типами
     for (let i = 0; i < PLATFORM_COUNT; i++) {
       const theta = Math.random() * Math.PI * 2;
       const y = (i / PLATFORM_COUNT * 2 - 1) * CYLINDER_HALF_HEIGHT;
       
-      const platform = new Platform(this.mesh, theta, y);
+      const isKiller = platformTypes[i]; // Определяем тип платформы
+      const platform = new Platform(this.mesh, theta, y, isKiller);
       const platformData = platform.create();
       this.platforms.push(platformData);
     }
+    
+    console.log(`Создано платформ: всего ${PLATFORM_COUNT}, убийц: ${killerCount}`); // Для отладки
   }
   
   getPlatforms() {
@@ -91,7 +112,7 @@ export class Tree {
   
   rotate(yDelta) {
     if (this.mesh) {
-      this.mesh.rotation.y += yDelta;
+      this.targetRotation += yDelta;
     }
   }
   
@@ -103,5 +124,9 @@ export class Tree {
   
   getRotationY() {
     return this.mesh ? this.mesh.rotation.y : 0;
+  }
+
+  update() {
+      this.setRotation(this.mesh.rotation.y + (this.targetRotation - this.mesh.rotation.y) * ROTATION_SMOOTH);
   }
 }

@@ -19,6 +19,9 @@ import { BallPhysics } from './physics/BallPhysics.js';
 import { MouseRotationControl } from './controls/MouseRotationControl.js';
 import { GameState, GAME_STATE } from './GameState.js';
 
+// Bootstrap доступен глобально через window.bootstrap
+const bootstrap = window.bootstrap;
+
 class Game {
   constructor() {
     this.container = document.getElementById('canvas-container');
@@ -31,40 +34,47 @@ class Game {
     this.mouseControl = null;
     this.bounceCounterElement = document.getElementById('bounce-counter');
     this.lastTime = performance.now();
+    
+    // Создаем gameState
     this.gameState = new GameState();
     
     // Хранилище для созданных объектов окружения
     this.environmentObjects = [];
     this.lights = [];
     
-    // Создание UI для конца игры
-    this.createGameOverUI();
+    // Инициализация Bootstrap модального окна
+    this.initGameOverModal();
   }
   
-  createGameOverUI() {
-    // Создаем элемент для отображения конца игры
-    this.gameOverElement = document.createElement('div');
-    this.gameOverElement.style.position = 'fixed';
-    this.gameOverElement.style.top = '50%';
-    this.gameOverElement.style.left = '50%';
-    this.gameOverElement.style.transform = 'translate(-50%, -50%)';
-    this.gameOverElement.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-    this.gameOverElement.style.color = 'white';
-    this.gameOverElement.style.padding = '30px 50px';
-    this.gameOverElement.style.borderRadius = '20px';
-    this.gameOverElement.style.fontSize = '32px';
-    this.gameOverElement.style.fontWeight = 'bold';
-    this.gameOverElement.style.textAlign = 'center';
-    this.gameOverElement.style.zIndex = '200';
-    this.gameOverElement.style.backdropFilter = 'blur(5px)';
-    this.gameOverElement.style.border = '2px solid rgba(255, 255, 255, 0.3)';
-    this.gameOverElement.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.5)';
-    this.gameOverElement.style.display = 'none';
-    this.gameOverElement.innerHTML = `
-      <div>💀 ИГРА ОКОНЧЕНА 💀</div>
-      <div style="font-size: 18px; margin-top: 20px; color: #ff6b6b;">Нажмите R для перезапуска</div>
-    `;
-    document.body.appendChild(this.gameOverElement);
+  initGameOverModal() {
+    // Получаем элемент модального окна
+    this.gameOverModalElement = document.getElementById('gameOverModal');
+    
+    if (this.gameOverModalElement && bootstrap) {
+      // Создаем экземпляр Bootstrap модального окна
+      this.gameOverModal = new bootstrap.Modal(this.gameOverModalElement, {
+        backdrop: 'static', // Запрещаем закрытие по клику вне модального окна
+        keyboard: false // Запрещаем закрытие по ESC
+      });
+      
+      // Обработчик для кнопки рестарта
+      const restartBtn = document.getElementById('restartButton');
+      if (restartBtn) {
+        restartBtn.addEventListener('click', () => {
+          this.resetGame();
+        });
+      }
+      
+      // Обработчик для закрытия модального окна (если пользователь нажмет X)
+      this.gameOverModalElement.addEventListener('hidden.bs.modal', () => {
+        // Если игра закончена и модальное окно закрыли, но не через рестарт
+        if (this.gameState.isGameOver()) {
+          this.resetGame();
+        }
+      });
+    } else {
+      console.warn('Bootstrap модальное окно не найдено или Bootstrap не загружен');
+    }
     
     // Настройка обработчика нажатия клавиши R для перезапуска
     window.addEventListener('keydown', (e) => {
@@ -75,13 +85,39 @@ class Game {
     
     // Подписка на события состояния игры
     this.gameState.onGameOver(() => {
-      this.gameOverElement.style.display = 'block';
-      this.mouseControl.destroy(); // Отключаем управление при окончании игры
+      console.log("Game Over callback вызван");
+      this.showGameOverModal();
+      if (this.mouseControl) {
+        this.mouseControl.destroy(); // Отключаем управление при окончании игры
+      }
     });
     
     this.gameState.onReset(() => {
-      this.gameOverElement.style.display = 'none';
+      console.log("Reset callback вызван");
+      if (this.gameOverModal) {
+        this.gameOverModal.hide();
+      }
     });
+  }
+  
+  showGameOverModal() {
+    // Обновляем статистику в модальном окне
+    const finalBounceElement = document.getElementById('finalBounceCount');
+    const finalHeightElement = document.getElementById('finalHeight');
+    
+    if (finalBounceElement && this.ball) {
+      finalBounceElement.textContent = this.ball.getBounceCount();
+    }
+    
+    if (finalHeightElement && this.ball) {
+      const ballPos = this.ball.getPosition();
+      finalHeightElement.textContent = ballPos.y.toFixed(1) + 'м';
+    }
+    
+    // Показываем модальное окно
+    if (this.gameOverModal) {
+      this.gameOverModal.show();
+    }
   }
   
   clearEnvironment() {
@@ -144,8 +180,8 @@ class Game {
     this.ball = new Ball(scene);
     this.ball.init();
     
-    // Инициализация физики
-    this.physics = new BallPhysics(this.ball, this.tree);
+    // Инициализация физики с передачей gameState
+    this.physics = new BallPhysics(this.ball, this.tree, this.gameState);
     
     // Инициализация управления мышью
     if (this.mouseControl) {
@@ -159,6 +195,8 @@ class Game {
   }
   
   resetGame() {
+    console.log("Сброс игры...");
+    
     // Очищаем старое окружение
     this.clearEnvironment();
     
@@ -166,13 +204,19 @@ class Game {
     this.createGameObjects();
     
     // Сброс камеры
-    this.cameraController.setPosition(2, CAMERA_START_Y, 9);
+    if (this.cameraController) {
+      this.cameraController.setPosition(2, CAMERA_START_Y, 9);
+    }
     
-    // Сброс состояния игры
-    this.gameState.reset();
+    // Сброс счетчика отскоков
+    if (this.ball) {
+      this.ball.resetBounceCount();
+    }
     
-    // Включаем управление обратно
-    this.mouseControl.init();
+    // Сброс состояния игры (это вызовет onReset колбэки)
+    if (this.gameState) {
+      this.gameState.reset();
+    }
   }
   
   createLights(scene) {
@@ -250,7 +294,7 @@ class Game {
   
   updateBounceCounter() {
     if (this.bounceCounterElement && this.ball) {
-      this.bounceCounterElement.textContent = `🔥 Отскоков: ${this.ball.getBounceCount()}`;
+      this.bounceCounterElement.innerHTML = `<i class="bi bi-fire"></i> Отскоков: ${this.ball.getBounceCount()}`;
     }
   }
   
@@ -262,6 +306,7 @@ class Game {
     
     // Если шарик упал ниже камеры на заданное смещение
     if (ballPos.y < cameraY + GAME_OVER_Y_OFFSET) {
+      console.log("Game Over по падению");
       this.gameState.gameOver();
     }
   }
@@ -275,6 +320,7 @@ class Game {
     
     if (this.gameState.isPlaying() && this.ball && this.physics) {
       // Обновление физики только если игра активна
+      this.tree.update();
       this.physics.update(dt);
       
       // Обновление вращения мыши

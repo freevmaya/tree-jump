@@ -11,8 +11,15 @@ def combine_project_files():
     
     # Определяем расширения файлов для обработки
     target_extensions = [".js", ".html"]
+    prompt = '''*Общая концепция для кодинга*
+
+Придерживайся объектно ориентированной концепции.
+Придерживаться изначальных именований классов, методов, функций, констант, переменных и не переименовывать при модификации.
+Если требуется создать отдельный класс и код его больше 100 строк, создавай его в отдельном файле
+Константы должны быть написаны в ВЕРХНЕМ РЕГИСТРЕ'''
     
     with open(output_file, "w", encoding="utf-8") as outfile:
+        outfile.write(prompt + "\n\n")
         outfile.write("# COMBINED PROJECT FILES FOR DEEPSEEK\n")
         outfile.write("# Encoding: UTF-8\n")
         outfile.write(f"# Processed extensions: {', '.join(target_extensions)}\n\n")

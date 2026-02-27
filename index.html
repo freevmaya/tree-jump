@@ -4,62 +4,76 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tree Jump — отскоки от дерева</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      overflow: hidden;
-      background: #87CEEB;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      cursor: grab;
-      user-select: none;
-    }
-    body:active { cursor: grabbing; }
-    #canvas-container {
-      width: 100vw;
-      height: 100vh;
-      position: relative;
-    }
-    canvas { display: block; outline: none; }
-    .hint {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: rgba(0,0,0,0.6);
-      background: rgba(255,255,240,0.25);
-      backdrop-filter: blur(4px);
-      padding: 8px 18px;
-      border-radius: 40px;
-      font-size: 15px;
-      font-weight: 500;
-      pointer-events: none;
-      text-shadow: 0 1px 2px rgba(255,255,255,0.3);
-      border: 1px solid rgba(255,255,255,0.3);
-      white-space: nowrap;
-      z-index: 100;
-    }
-    .bounce-indicator {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: rgba(0,0,0,0.3);
-      backdrop-filter: blur(4px);
-      color: white;
-      padding: 6px 14px;
-      border-radius: 30px;
-      font-size: 14px;
-      font-weight: 500;
-      border: 1px solid rgba(255,255,255,0.2);
-      pointer-events: none;
-      z-index: 100;
-    }
-  </style>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="./styles/main.css">
 </head>
 <body>
   <div id="canvas-container"></div>
-  <div class="hint">🖱️ Зажмите левую кнопку и тяните, чтобы вращать дерево</div>
-  <div class="bounce-indicator" id="bounce-counter">🔥 Отскоков: 0</div>
+  
+  <!-- Подсказка -->
+  <div class="hint">
+    <i class="bi bi-mouse"></i> Зажмите левую кнопку и тяните, чтобы вращать дерево
+  </div>
+  
+  <!-- Счетчик отскоков -->
+  <div class="bounce-indicator" id="bounce-counter">
+    <i class="bi bi-fire"></i> Отскоков: 0
+  </div>
+  
+  <!-- Индикатор красных платформ -->
+  <div class="killer-indicator" id="killer-indicator">
+    <i class="bi bi-exclamation-triangle-fill"></i> Красные платформы смертельны!
+  </div>
 
+  <!-- Bootstrap модальное окно для Game Over -->
+  <div class="modal fade" id="gameOverModal" tabindex="-1" aria-labelledby="gameOverModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="gameOverModalLabel">
+            <i class="bi bi-skull"></i> ИГРА ОКОНЧЕНА
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <i class="bi bi-tree-fill" style="font-size: 4rem; color: #ff6b6b; margin-bottom: 20px;"></i>
+          
+          <!-- Статистика игры -->
+          <div class="stats-container">
+            <div class="row">
+              <div class="col-6">
+                <div class="stat-value" id="finalBounceCount">0</div>
+                <div class="stat-label">Отскоков</div>
+              </div>
+              <div class="col-6">
+                <div class="stat-value" id="finalHeight">0</div>
+                <div class="stat-label">Высота</div>
+              </div>
+            </div>
+          </div>
+          
+          <p class="modal-subtitle">
+            <i class="bi bi-arrow-up-circle"></i> Нажмите R для перезапуска
+          </p>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-restart" id="restartButton">
+            <i class="bi bi-arrow-repeat"></i> Новая игра
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Подключаем Bootstrap JS глобально -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Import maps для Three.js -->
   <script type="importmap">
   {
     "imports": {
@@ -69,6 +83,8 @@
     }
   }
   </script>
+  
+  <!-- Main script -->
   <script type="module" src="./scripts/main.js"></script>
 </body>
 </html>

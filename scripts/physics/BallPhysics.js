@@ -5,11 +5,14 @@ import {
   BASE_PLATFORM_TOP_Y, GRAVITY, BOUNCE_SPEED, MAX_VELOCITY,
   MAIN_RADIUS
 } from '../constants.js';
+// Импортируем GameState для проверки состояния (опционально)
+import { GameState, GAME_STATE } from '../GameState.js';
 
 export class BallPhysics {
-  constructor(ball, tree) {
+  constructor(ball, tree, gameState) { // Три параметра: ball, tree, gameState
     this.ball = ball;
     this.tree = tree;
+    this.gameState = gameState; // Сохраняем ссылку на состояние игры
     this.gravity = GRAVITY;
     this.bounceSpeed = BOUNCE_SPEED;
     this.maxVelocity = MAX_VELOCITY;
@@ -63,7 +66,14 @@ export class BallPhysics {
             ballPos.y > platformTop &&
             this.ball.velocity.y < 0) {
           
-          // Отскок от верхней поверхности (летим вверх)
+          // Если это платформа-убийца - заканчиваем игру (ТОЛЬКО ПРИ УДАРЕ СВЕРХУ)
+          if (platformData.isKiller) {
+            console.log("Платформа-убийца! Игра окончена (удар сверху). gameState:", this.gameState);
+            this.gameState.gameOver();
+            return; // Прерываем проверку
+          }
+          
+          // Обычный отскок от верхней поверхности (летим вверх)
           this.ball.bounce(platformTop, this.bounceSpeed);
           break;
         }
@@ -74,7 +84,15 @@ export class BallPhysics {
             ballPos.y < platformBottom &&
             this.ball.velocity.y > 0) {
           
-          // Отскок от нижней поверхности - летим ВНИЗ (отрицательная скорость)
+          // Если это платформа-убийца - НЕ заканчиваем игру при ударе снизу
+          if (platformData.isKiller) {
+            console.log("Платформа-убийца: удар снизу - безопасно");
+            // Обычный отскок от нижней поверхности для платформы-убийцы
+            this.ball.bounce(platformBottom, -this.bounceSpeed);
+            break;
+          }
+          
+          // Обычный отскок от нижней поверхности - летим ВНИЗ (отрицательная скорость)
           this.ball.bounce(platformBottom, -this.bounceSpeed);
           break;
         }

@@ -23,12 +23,14 @@ export class GameState {
   gameOver() {
     if (this.state !== GAME_STATE.GAME_OVER) {
       this.state = GAME_STATE.GAME_OVER;
+      console.log("GameState.gameOver() вызван, колбэков:", this.gameOverCallbacks.length);
       this.gameOverCallbacks.forEach(callback => callback());
     }
   }
   
   reset() {
     this.state = GAME_STATE.PLAYING;
+    console.log("GameState.reset() вызван, колбэков:", this.resetCallbacks.length);
     this.resetCallbacks.forEach(callback => callback());
   }
   

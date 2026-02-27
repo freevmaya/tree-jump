@@ -13,7 +13,7 @@ export const STICK_OUT = 0.1 * MAIN_DIAMETER;
 export const PLATFORM_RADIUS = MAIN_DIAMETER * 0.4 / 2;
 export const PLATFORM_HEIGHT = 0.02 * MAIN_DIAMETER;
 export const CYLINDER_HALF_HEIGHT = TREE_HEIGHT / 2;
-export const PLATFORM_DENSITY = 0.5;
+export const PLATFORM_DENSITY = 0.8;
 export const PLATFORM_COUNT = Math.floor(TREE_HEIGHT * PLATFORM_DENSITY);
 
 // Базовая платформа
@@ -34,7 +34,8 @@ export const CAMERA_HEIGHT_OFFSET = 2.8;
 export const CAMERA_START_Y = 0;
 
 // Управление мышью
-export const ROTATION_SPEED = 0.005;
+export const ROTATION_SPEED = 0.05;
+export const ROTATION_SMOOTH = 0.5;
 export const INERTIA = 0.92;
 
 // Цвета
@@ -63,3 +64,10 @@ export const RESET_POSITION_X = 0;
 export const RESET_POSITION_Z = MAIN_RADIUS * 1.3;
 export const RESET_POSITION_Y = BASE_PLATFORM_TOP_Y + BALL_RADIUS;
 export const RESET_VELOCITY_Y = BOUNCE_SPEED;
+
+// Цвета для платформ
+export const PLATFORM_NORMAL_COLOR = 0xA67C52; // Используем существующий TREE_COLOR для обычных платформ
+export const PLATFORM_KILLER_COLOR = 0xFF3333; // Ярко-красный для платформ-убийц
+
+// Процент платформ-убийц
+export const KILLER_PLATFORM_PERCENTAGE = 0.2; // 20%

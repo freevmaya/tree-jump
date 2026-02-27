@@ -1,3 +1,10 @@
+*Общая концепция для кодинга*
+
+Придерживайся объектно ориентированной концепции.
+Придерживаться изначальных именований классов, методов, функций, констант, переменных и не переименовывать при модификации.
+Если требуется создать отдельный класс и код его больше 100 строк, создавай его в отдельном файле
+Константы должны быть написаны в ВЕРХНЕМ РЕГИСТРЕ
+
 # COMBINED PROJECT FILES FOR DEEPSEEK
 # Encoding: UTF-8
 # Processed extensions: .js, .html
@@ -113,12 +120,14 @@ export class GameState {
   gameOver() {
     if (this.state !== GAME_STATE.GAME_OVER) {
       this.state = GAME_STATE.GAME_OVER;
+      console.log("GameState.gameOver() вызван, колбэков:", this.gameOverCallbacks.length);
       this.gameOverCallbacks.forEach(callback => callback());
     }
   }
   
   reset() {
     this.state = GAME_STATE.PLAYING;
+    console.log("GameState.reset() вызван, колбэков:", this.resetCallbacks.length);
     this.resetCallbacks.forEach(callback => callback());
   }
   
@@ -152,7 +161,7 @@ export const STICK_OUT = 0.1 * MAIN_DIAMETER;
 export const PLATFORM_RADIUS = MAIN_DIAMETER * 0.4 / 2;
 export const PLATFORM_HEIGHT = 0.02 * MAIN_DIAMETER;
 export const CYLINDER_HALF_HEIGHT = TREE_HEIGHT / 2;
-export const PLATFORM_DENSITY = 0.5;
+export const PLATFORM_DENSITY = 0.8;
 export const PLATFORM_COUNT = Math.floor(TREE_HEIGHT * PLATFORM_DENSITY);
 
 // Базовая платформа
@@ -173,7 +182,8 @@ export const CAMERA_HEIGHT_OFFSET = 2.8;
 export const CAMERA_START_Y = 0;
 
 // Управление мышью
-export const ROTATION_SPEED = 0.005;
+export const ROTATION_SPEED = 0.05;
+export const ROTATION_SMOOTH = 0.5;
 export const INERTIA = 0.92;
 
 // Цвета
@@ -203,6 +213,13 @@ export const RESET_POSITION_Z = MAIN_RADIUS * 1.3;
 export const RESET_POSITION_Y = BASE_PLATFORM_TOP_Y + BALL_RADIUS;
 export const RESET_VELOCITY_Y = BOUNCE_SPEED;
 
+// Цвета для платформ
+export const PLATFORM_NORMAL_COLOR = 0xA67C52; // Используем существующий TREE_COLOR для обычных платформ
+export const PLATFORM_KILLER_COLOR = 0xFF3333; // Ярко-красный для платформ-убийц
+
+// Процент платформ-убийц
+export const KILLER_PLATFORM_PERCENTAGE = 0.2; // 20%
+
 
 # ============================================================
 # FILE: .\scripts\controls\MouseRotationControl.js
@@ -217,46 +234,113 @@ export class MouseRotationControl {
     this.tree = tree;
     this.container = container;
     this.isDragging = false;
-    this.previousMouseX = 0;
+    this.previousX = 0;
     this.velocityY = 0;
     this.rotationSpeed = ROTATION_SPEED;
     this.inertia = INERTIA;
     
+    // Привязываем методы для мыши
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
     this.onMouseLeave = this.onMouseUp.bind(this);
+    
+    // Привязываем методы для тачскрина
+    this.onTouchStart = this.onTouchStart.bind(this);
+    this.onTouchMove = this.onTouchMove.bind(this);
+    this.onTouchEnd = this.onTouchEnd.bind(this);
+    this.onTouchCancel = this.onTouchEnd.bind(this);
   }
   
   init() {
+    // События мыши
     this.container.addEventListener('mousedown', this.onMouseDown);
     window.addEventListener('mousemove', this.onMouseMove);
     window.addEventListener('mouseup', this.onMouseUp);
     window.addEventListener('mouseleave', this.onMouseLeave);
+    
+    // События тачскрина
+    this.container.addEventListener('touchstart', this.onTouchStart, { passive: false });
+    window.addEventListener('touchmove', this.onTouchMove, { passive: false });
+    window.addEventListener('touchend', this.onTouchEnd);
+    window.addEventListener('touchcancel', this.onTouchCancel);
+    
+    // Запрещаем скролл страницы при касании canvas
+    this.container.style.touchAction = 'none';
   }
   
   destroy() {
+    // Удаляем события мыши
     this.container.removeEventListener('mousedown', this.onMouseDown);
     window.removeEventListener('mousemove', this.onMouseMove);
     window.removeEventListener('mouseup', this.onMouseUp);
     window.removeEventListener('mouseleave', this.onMouseLeave);
+    
+    // Удаляем события тачскрина
+    this.container.removeEventListener('touchstart', this.onTouchStart);
+    window.removeEventListener('touchmove', this.onTouchMove);
+    window.removeEventListener('touchend', this.onTouchEnd);
+    window.removeEventListener('touchcancel', this.onTouchCancel);
+    
+    // Возвращаем стандартное поведение
+    this.container.style.touchAction = '';
   }
   
+  // Обработчики для мыши
   onMouseDown(e) {
-    this.isDragging = true;
-    this.previousMouseX = e.clientX;
-    this.velocityY = 0;
+    e.preventDefault();
+    this.startDrag(e.clientX);
   }
   
   onMouseMove(e) {
     if (!this.isDragging) return;
-    const dx = e.clientX - this.previousMouseX;
-    this.velocityY = dx * this.rotationSpeed;
-    this.tree.rotate(this.velocityY);
-    this.previousMouseX = e.clientX;
+    e.preventDefault();
+    this.drag(e.clientX);
   }
   
   onMouseUp() {
+    this.stopDrag();
+  }
+  
+  // Обработчики для тачскрина
+  onTouchStart(e) {
+    e.preventDefault();
+    if (e.touches.length === 1) {
+      this.startDrag(e.touches[0].clientX);
+    }
+  }
+  
+  onTouchMove(e) {
+    if (!this.isDragging || e.touches.length !== 1) return;
+    e.preventDefault();
+    this.drag(e.touches[0].clientX);
+  }
+  
+  onTouchEnd(e) {
+    e.preventDefault();
+    this.stopDrag();
+  }
+  
+  onTouchCancel(e) {
+    e.preventDefault();
+    this.stopDrag();
+  }
+  
+  // Общие методы для начала, выполнения и остановки перетаскивания
+  startDrag(clientX) {
+    this.isDragging = true;
+    this.previousX = clientX;
+    this.velocityY = 0;
+  }
+  
+  drag(currentX) {
+    const dx = currentX - this.previousX;
+    this.velocityY = dx * this.rotationSpeed;
+    this.tree.rotate(this.velocityY);
+    this.previousX = currentX;
+  }
+  
+  stopDrag() {
     this.isDragging = false;
   }
   
@@ -439,13 +523,15 @@ class Game {
     this.mouseControl = null;
     this.bounceCounterElement = document.getElementById('bounce-counter');
     this.lastTime = performance.now();
+    
+    // Сначала создаем gameState
     this.gameState = new GameState();
     
     // Хранилище для созданных объектов окружения
     this.environmentObjects = [];
     this.lights = [];
     
-    // Создание UI для конца игры
+    // Потом создаем UI (теперь gameState уже существует)
     this.createGameOverUI();
   }
   
@@ -481,13 +567,17 @@ class Game {
       }
     });
     
-    // Подписка на события состояния игры
+    // Подписка на события состояния игры (теперь gameState точно существует)
     this.gameState.onGameOver(() => {
+      console.log("Game Over callback вызван");
       this.gameOverElement.style.display = 'block';
-      this.mouseControl.destroy(); // Отключаем управление при окончании игры
+      if (this.mouseControl) {
+        this.mouseControl.destroy(); // Отключаем управление при окончании игры
+      }
     });
     
     this.gameState.onReset(() => {
+      console.log("Reset callback вызван");
       this.gameOverElement.style.display = 'none';
     });
   }
@@ -552,8 +642,8 @@ class Game {
     this.ball = new Ball(scene);
     this.ball.init();
     
-    // Инициализация физики
-    this.physics = new BallPhysics(this.ball, this.tree);
+    // Инициализация физики с передачей gameState
+    this.physics = new BallPhysics(this.ball, this.tree, this.gameState);
     
     // Инициализация управления мышью
     if (this.mouseControl) {
@@ -567,6 +657,8 @@ class Game {
   }
   
   resetGame() {
+    console.log("Сброс игры...");
+    
     // Очищаем старое окружение
     this.clearEnvironment();
     
@@ -574,13 +666,19 @@ class Game {
     this.createGameObjects();
     
     // Сброс камеры
-    this.cameraController.setPosition(2, CAMERA_START_Y, 9);
+    if (this.cameraController) {
+      this.cameraController.setPosition(2, CAMERA_START_Y, 9);
+    }
     
-    // Сброс состояния игры
-    this.gameState.reset();
+    // Сброс счетчика отскоков
+    if (this.ball) {
+      this.ball.resetBounceCount();
+    }
     
-    // Включаем управление обратно
-    this.mouseControl.init();
+    // Сброс состояния игры (это вызовет onReset колбэки)
+    if (this.gameState) {
+      this.gameState.reset();
+    }
   }
   
   createLights(scene) {
@@ -670,6 +768,7 @@ class Game {
     
     // Если шарик упал ниже камеры на заданное смещение
     if (ballPos.y < cameraY + GAME_OVER_Y_OFFSET) {
+      console.log("Game Over по падению");
       this.gameState.gameOver();
     }
   }
@@ -683,6 +782,7 @@ class Game {
     
     if (this.gameState.isPlaying() && this.ball && this.physics) {
       // Обновление физики только если игра активна
+      this.tree.update();
       this.physics.update(dt);
       
       // Обновление вращения мыши
@@ -815,14 +915,16 @@ export class Ball {
 // scripts/models/Platform.js
 import * as THREE from 'three';
 import { 
-  TREE_COLOR, STICK_OUT, PLATFORM_RADIUS, PLATFORM_HEIGHT, MAIN_RADIUS
+  TREE_COLOR, STICK_OUT, PLATFORM_RADIUS, PLATFORM_HEIGHT, 
+  MAIN_RADIUS, PLATFORM_NORMAL_COLOR, PLATFORM_KILLER_COLOR
 } from '../constants.js';
 
 export class Platform {
-  constructor(parentMesh, theta, y) {
+  constructor(parentMesh, theta, y, isKiller = false) {
     this.parentMesh = parentMesh;
     this.theta = theta;
     this.y = y;
+    this.isKiller = isKiller;
     this.group = null;
     this.box = null;
     this.platformMesh = null;
@@ -834,10 +936,14 @@ export class Platform {
     this.boxGeometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
     this.platformGeometry = new THREE.CylinderGeometry(PLATFORM_RADIUS, PLATFORM_RADIUS, PLATFORM_HEIGHT, 16);
     
+    // Выбираем цвет в зависимости от типа платформы
+    const platformColor = isKiller ? PLATFORM_KILLER_COLOR : PLATFORM_NORMAL_COLOR;
+    
     this.material = new THREE.MeshStandardMaterial({
-      color: TREE_COLOR,
-      metalness: 0.0,
-      roughness: 0.9,
+      color: platformColor,
+      metalness: isKiller ? 0.3 : 0.0,
+      roughness: isKiller ? 0.4 : 0.9,
+      emissive: isKiller ? new THREE.Color(0x330000) : new THREE.Color(0x000000),
     });
   }
   
@@ -858,17 +964,84 @@ export class Platform {
     this.platformMesh.castShadow = true;
     this.group.add(this.platformMesh);
     
+    // Добавляем шипы для платформ-убийц
+    if (this.isKiller) {
+      this.addSpikes();
+    }
+    
     this.parentMesh.add(this.group);
     
     return {
       mesh: this.platformMesh,
       group: this.group,
-      localY: this.y
+      localY: this.y,
+      isKiller: this.isKiller
     };
   }
   
+  addSpikes() {
+    const spikeCount = 6; // Количество шипов
+    const spikeRadius = PLATFORM_RADIUS * 0.7; // Радиус размещения шипов
+    const spikeHeight = PLATFORM_HEIGHT * 3; // Высота шипа
+    
+    // Создаем материал для шипов (более яркий красный)
+    const spikeMaterial = new THREE.MeshStandardMaterial({
+      color: 0xFF5555,
+      emissive: 0x220000,
+      metalness: 0.1,
+      roughness: 0.3
+    });
+    
+    for (let i = 0; i < spikeCount; i++) {
+      // Угол для размещения шипа по кругу
+      const angle = (i / spikeCount) * Math.PI * 2;
+      
+      // Создаем конус (пирамидку) для шипа
+      const spikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.2, spikeHeight, 8);
+      const spike = new THREE.Mesh(spikeGeometry, spikeMaterial);
+      
+      // Позиционируем шип на краю платформы
+      spike.position.set(
+        STICK_OUT + Math.cos(angle) * spikeRadius,
+        PLATFORM_HEIGHT / 2 + spikeHeight / 2,
+        Math.sin(angle) * spikeRadius
+      );
+      
+      spike.castShadow = true;
+      spike.receiveShadow = true;
+      
+      this.group.add(spike);
+    }
+    
+    // Добавляем один центральный шип для большей угрозы
+    const centerSpikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.25, spikeHeight * 1.2, 8);
+    const centerSpike = new THREE.Mesh(centerSpikeGeometry, spikeMaterial);
+    centerSpike.position.set(STICK_OUT, PLATFORM_HEIGHT / 2 + spikeHeight * 1.2 / 2, 0);
+    centerSpike.castShadow = true;
+    centerSpike.receiveShadow = true;
+    this.group.add(centerSpike);
+    
+    // Добавляем маленькие шипы на выступе (боксе)
+    const boxSpikeCount = 3;
+    for (let i = 0; i < boxSpikeCount; i++) {
+      const boxSpikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.15, spikeHeight * 0.8, 6);
+      const boxSpike = new THREE.Mesh(boxSpikeGeometry, spikeMaterial);
+      
+      const offset = (i - 1) * PLATFORM_RADIUS * 0.3;
+      boxSpike.position.set(
+        -PLATFORM_RADIUS - PLATFORM_RADIUS * 0.2,
+        PLATFORM_HEIGHT / 2 + spikeHeight * 0.8 / 2,
+        offset
+      );
+      
+      boxSpike.castShadow = true;
+      boxSpike.receiveShadow = true;
+      this.group.add(boxSpike);
+    }
+  }
+  
   updateTexture(texture) {
-    if (texture) {
+    if (texture && !this.isKiller) {
       this.material.map = texture;
       this.material.color.setHex(0xffffff);
       this.material.needsUpdate = true;
@@ -887,7 +1060,8 @@ import * as THREE from 'three';
 import { 
   TREE_COLOR, TREE_HEIGHT, MAIN_RADIUS, STICK_OUT, 
   PLATFORM_RADIUS, PLATFORM_HEIGHT, PLATFORM_COUNT,
-  CYLINDER_HALF_HEIGHT, WIREFRAME_COLOR, BARK_TEXTURE_PATH
+  CYLINDER_HALF_HEIGHT, WIREFRAME_COLOR, BARK_TEXTURE_PATH,
+  KILLER_PLATFORM_PERCENTAGE, ROTATION_SMOOTH
 } from '../constants.js';
 import { Platform } from './Platform.js';
 
@@ -898,6 +1072,7 @@ export class Tree {
     this.platforms = [];
     this.textureLoader = new THREE.TextureLoader();
     this.barkTexture = null;
+    this.targetRotation = 0;
   }
   
   init() {
@@ -959,14 +1134,33 @@ export class Tree {
     // Очищаем массив платформ перед созданием новых
     this.platforms = [];
     
+    // Рассчитываем количество платформ-убийц (20%)
+    const killerCount = Math.floor(PLATFORM_COUNT * KILLER_PLATFORM_PERCENTAGE);
+    
+    // Создаем массив булевых значений для определения типа каждой платформы
+    const platformTypes = new Array(PLATFORM_COUNT).fill(false);
+    
+    // Случайно выбираем индексы для платформ-убийц
+    for (let i = 0; i < killerCount; i++) {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * PLATFORM_COUNT);
+      } while (platformTypes[randomIndex] === true); // Ищем свободный индекс
+      platformTypes[randomIndex] = true;
+    }
+    
+    // Создаем платформы с соответствующими типами
     for (let i = 0; i < PLATFORM_COUNT; i++) {
       const theta = Math.random() * Math.PI * 2;
       const y = (i / PLATFORM_COUNT * 2 - 1) * CYLINDER_HALF_HEIGHT;
       
-      const platform = new Platform(this.mesh, theta, y);
+      const isKiller = platformTypes[i]; // Определяем тип платформы
+      const platform = new Platform(this.mesh, theta, y, isKiller);
       const platformData = platform.create();
       this.platforms.push(platformData);
     }
+    
+    console.log(`Создано платформ: всего ${PLATFORM_COUNT}, убийц: ${killerCount}`); // Для отладки
   }
   
   getPlatforms() {
@@ -975,7 +1169,7 @@ export class Tree {
   
   rotate(yDelta) {
     if (this.mesh) {
-      this.mesh.rotation.y += yDelta;
+      this.targetRotation += yDelta;
     }
   }
   
@@ -987,6 +1181,10 @@ export class Tree {
   
   getRotationY() {
     return this.mesh ? this.mesh.rotation.y : 0;
+  }
+
+  update() {
+      this.setRotation(this.mesh.rotation.y + (this.targetRotation - this.mesh.rotation.y) * ROTATION_SMOOTH);
   }
 }
 
@@ -1003,11 +1201,14 @@ import {
   BASE_PLATFORM_TOP_Y, GRAVITY, BOUNCE_SPEED, MAX_VELOCITY,
   MAIN_RADIUS
 } from '../constants.js';
+// Импортируем GameState для проверки состояния (опционально)
+import { GameState, GAME_STATE } from '../GameState.js';
 
 export class BallPhysics {
-  constructor(ball, tree) {
+  constructor(ball, tree, gameState) { // Три параметра: ball, tree, gameState
     this.ball = ball;
     this.tree = tree;
+    this.gameState = gameState; // Сохраняем ссылку на состояние игры
     this.gravity = GRAVITY;
     this.bounceSpeed = BOUNCE_SPEED;
     this.maxVelocity = MAX_VELOCITY;
@@ -1061,7 +1262,14 @@ export class BallPhysics {
             ballPos.y > platformTop &&
             this.ball.velocity.y < 0) {
           
-          // Отскок от верхней поверхности (летим вверх)
+          // Если это платформа-убийца - заканчиваем игру (ТОЛЬКО ПРИ УДАРЕ СВЕРХУ)
+          if (platformData.isKiller) {
+            console.log("Платформа-убийца! Игра окончена (удар сверху). gameState:", this.gameState);
+            this.gameState.gameOver();
+            return; // Прерываем проверку
+          }
+          
+          // Обычный отскок от верхней поверхности (летим вверх)
           this.ball.bounce(platformTop, this.bounceSpeed);
           break;
         }
@@ -1072,7 +1280,15 @@ export class BallPhysics {
             ballPos.y < platformBottom &&
             this.ball.velocity.y > 0) {
           
-          // Отскок от нижней поверхности - летим ВНИЗ (отрицательная скорость)
+          // Если это платформа-убийца - НЕ заканчиваем игру при ударе снизу
+          if (platformData.isKiller) {
+            console.log("Платформа-убийца: удар снизу - безопасно");
+            // Обычный отскок от нижней поверхности для платформы-убийцы
+            this.ball.bounce(platformBottom, -this.bounceSpeed);
+            break;
+          }
+          
+          // Обычный отскок от нижней поверхности - летим ВНИЗ (отрицательная скорость)
           this.ball.bounce(platformBottom, -this.bounceSpeed);
           break;
         }

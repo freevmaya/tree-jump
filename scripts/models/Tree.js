@@ -5,7 +5,7 @@ import {
   PLATFORM_RADIUS, PLATFORM_HEIGHT, PLATFORM_COUNT,
   CYLINDER_HALF_HEIGHT, WIREFRAME_COLOR, BARK_TEXTURE_PATH,
   KILLER_PLATFORM_PERCENTAGE, ROTATION_SMOOTH,
-  BRANCH_COUNT, BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH
+  BRANCH_COUNT, BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH, BRANCH_DENSITY
 } from '../constants.js';
 import { Platform } from './Platform.js';
 import { Branch } from './Branch.js';
@@ -16,7 +16,7 @@ export class Tree {
     this.scene = scene;
     this.mesh = null;
     this.platforms = [];
-    this.branches = []; // Добавляем массив для хранения веток
+    this.branches = []; // Массив для хранения веток
     this.barkTexture = null;
     this.targetRotation = 0;
     this.minRadius = MAIN_RADIUS * 0.5;
@@ -47,8 +47,8 @@ export class Tree {
     // Создание платформ
     this.createPlatforms();
     
-    // Создание веток
-    this.createBranches();
+    // Создание веток под платформами
+    this.createBranchesUnderPlatforms();
     
     this.scene.add(this.mesh);
     return this.mesh;
@@ -157,9 +157,9 @@ export class Tree {
       const isKiller = platformTypes[i];
       
       const platform = new Platform(this.mesh, theta, y, isKiller);
-      const platformData = platform.create(this.calcDistance(y));
+      platform.create(this.calcDistance(y));
       
-      this.platforms.push(platformData);
+      this.platforms.push(platform);
       
       previousTheta = theta;
     }
@@ -167,76 +167,89 @@ export class Tree {
     console.log(`Создано платформ: всего ${PLATFORM_COUNT}, убийц: ${killerCount}`);
   }
   
-  createBranches() {
+  createBranchesUnderPlatforms() {
     // Очищаем массив веток
     this.branches = [];
     
-    // Рассчитываем количество веток (реже чем платформы)
-    // Используем BRANCH_COUNT из констант
+    if (this.platforms.length === 0) return;
     
-    console.log(`Создание веток: ${BRANCH_COUNT} шт.`);
+    // Рассчитываем количество веток на основе плотности
+    const targetBranchCount = Math.floor(PLATFORM_COUNT * BRANCH_DENSITY);
+    console.log(`Создание веток под платформами: ${targetBranchCount} шт. (плотность ${BRANCH_DENSITY})`);
     
-    // Создаем массив для хранения занятых позиций по Y
-    // Чтобы ветки не мешали платформам, размещаем их между платформами
+    // Сортируем платформы по высоте
+    const sortedPlatforms = [...this.platforms].sort((a, b) => a.y - b.y);
     
-    const platformYPositions = this.platforms.map(p => p.localY);
-    platformYPositions.sort((a, b) => a - b);
-    
-    let branchCreated = 0;
+    // Выбираем случайные платформы для размещения веток под ними
+    const selectedPlatformIndices = new Set();
     let attempts = 0;
     const maxAttempts = 1000;
     
-    while (branchCreated < BRANCH_COUNT && attempts < maxAttempts) {
+    while (selectedPlatformIndices.size < targetBranchCount && attempts < maxAttempts) {
       attempts++;
       
-      // Выбираем случайную высоту
-      const y = (Math.random() - 0.5) * TREE_HEIGHT * 0.9;
+      // Выбираем случайную платформу
+      const platformIndex = Math.floor(Math.random() * sortedPlatforms.length);
       
-      // Проверяем, что высота не слишком близка к платформам
-      let tooClose = false;
-      for (const platformY of platformYPositions) {
-        if (Math.abs(platformY - y) < 0.6) { // Минимальное расстояние до платформы
-          tooClose = true;
-          break;
+      // Проверяем, не выбрана ли уже эта платформа
+      if (!selectedPlatformIndices.has(platformIndex)) {
+        const platform = sortedPlatforms[platformIndex];
+        
+        // Проверяем, что под платформой достаточно места для ветки
+        const platformY = platform.y;
+        
+        // Проверяем расстояние до других веток
+        let tooClose = false;
+        for (const branch of this.branches) {
+          if (Math.abs(branch.y - platformY) < 0.8) {
+            tooClose = true;
+            break;
+          }
         }
-      }
-      
-      // Также проверяем расстояние до других веток
-      for (const branch of this.branches) {
-        if (Math.abs(branch.localY - y) < 0.8) {
-          tooClose = true;
-          break;
+        
+        // Также проверяем расстояние до других платформ (чтобы ветка не мешала)
+        for (const otherPlatform of sortedPlatforms) {
+          if (otherPlatform !== platform && Math.abs(otherPlatform.y - platformY) < 0.6) {
+            tooClose = true;
+            break;
+          }
         }
-      }
-      
-      if (!tooClose) {
-        // Генерируем угол для ветки
-        const theta = (Math.random() - 0.5) * Math.PI * 2;
         
-        // Рассчитываем радиус ствола на этой высоте
-        const distance = this.calcDistance(y) * 0.6;
-        
-        // Определяем масштаб ветки (чем выше, тем меньше)
-        const heightFactor = (CYLINDER_HALF_HEIGHT - y) / TREE_HEIGHT;
-        const scaleFactor = 0.6 + heightFactor * 0.8; // Ветки внизу крупнее
-        
-        // Создаем ветку
-        const branch = new Branch(this.mesh, theta, y, scaleFactor);
-        const branchData = branch.create(distance);
-        
-        // Сохраняем данные ветки
-        this.branches.push({
-          group: branchData.group,
-          meshes: branchData.meshes,
-          localY: branchData.localY,
-          branch: branch // Сохраняем ссылку на объект Branch для возможного обновления
-        });
-        
-        branchCreated++;
+        if (!tooClose) {
+          // Добавляем платформу в выбранные
+          selectedPlatformIndices.add(platformIndex);
+        }
       }
     }
     
-    console.log(`Создано веток: ${branchCreated} из ${BRANCH_COUNT} запланированных`);
+    // Создаем ветки под выбранными платформами
+    selectedPlatformIndices.forEach(platformIndex => {
+      const platform = sortedPlatforms[platformIndex];
+      
+      // Высота ветки - чуть ниже платформы
+      const branchY = platform.y - PLATFORM_HEIGHT / 2 - 0.5;   
+
+      const distance = this.calcDistance(branchY) * 0.6;
+      
+      // Определяем масштаб ветки (чем выше, тем меньше)
+      const heightFactor = (CYLINDER_HALF_HEIGHT - branchY) / TREE_HEIGHT;
+      const scaleFactor = 0.6 + heightFactor * 0.8; // Ветки внизу крупнее
+      
+      // Создаем ветку
+      const branch = new Branch(this.mesh, platform.theta, branchY, scaleFactor);
+      const branchData = branch.create(distance);
+      
+      // Сохраняем данные ветки
+      this.branches.push({
+        group: branchData.group,
+        mesh: branchData.mesh,
+        localY: branchData.y,
+        branch: branch, // Сохраняем ссылку на объект Branch для возможного обновления
+        platformIndex: platformIndex // Сохраняем индекс платформы, под которой создана ветка
+      });
+    });
+    
+    console.log(`Создано веток под платформами: ${this.branches.length} из ${targetBranchCount} запланированных`);
   }
   
   getPlatforms() {

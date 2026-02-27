@@ -14,7 +14,7 @@ export class Platform {
     this.y = y;
     this.isKiller = isKiller;
     this.group = null;
-    this.platformMesh = null;
+    this.mesh = null;
     this.texture = null;
 
     this.platformGeometry = new THREE.CylinderGeometry(PLATFORM_RADIUS, PLATFORM_RADIUS * 0.9, PLATFORM_HEIGHT, 16);
@@ -36,11 +36,11 @@ export class Platform {
     this.group.rotation.y = -this.theta;
     
     // Создание площадки
-    this.platformMesh = new THREE.Mesh(this.platformGeometry, this.material);
-    this.platformMesh.position.set(STICK_OUT, 0, 0);
-    this.platformMesh.castShadow = true;
-    this.platformMesh.receiveShadow = true;
-    this.group.add(this.platformMesh);
+    this.mesh = new THREE.Mesh(this.platformGeometry, this.material);
+    this.mesh.position.set(STICK_OUT, 0, 0);
+    this.mesh.castShadow = true;
+    this.mesh.receiveShadow = true;
+    this.group.add(this.mesh);
     
     // Загружаем текстуру для платформы
     this.loadTexture();
@@ -53,7 +53,7 @@ export class Platform {
     this.parentMesh.add(this.group);
     
     return {
-      mesh: this.platformMesh,
+      mesh: this.mesh,
       group: this.group,
       localY: this.y,
       isKiller: this.isKiller

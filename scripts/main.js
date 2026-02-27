@@ -37,8 +37,11 @@ class Game {
     this.mouseControl = null;
     this.joystickControl = null;
     this.bounceCounterElement = document.getElementById('bounce-counter');
+    this.scoreIndicatorElement = document.getElementById('score-indicator');
+    this.currentScoreElement = document.getElementById('current-score');
     this.lastTime = performance.now();
     this.crystal = null;
+    this.currentScore = 0;
     
     // Создаем gameState
     this.gameState = new GameState();
@@ -76,6 +79,7 @@ class Game {
     // Подписка на события состояния игры
     this.gameState.onGameOver(() => {
       console.log("Game Over callback вызван");
+      this.hideScoreIndicator();
       this.showGameOverModal();
       if (this.mouseControl) {
         this.mouseControl.destroy();
@@ -87,6 +91,7 @@ class Game {
     
     this.gameState.onVictory(() => {
       console.log("Victory callback вызван");
+      this.calculateScore();
       this.showVictoryModal();
       if (this.mouseControl) {
         this.mouseControl.destroy();
@@ -129,6 +134,7 @@ class Game {
       if (this.pauseModal) {
         this.pauseModal.hide();
       }
+      this.hideScoreIndicator();
     });
   }
   
@@ -220,15 +226,9 @@ class Game {
   showGameOverModal() {
     // Обновляем статистику в модальном окне
     const finalBounceElement = document.getElementById('finalBounceCount');
-    const finalHeightElement = document.getElementById('finalHeight');
     
     if (finalBounceElement && this.ball) {
       finalBounceElement.textContent = this.ball.getBounceCount();
-    }
-    
-    if (finalHeightElement && this.ball) {
-      const ballPos = this.ball.getPosition();
-      finalHeightElement.textContent = ballPos.y.toFixed(1) + 'м';
     }
     
     // Показываем модальное окно
@@ -240,15 +240,14 @@ class Game {
   showVictoryModal() {
     // Обновляем статистику в модальном окне победы
     const victoryBounceElement = document.getElementById('victoryBounceCount');
-    const victoryHeightElement = document.getElementById('victoryHeight');
+    const victoryScoreElement = document.getElementById('victoryScore');
     
     if (victoryBounceElement && this.ball) {
       victoryBounceElement.textContent = this.ball.getBounceCount();
     }
     
-    if (victoryHeightElement && this.ball) {
-      const ballPos = this.ball.getPosition();
-      victoryHeightElement.textContent = ballPos.y.toFixed(1) + 'м';
+    if (victoryScoreElement) {
+      victoryScoreElement.textContent = this.currentScore;
     }
     
     // Показываем модальное окно
@@ -269,6 +268,46 @@ class Game {
     }
   }
   
+  showScoreIndicator() {
+    if (this.scoreIndicatorElement) {
+      this.scoreIndicatorElement.style.display = 'block';
+    }
+  }
+  
+  hideScoreIndicator() {
+    if (this.scoreIndicatorElement) {
+      this.scoreIndicatorElement.style.display = 'none';
+    }
+  }
+  
+  updateScoreIndicator() {
+    if (this.currentScoreElement) {
+      this.currentScoreElement.textContent = this.currentScore;
+    }
+  }
+  
+  calculateScore() {
+    if (!this.ball) return;
+    
+    const bounceCount = this.ball.getBounceCount();
+    // Формула: чем меньше отскоков, тем больше очков
+    // Максимум 1000 очков при 0 отскоков, минимум 100 при максимальном количестве
+    const MAX_BOUNCES = 30; // Ожидаемое максимальное количество отскоков
+    const MAX_SCORE = 1000;
+    const MIN_SCORE = 100;
+    
+    if (bounceCount >= MAX_BOUNCES) {
+      this.currentScore = MIN_SCORE;
+    } else {
+      // Линейная интерполяция: больше отскоков = меньше очков
+      this.currentScore = Math.floor(
+        MAX_SCORE - (bounceCount / MAX_BOUNCES) * (MAX_SCORE - MIN_SCORE)
+      );
+    }
+    
+    this.updateScoreIndicator();
+  }
+  
   clearEnvironment() {
     // Удаляем все объекты окружения из сцены
     const scene = this.sceneManager.getScene();
@@ -287,8 +326,8 @@ class Game {
     }
     
     // Удаляем старый шарик
-    if (this.ball && this.ball.mesh) {
-      scene.remove(this.ball.mesh);
+    if (this.ball) {
+      this.ball.dispose();
       this.ball = null;
     }
     
@@ -360,6 +399,10 @@ class Game {
     
     // Создание пола и базовой платформы
     this.createEnvironment(scene);
+    
+    // Сброс счета
+    this.currentScore = 0;
+    this.updateScoreIndicator();
   }
   
   resetGame() {
@@ -396,6 +439,10 @@ class Game {
     if (this.joystickControl) {
       this.joystickControl.reset();
     }
+    
+    // Сброс счета
+    this.currentScore = 0;
+    this.updateScoreIndicator();
   }
   
   createLights(scene) {
@@ -450,22 +497,6 @@ class Game {
     floor.receiveShadow = true;
     scene.add(floor);
     this.environmentObjects.push(floor);
-
-    
-    /*
-    // Базовая платформа
-    const basePlatformGeometry = new THREE.BoxGeometry(BASE_PLATFORM_SIZE, 0.01, BASE_PLATFORM_SIZE);
-    const basePlatformMaterial = new THREE.MeshStandardMaterial({
-      color: BASE_PLATFORM_COLOR,
-      metalness: 0.1,
-      roughness: 0.85,
-    });
-    const basePlatform = new THREE.Mesh(basePlatformGeometry, basePlatformMaterial);
-    basePlatform.position.set(0, -TREE_HEIGHT / 2, 0);
-    basePlatform.receiveShadow = true;
-    basePlatform.castShadow = true;
-    scene.add(basePlatform);
-    this.environmentObjects.push(basePlatform);*/
   }
   
   onResize() {
@@ -516,6 +547,14 @@ class Game {
       
       // Проверка конца игры
       this.checkGameOver();
+      
+      // Показываем индикатор очков при приближении к вершине
+      if (this.ball && this.ball.getPosition().y > TREE_HEIGHT / 2 - 2) {
+        this.showScoreIndicator();
+        this.calculateScore();
+      } else {
+        this.hideScoreIndicator();
+      }
     } else if (this.gameState.isPaused()) {
       // На паузе ничего не обновляем, но дерево может продолжать вращаться по инерции?
       // Для чистоты эксперимента - останавливаем всё

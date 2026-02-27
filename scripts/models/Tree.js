@@ -4,9 +4,11 @@ import {
   TREE_COLOR, TREE_HEIGHT, MAIN_RADIUS, STICK_OUT, 
   PLATFORM_RADIUS, PLATFORM_HEIGHT, PLATFORM_COUNT,
   CYLINDER_HALF_HEIGHT, WIREFRAME_COLOR, BARK_TEXTURE_PATH,
-  KILLER_PLATFORM_PERCENTAGE, ROTATION_SMOOTH
+  KILLER_PLATFORM_PERCENTAGE, ROTATION_SMOOTH,
+  BRANCH_COUNT, BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH
 } from '../constants.js';
 import { Platform } from './Platform.js';
+import { Branch } from './Branch.js';
 import { textureLoader } from '../utils/TextureLoader.js';
 
 export class Tree {
@@ -14,6 +16,7 @@ export class Tree {
     this.scene = scene;
     this.mesh = null;
     this.platforms = [];
+    this.branches = []; // Добавляем массив для хранения веток
     this.barkTexture = null;
     this.targetRotation = 0;
     this.minRadius = MAIN_RADIUS * 0.5;
@@ -43,6 +46,9 @@ export class Tree {
     
     // Создание платформ
     this.createPlatforms();
+    
+    // Создание веток
+    this.createBranches();
     
     this.scene.add(this.mesh);
     return this.mesh;
@@ -94,50 +100,53 @@ export class Tree {
     // Очищаем массив платформ перед созданием новых
     this.platforms = [];
     
-    // Рассчитываем количество платформ-убийц (10% согласно константе)
+    // Рассчитываем количество платформ-убийц
     const killerCount = Math.floor(PLATFORM_COUNT * KILLER_PLATFORM_PERCENTAGE);
     
-    // Создаем массив булевых значений для определения типа каждой платформы
+    // Создаем массив для хранения типов платформ
     const platformTypes = new Array(PLATFORM_COUNT).fill(false);
     
-    // Случайно выбираем индексы для платформ-убийц
-    for (let i = 0; i < killerCount; i++) {
-      let randomIndex;
-      do {
-        randomIndex = Math.floor(Math.random() * PLATFORM_COUNT);
-      } while (platformTypes[randomIndex] === true); // Ищем свободный индекс
-      platformTypes[randomIndex] = true;
+    // Распределяем платформы-убийцы равномерно между обычными платформами
+    if (killerCount > 0) {
+      // Вычисляем интервал между платформами-убийцами
+      const interval = Math.floor(PLATFORM_COUNT / (killerCount + 1));
+      
+      // Размещаем платформы-убийцы с равными промежутками
+      for (let i = 0; i < killerCount; i++) {
+        let position = interval * (i + 1);
+        
+        if (position >= PLATFORM_COUNT) {
+          position = PLATFORM_COUNT - 1;
+        }
+        
+        platformTypes[position] = true;
+      }
+      
+      console.log(`Платформы-убийцы распределены равномерно: ${platformTypes.filter(t => t).length} шт.`);
     }
     
     let base_y = CYLINDER_HALF_HEIGHT / PLATFORM_COUNT;
-    let previousTheta = null; // Переменная для хранения предыдущего угла
+    let previousTheta = null;
+    const MIN_ANGLE_DIFF = Math.PI / 3;
     
-    // Создаем платформы с соответствующими типами
     for (let i = 0; i < PLATFORM_COUNT; i++) {
       const y = base_y + (i / PLATFORM_COUNT * 2 - 1) * (CYLINDER_HALF_HEIGHT - base_y);
       
-      // Генерируем угол с проверкой на минимальное отличие от предыдущего
       let theta;
-      const MIN_ANGLE_DIFF = Math.PI / 3; // Минимальная разница в 60 градусов
       
       if (previousTheta === null) {
-        // Для первой платформы - случайный угол
         theta = (Math.random() - 0.5) * Math.PI * 2;
       } else {
-        // Для последующих - генерируем угол, отличающийся от предыдущего не менее чем на MIN_ANGLE_DIFF
         let attempts = 0;
-        const maxAttempts = 100; // Предотвращаем бесконечный цикл
+        const maxAttempts = 100;
         
         do {
           theta = (Math.random() - 0.5) * Math.PI * 2;
           attempts++;
           
-          // Если не получается найти подходящий угол за много попыток,
-          // добавляем MIN_ANGLE_DIFF к предыдущему углу со случайным направлением
           if (attempts > maxAttempts) {
             const direction = Math.random() > 0.5 ? 1 : -1;
             theta = previousTheta + direction * MIN_ANGLE_DIFF;
-            // Нормализуем угол в диапазон [-PI, PI]
             while (theta > Math.PI) theta -= Math.PI * 2;
             while (theta < -Math.PI) theta += Math.PI * 2;
             break;
@@ -145,22 +154,97 @@ export class Tree {
         } while (Math.abs(theta - previousTheta) < MIN_ANGLE_DIFF);
       }
       
-      const isKiller = platformTypes[i]; // Используем реальные типы
+      const isKiller = platformTypes[i];
       
       const platform = new Platform(this.mesh, theta, y, isKiller);
       const platformData = platform.create(this.calcDistance(y));
       
       this.platforms.push(platformData);
       
-      // Сохраняем текущий угол для следующей итерации
       previousTheta = theta;
     }
     
     console.log(`Создано платформ: всего ${PLATFORM_COUNT}, убийц: ${killerCount}`);
   }
   
+  createBranches() {
+    // Очищаем массив веток
+    this.branches = [];
+    
+    // Рассчитываем количество веток (реже чем платформы)
+    // Используем BRANCH_COUNT из констант
+    
+    console.log(`Создание веток: ${BRANCH_COUNT} шт.`);
+    
+    // Создаем массив для хранения занятых позиций по Y
+    // Чтобы ветки не мешали платформам, размещаем их между платформами
+    
+    const platformYPositions = this.platforms.map(p => p.localY);
+    platformYPositions.sort((a, b) => a - b);
+    
+    let branchCreated = 0;
+    let attempts = 0;
+    const maxAttempts = 1000;
+    
+    while (branchCreated < BRANCH_COUNT && attempts < maxAttempts) {
+      attempts++;
+      
+      // Выбираем случайную высоту
+      const y = (Math.random() - 0.5) * TREE_HEIGHT * 0.9;
+      
+      // Проверяем, что высота не слишком близка к платформам
+      let tooClose = false;
+      for (const platformY of platformYPositions) {
+        if (Math.abs(platformY - y) < 0.6) { // Минимальное расстояние до платформы
+          tooClose = true;
+          break;
+        }
+      }
+      
+      // Также проверяем расстояние до других веток
+      for (const branch of this.branches) {
+        if (Math.abs(branch.localY - y) < 0.8) {
+          tooClose = true;
+          break;
+        }
+      }
+      
+      if (!tooClose) {
+        // Генерируем угол для ветки
+        const theta = (Math.random() - 0.5) * Math.PI * 2;
+        
+        // Рассчитываем радиус ствола на этой высоте
+        const distance = this.calcDistance(y) * 0.6;
+        
+        // Определяем масштаб ветки (чем выше, тем меньше)
+        const heightFactor = (CYLINDER_HALF_HEIGHT - y) / TREE_HEIGHT;
+        const scaleFactor = 0.6 + heightFactor * 0.8; // Ветки внизу крупнее
+        
+        // Создаем ветку
+        const branch = new Branch(this.mesh, theta, y, scaleFactor);
+        const branchData = branch.create(distance);
+        
+        // Сохраняем данные ветки
+        this.branches.push({
+          group: branchData.group,
+          meshes: branchData.meshes,
+          localY: branchData.localY,
+          branch: branch // Сохраняем ссылку на объект Branch для возможного обновления
+        });
+        
+        branchCreated++;
+      }
+    }
+    
+    console.log(`Создано веток: ${branchCreated} из ${BRANCH_COUNT} запланированных`);
+  }
+  
   getPlatforms() {
     return this.platforms;
+  }
+  
+  getBranches() {
+    return this.branches;
   }
   
   rotate(yDelta) {
@@ -180,6 +264,6 @@ export class Tree {
   }
 
   update() {
-      this.setRotation(this.mesh.rotation.y + (this.targetRotation - this.mesh.rotation.y) * ROTATION_SMOOTH);
+    this.setRotation(this.mesh.rotation.y + (this.targetRotation - this.mesh.rotation.y) * ROTATION_SMOOTH);
   }
 }

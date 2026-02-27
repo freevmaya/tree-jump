@@ -86,4 +86,8 @@ export class Ball {
   resetBounceCount() {
     this.bounceCount = 0;
   }
+
+  dispose() {
+    this.scene.remove(this.mesh);
+  }
 }

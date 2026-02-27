@@ -14,15 +14,9 @@ export class Platform {
     this.y = y;
     this.isKiller = isKiller;
     this.group = null;
-    this.box = null;
     this.platformMesh = null;
     this.texture = null;
-    
-    const boxWidth = STICK_OUT * 3;
-    const boxHeight = STICK_OUT * 0.6;
-    const boxDepth = STICK_OUT * 0.6;
-    
-    this.boxGeometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+
     this.platformGeometry = new THREE.CylinderGeometry(PLATFORM_RADIUS, PLATFORM_RADIUS * 0.9, PLATFORM_HEIGHT, 16);
     
     // Выбираем цвет в зависимости от типа платформы
@@ -40,13 +34,6 @@ export class Platform {
     this.group = new THREE.Group();
     this.group.position.set(distance * Math.cos(this.theta), this.y, distance * Math.sin(this.theta));
     this.group.rotation.y = -this.theta;
-    
-    // Создание выступа (бокса)
-    this.box = new THREE.Mesh(this.boxGeometry, this.material);
-    this.box.position.set(-PLATFORM_RADIUS, 0, 0);
-    this.box.castShadow = true;
-    this.box.receiveShadow = true;
-    this.group.add(this.box);
     
     // Создание площадки
     this.platformMesh = new THREE.Mesh(this.platformGeometry, this.material);
@@ -118,6 +105,7 @@ export class Platform {
       roughness: 0.3
     });
     
+    /*
     // Загружаем текстуру для шипов
     textureLoader.loadTexture(
       'textures/spike.jpg',
@@ -128,7 +116,7 @@ export class Platform {
       () => {
         // Игнорируем ошибку, используем цвет
       }
-    );
+    );*/
     
     for (let i = 0; i < spikeCount; i++) {
       // Угол для размещения шипа по кругу

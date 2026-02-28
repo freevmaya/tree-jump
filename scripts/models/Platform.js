@@ -18,6 +18,8 @@ export class Platform {
     this.texture = null;
 
     this.platformGeometry = new THREE.CylinderGeometry(PLATFORM_RADIUS, PLATFORM_RADIUS * 0.9, PLATFORM_HEIGHT, 16);
+
+    textureLoader.rotateUV(this.platformGeometry, Math.PI * 0.5);
     
     // Выбираем цвет в зависимости от типа платформы
     const platformColor = isKiller ? PLATFORM_KILLER_COLOR : PLATFORM_NORMAL_COLOR;
@@ -51,13 +53,6 @@ export class Platform {
     }
     
     this.parentMesh.add(this.group);
-    
-    return {
-      mesh: this.mesh,
-      group: this.group,
-      localY: this.y,
-      isKiller: this.isKiller
-    };
   }
   
   loadTexture() {

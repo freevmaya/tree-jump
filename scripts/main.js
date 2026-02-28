@@ -39,7 +39,6 @@ class Game {
     this.physics = null;
     this.mouseControl = null;
     this.joystickControl = null;
-    this.bounceCounterElement = document.getElementById('bounce-counter');
     this.scoreIndicatorElement = document.getElementById('score-indicator');
     this.currentScoreElement = document.getElementById('current-score');
     this.lastTime = performance.now();
@@ -369,17 +368,11 @@ class Game {
         scene.background = new THREE.Color(0x87CEEB); // Запасной цвет
       }
     );*/
-
-    this.background = new Background(scene);
-    this.background.init(BACKGROUND_IMAGE_PATH, {
-      size: 40, // Увеличиваем размер для лучшего покрытия
-      opacity: 1.0,
-      rotation: 0,
-      repeat: { x: 1, y: 1 }
-    });
     
     // Создание освещения
     this.createLights(scene);
+
+    this.createEnvironment(scene);
     
     // Создание игровых объектов
     this.createGameObjects();
@@ -424,9 +417,6 @@ class Game {
     if (joystickPad && joystickThumb) {
       this.joystickControl = new JoystickControl(this.tree, joystickPad, joystickThumb);
     }
-    
-    // Создание пола и базовой платформы
-    this.createEnvironment(scene);
     
     // Сброс счета
     this.currentScore = 0;
@@ -512,7 +502,17 @@ class Game {
   }
   
   createEnvironment(scene) {
+
+    this.background = new Background(scene);
+    this.background.init(BACKGROUND_IMAGE_PATH, {
+      size: 50,
+      opacity: 1.0,
+      rotation: 0,
+      repeat: { x: 1, y: 1 }
+    });
+
     // Пол
+    /*
     const floorGeometry = new THREE.CircleGeometry(100, 64);
     const floorMaterial = new THREE.MeshStandardMaterial({
       color: FLOOR_COLOR,
@@ -525,17 +525,12 @@ class Game {
     floor.receiveShadow = true;
     scene.add(floor);
     this.environmentObjects.push(floor);
+    */
   }
   
   onResize() {
     this.rendererManager.resize();
     this.cameraController.resize(this.rendererManager.getAspectRatio());
-  }
-  
-  updateBounceCounter() {
-    if (this.bounceCounterElement && this.ball) {
-      this.bounceCounterElement.innerHTML = `<i class="bi bi-fire"></i> Отскоков: ${this.ball.getBounceCount()}`;
-    }
   }
   
   checkGameOver() {
@@ -607,9 +602,6 @@ class Game {
     if (this.ball) {
       this.cameraController.update(this.ball.getLastBounceY());
     }
-    
-    // Обновление счетчика отскоков
-    this.updateBounceCounter();
     
     // Рендеринг (всегда, чтобы видеть паузу)
     if (this.sceneManager.getScene() && this.cameraController) {

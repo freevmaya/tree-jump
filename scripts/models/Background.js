@@ -54,15 +54,12 @@ export class Background {
     const geometry = new THREE.PlaneGeometry(size / 0.75, size);
     
     // Создаем материал с текстурой
-    const material = new THREE.MeshStandardMaterial({
+    const material = new THREE.MeshBasicMaterial({
       map: this.texture,
+      color: 0x888888,
       side: THREE.DoubleSide,
       transparent: true,
       opacity: opacity,
-      emissive: 0x000000,
-      emissiveIntensity: 0,
-      roughness: 1,
-      metalness: 0,
       depthWrite: false,
       depthTest: true
     });

@@ -8,7 +8,7 @@
 
 body {
   overflow: hidden;
-  background: #87CEEB;
+  background: #000404;
   font-family: 'Segoe UI', system-ui, sans-serif;
   user-select: none;
   height: 100vh;
@@ -80,7 +80,7 @@ canvas {
 }
 
 .joystick-pad {
-  width: 30%;
+  width: 60%;
   height: 70%;
   background: rgba(255, 255, 255, 0.15);
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -287,7 +287,7 @@ canvas {
 /* Адаптация для мобильных устройств */
 @media (max-width: 768px) {
   .joystick-pad {
-    width: 50%;
+    width: calc(100% - 20px);
   }
   
   .hint {

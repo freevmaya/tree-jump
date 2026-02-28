@@ -11,7 +11,7 @@ export class JoystickControl {
     this.startX = 0;
     this.currentX = 0;
     this.normalizedDirect = 0;
-    this.rotationSpeed = ROTATION_SPEED * 3; // Увеличим скорость для джойстика
+    this.rotationSpeed = ROTATION_SPEED * 200; // Увеличим скорость для джойстика
     this.inertia = INERTIA;
     
     // Границы движения джойстика
@@ -128,7 +128,7 @@ export class JoystickControl {
     this.joystickThumb.style.left = `calc(50% + ${offsetX}px)`;
     
     // Вычисляем скорость вращения на основе смещения
-    this.normalizedDirect = this.deltaDirect / this.maxOffset; // от -1 до 1
+    this.normalizedDirect = (this.deltaDirect / this.maxOffset) * this.rotationSpeed; // от -1 до 1
   }
   
   stopDrag() {

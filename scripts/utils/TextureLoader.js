@@ -6,6 +6,30 @@ export class TextureLoaderUtil {
     this.loader = new THREE.TextureLoader();
     this.cubeLoader = new THREE.CubeTextureLoader();
     this.cache = new Map();
+    this.useCache = true;
+  }
+
+  applyOptions(texture, options = {}) {
+
+    const mergedOptions = { ...{
+      colorSpace: THREE.SRGBColorSpace,
+      wrapS: THREE.RepeatWrapping,
+      wrapT: THREE.RepeatWrapping,
+      repeat: { x: 1, y: 1 },
+      rotation: 0,
+      anisotropy: 16 // Добавляем анизотропную фильтрацию для лучшего качества
+    }, ...options };
+
+    // Применяем настройки
+    texture.colorSpace = mergedOptions.colorSpace;
+    texture.wrapS = mergedOptions.wrapS;
+    texture.wrapT = mergedOptions.wrapT;
+    texture.repeat.set(mergedOptions.repeat.x, mergedOptions.repeat.y);
+    texture.anisotropy = mergedOptions.anisotropy;
+    texture.minFilter = THREE.LinearMipmapLinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.rotation = mergedOptions.rotation;
+    return texture;
   }
 
   /**
@@ -16,39 +40,23 @@ export class TextureLoaderUtil {
    * @param {object} options - дополнительные параметры текстуры
    */
   loadTexture(path, onLoad, onError, options = {}) {
+
     // Проверяем кэш
-    if (this.cache.has(path)) {
+    if (this.useCache && this.cache.has(path)) {
       const cachedTexture = this.cache.get(path);
-      if (onLoad) onLoad(cachedTexture);
+      if (onLoad) onLoad(this.applyOptions(cachedTexture.clone(), options));
       return cachedTexture;
     }
-
-    const defaultOptions = {
-      colorSpace: THREE.SRGBColorSpace,
-      wrapS: THREE.RepeatWrapping,
-      wrapT: THREE.RepeatWrapping,
-      repeat: { x: 1, y: 1 },
-      anisotropy: 16 // Добавляем анизотропную фильтрацию для лучшего качества
-    };
-
-    const mergedOptions = { ...defaultOptions, ...options };
 
     return this.loader.load(
       path,
       (texture) => {
-        // Применяем настройки
-        texture.colorSpace = mergedOptions.colorSpace;
-        texture.wrapS = mergedOptions.wrapS;
-        texture.wrapT = mergedOptions.wrapT;
-        texture.repeat.set(mergedOptions.repeat.x, mergedOptions.repeat.y);
-        texture.anisotropy = mergedOptions.anisotropy;
-        texture.minFilter = THREE.LinearMipmapLinearFilter;
-        texture.magFilter = THREE.LinearFilter;
 
         // Сохраняем в кэш
-        this.cache.set(path, texture);
+        if (this.useCache)
+          this.cache.set(path, texture);
 
-        if (onLoad) onLoad(texture);
+        if (onLoad) onLoad(this.applyOptions(texture.clone(), options));
       },
       undefined,
       (error) => {
@@ -277,6 +285,35 @@ export class TextureLoaderUtil {
    */
   getFromCache(path) {
     return this.cache.get(path) || null;
+  }
+
+  rotateUV(geometry, angle) {
+
+    // Получить UV-координаты
+    const uvAttribute = geometry.attributes.uv;
+
+    // Трансформация UV для поворота
+    for (let i = 0; i < uvAttribute.count; i++) {
+        let u = uvAttribute.getX(i);
+        let v = uvAttribute.getY(i);
+        
+        // Поворот вокруг центра (0.5, 0.5)
+        const centerU = 0.5;
+        const centerV = 0.5;
+        
+        // Смещаем к центру
+        u -= centerU;
+        v -= centerV;
+        
+        // Поворачиваем
+        const rotatedU = u * Math.cos(angle) - v * Math.sin(angle);
+        const rotatedV = u * Math.sin(angle) + v * Math.cos(angle);
+        
+        // Возвращаем обратно
+        uvAttribute.setXY(i, rotatedU + centerU, rotatedV + centerV);
+    }
+
+    uvAttribute.needsUpdate = true;
   }
 }
 

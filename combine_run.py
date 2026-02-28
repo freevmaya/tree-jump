@@ -10,7 +10,7 @@ def combine_project_files():
     exclude_paths = ["vendor", "dev"]
     
     # Определяем расширения файлов для обработки
-    target_extensions = [".js", ".html"]
+    target_extensions = [".js", ".html", ".css"]
     prompt = '''*Общая концепция для кодинга*
 
 Придерживайся объектно ориентированной концепции и событийной модели.

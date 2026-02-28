@@ -7,7 +7,8 @@ import {
   FILL_LIGHT_INTENSITY, RIM_LIGHT_COLOR, RIM_LIGHT_INTENSITY,
   RIM_LIGHT_DISTANCE, TREE_HEIGHT, MAIN_RADIUS,
   GAME_OVER_Y_OFFSET, RESET_POSITION_X, RESET_POSITION_Y,
-  RESET_POSITION_Z, RESET_VELOCITY_Y, CAMERA_START_Y
+  RESET_POSITION_Z, RESET_VELOCITY_Y, CAMERA_START_Y,
+  BACKGROUND_IMAGE_PATH
 } from './constants.js';
 
 import { SceneManager } from './core/SceneManager.js';
@@ -20,6 +21,8 @@ import { MouseRotationControl } from './controls/MouseRotationControl.js';
 import { JoystickControl } from './controls/JoystickControl.js';
 import { GameState, GAME_STATE } from './GameState.js';
 import { Crystal } from './models/Crystal.js';
+import { Background } from './models/Background.js';
+import { textureLoader } from './utils/TextureLoader.js';
 
 // Bootstrap доступен глобально через window.bootstrap
 const bootstrap = window.bootstrap;
@@ -41,6 +44,7 @@ class Game {
     this.currentScoreElement = document.getElementById('current-score');
     this.lastTime = performance.now();
     this.crystal = null;
+    this.background = null; // Добавлено для фона
     this.currentScore = 0;
     
     // Создаем gameState
@@ -344,13 +348,37 @@ class Game {
     // Инициализация сцены
     const scene = this.sceneManager.init();
     
+    // Отключаем fog для сцены, если хотим использовать чистый фон
+    // scene.fog = null; // Закомментируйте или удалите эту строку
+    
     // Инициализация рендерера
     this.rendererManager.init();
     
     // Инициализация камеры
     this.cameraController = new CameraController(this.rendererManager.getAspectRatio());
     
-    // Создание освещения (только один раз)
+    /*
+    // Загружаем текстуру для фона сцены
+    textureLoader.loadTexture(
+      BACKGROUND_IMAGE_PATH || 'textures/background.jpg',
+      (texture) => {
+        scene.background = texture;
+      },
+      (error) => {
+        console.warn('Не удалось загрузить фоновое изображение, использую цвет');
+        scene.background = new THREE.Color(0x87CEEB); // Запасной цвет
+      }
+    );*/
+
+    this.background = new Background(scene);
+    this.background.init(BACKGROUND_IMAGE_PATH, {
+      size: 40, // Увеличиваем размер для лучшего покрытия
+      opacity: 1.0,
+      rotation: 0,
+      repeat: { x: 1, y: 1 }
+    });
+    
+    // Создание освещения
     this.createLights(scene);
     
     // Создание игровых объектов
@@ -422,7 +450,7 @@ class Game {
     
     // Сброс камеры
     if (this.cameraController) {
-      this.cameraController.setPosition(2, CAMERA_START_Y, 9);
+      this.cameraController.setPosition(0, CAMERA_START_Y, 9);
     }
     
     // Сброс счетчика отскоков
@@ -524,6 +552,7 @@ class Game {
   }
   
   animate() {
+
     requestAnimationFrame(this.animate.bind(this));
     
     const time = performance.now();
@@ -534,6 +563,11 @@ class Game {
     if (this.gameState.isPlaying() && this.ball && this.physics) {
       this.tree.update();
       this.physics.update(dt);
+    
+      // Обновление фона
+      if (this.background) {
+        this.background.update(dt);
+      }
       
       // Обновление вращения мыши
       if (this.mouseControl) {

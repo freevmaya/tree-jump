@@ -229,7 +229,7 @@ export class Tree {
       // Высота ветки - чуть ниже платформы
       const branchY = platform.y - PLATFORM_HEIGHT / 2 - 0.5;   
 
-      const distance = this.calcDistance(branchY) * 0.6;
+      const distance = this.calcDistance(branchY) * 0.5;
       
       // Определяем масштаб ветки (чем выше, тем меньше)
       const heightFactor = (CYLINDER_HALF_HEIGHT - branchY) / TREE_HEIGHT;

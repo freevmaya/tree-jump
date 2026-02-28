@@ -9,14 +9,14 @@ export const MAIN_RADIUS = 1;
 export const MAIN_DIAMETER = MAIN_RADIUS * 2;
 
 // Ветки
-export const BRANCH_DENSITY = 0.5; // Плотность веток (меньше чем у платформ)
+export const BRANCH_DENSITY = 1; // Плотность веток (меньше чем у платформ)
 export const BRANCH_COUNT = Math.floor(TREE_HEIGHT * BRANCH_DENSITY); // Количество веток
 export const BRANCH_MIN_RADIUS = 0.1; // Минимальная толщина ветки у основания
 export const BRANCH_MAX_RADIUS = 0.3; // Максимальная толщина ветки у основания
 export const BRANCH_MIN_LENGTH = 2; // Минимальная длина ветки
-export const BRANCH_MAX_LENGTH = 5; // Максимальная длина ветки
-export const BRANCH_ANGLE_MIN = 0.1; // Минимальный угол наклона ветки (от горизонтали)
-export const BRANCH_ANGLE_MAX = 0.3; // Максимальный угол наклона ветки (от горизонтали)
+export const BRANCH_MAX_LENGTH = 3; // Максимальная длина ветки
+export const BRANCH_ANGLE_MIN = 0.2; // Минимальный угол наклона ветки (от горизонтали)
+export const BRANCH_ANGLE_MAX = 0.5; // Максимальный угол наклона ветки (от горизонтали)
 export const BRANCH_CURVE_STRENGTH = 0.5; // Сила изгиба ветки
 export const BRANCH_SEGMENTS = 5; // Количество сегментов для изогнутой ветки
 
@@ -72,6 +72,7 @@ export const RIM_LIGHT_DISTANCE = 12;
 export const BARK_TEXTURE_PATH = 'textures/bark.jpg';
 export const PLATFORM_TEXTURE_PATH = 'textures/platform.jpg';
 export const KILLER_PLATFORM_TEXTURE_PATH = 'textures/killer_platform.jpg';
+export const BACKGROUND_IMAGE_PATH = 'images/5Wn5OGu.png';
 
 // Игровые параметры
 export const GAME_OVER_Y_OFFSET = -7; // Смещение относительно камеры для конца игры

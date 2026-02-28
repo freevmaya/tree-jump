@@ -37,7 +37,7 @@ export class Branch {
     this.curveStrength = BRANCH_CURVE_STRENGTH * (0.5 + Math.random() * 0.8);
     
     // Направление изгиба
-    this.curveDirection = (Math.random() - 0.5) * 2;
+    this.curveDirection = (Math.random() - 0.5) * BRANCH_CURVE_STRENGTH;
   }
   
   create(distance) {

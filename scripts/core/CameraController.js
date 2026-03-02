@@ -5,10 +5,14 @@ import { CAMERA_FOLLOW_SPEED, CAMERA_HEIGHT_OFFSET, CAMERA_START_Y } from '../co
 export class CameraController {
   constructor(aspectRatio) {
     this.camera = new THREE.PerspectiveCamera(50, aspectRatio, 0.1, 100);
-    this.camera.position.set(0, CAMERA_START_Y, 12);
     this.targetY = 0;
     this.followSpeed = CAMERA_FOLLOW_SPEED;
     this.heightOffset = CAMERA_HEIGHT_OFFSET;
+    this.reset();
+  }
+
+  reset() {
+    this.camera.position.set(0, CAMERA_START_Y, 12);
   }
   
   update(targetY) {

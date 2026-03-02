@@ -23,6 +23,8 @@ import { GameState, GAME_STATE } from './GameState.js';
 import { Crystal } from './models/Crystal.js';
 import { Background } from './models/Background.js';
 import { textureLoader } from './utils/TextureLoader.js';
+import { eventBus } from './utils/EventEmitter.js';
+import { soundManager } from './audio/SoundManager.js';
 
 // Bootstrap доступен глобально через window.bootstrap
 const bootstrap = window.bootstrap;
@@ -41,10 +43,14 @@ class Game {
     this.joystickControl = null;
     this.scoreIndicatorElement = document.getElementById('score-indicator');
     this.currentScoreElement = document.getElementById('current-score');
+    this.gameHintElement = document.getElementById('game-hint');
+    this.killerIndicatorElement = document.getElementById('killer-indicator');
     this.lastTime = performance.now();
     this.crystal = null;
-    this.background = null; // Добавлено для фона
+    this.background = null;
     this.currentScore = 0;
+    this.soundsLoaded = false;
+    this.gameStarted = false; // Флаг, что игра была запущена
     
     // Создаем gameState
     this.gameState = new GameState();
@@ -55,17 +61,32 @@ class Game {
     
     // Инициализация Bootstrap модальных окон
     this.initModals();
+    
+    // Загрузка звуков
+    this.initAudio();
+  }
+  
+  async initAudio() {
+    try {
+      console.log('Загрузка звуков...');
+      await soundManager.loadAllSounds();
+      this.soundsLoaded = true;
+      console.log('Звуки успешно загружены');
+    } catch (error) {
+      console.warn('Ошибка загрузки звуков:', error);
+    }
   }
   
   initModals() {
+    this.initStartModal();
     this.initGameOverModal();
     this.initVictoryModal();
     this.initPauseModal();
     
     // Настройка обработчика нажатия клавиш
     window.addEventListener('keydown', (e) => {
-      // Перезапуск по клавише R (в любом состоянии)
-      if (e.key === 'r' || e.key === 'R') {
+      // Перезапуск по клавише R (в любом состоянии, кроме IDLE)
+      if ((e.key === 'r' || e.key === 'R') && !this.gameState.isIdle()) {
         this.resetGame();
       }
       
@@ -77,53 +98,41 @@ class Game {
           this.gameState.resume();
         }
       }
+      
+      // Клавиша M для отключения звука
+      if (e.key === 'm' || e.key === 'M') {
+        soundManager.setMuted(!soundManager.muted);
+        console.log(`Звук ${soundManager.muted ? 'выключен' : 'включен'}`);
+      }
     });
     
     // Подписка на события состояния игры
     this.gameState.onGameOver(() => {
       console.log("Game Over callback вызван");
       this.hideScoreIndicator();
+      this.hideGameHint();
+      this.hideKillerIndicator();
       this.showGameOverModal();
-      if (this.mouseControl) {
-        this.mouseControl.destroy();
-      }
-      if (this.joystickControl) {
-        this.joystickControl.destroy();
-      }
+      this.disableControls();
     });
     
     this.gameState.onVictory(() => {
       console.log("Victory callback вызван");
       this.calculateScore();
       this.showVictoryModal();
-      if (this.mouseControl) {
-        this.mouseControl.destroy();
-      }
-      if (this.joystickControl) {
-        this.joystickControl.destroy();
-      }
+      this.disableControls();
     });
     
     this.gameState.onPause(() => {
       console.log("Pause callback вызван");
       this.showPauseModal();
-      if (this.mouseControl) {
-        this.mouseControl.destroy();
-      }
-      if (this.joystickControl) {
-        this.joystickControl.destroy();
-      }
+      this.disableControls();
     });
     
     this.gameState.onResume(() => {
       console.log("Resume callback вызван");
       this.hidePauseModal();
-      if (this.mouseControl) {
-        this.mouseControl.init();
-      }
-      if (this.joystickControl) {
-        // Джойстик не нужно реинициализировать, он сам восстанавливается
-      }
+      this.enableControls();
     });
     
     this.gameState.onReset(() => {
@@ -138,7 +147,41 @@ class Game {
         this.pauseModal.hide();
       }
       this.hideScoreIndicator();
+      this.showGameHint();
+      this.showKillerIndicator();
+      this.enableControls();
     });
+
+    // Подписка на старт игры
+    this.gameState.onStart(() => {
+      console.log("Start callback вызван");
+      this.hideStartModal();
+      this.showGameHint();
+      this.showKillerIndicator();
+      this.enableControls();
+      this.gameStarted = true;
+    });
+  }
+  
+  initStartModal() {
+    // Получаем элемент модального окна Start
+    this.startModalElement = document.getElementById('startModal');
+    
+    if (this.startModalElement && bootstrap) {
+      // Создаем экземпляр Bootstrap модального окна
+      this.startModal = new bootstrap.Modal(this.startModalElement, {
+        backdrop: 'static',
+        keyboard: false
+      });
+      
+      // Обработчик для кнопки старта
+      const startBtn = document.getElementById('startGameButton');
+      if (startBtn) {
+        startBtn.addEventListener('click', () => {
+          this.gameState.start();
+        });
+      }
+    }
   }
   
   initGameOverModal() {
@@ -226,6 +269,18 @@ class Game {
     }
   }
   
+  showStartModal() {
+    if (this.startModal) {
+      this.startModal.show();
+    }
+  }
+  
+  hideStartModal() {
+    if (this.startModal) {
+      this.startModal.hide();
+    }
+  }
+  
   showGameOverModal() {
     // Обновляем статистику в модальном окне
     const finalBounceElement = document.getElementById('finalBounceCount');
@@ -280,6 +335,60 @@ class Game {
   hideScoreIndicator() {
     if (this.scoreIndicatorElement) {
       this.scoreIndicatorElement.style.display = 'none';
+    }
+  }
+  
+  showGameHint() {
+    if (this.gameHintElement) {
+      this.gameHintElement.style.display = 'block';
+    }
+  }
+  
+  hideGameHint() {
+    if (this.gameHintElement) {
+      this.gameHintElement.style.display = 'none';
+    }
+  }
+  
+  showKillerIndicator() {
+    if (this.killerIndicatorElement) {
+      this.killerIndicatorElement.style.display = 'block';
+    }
+  }
+  
+  hideKillerIndicator() {
+    if (this.killerIndicatorElement) {
+      this.killerIndicatorElement.style.display = 'none';
+    }
+  }
+  
+  disableControls() {
+    if (this.mouseControl) {
+      this.mouseControl.destroy();
+      this.mouseControl = null;
+    }
+    if (this.joystickControl) {
+      this.joystickControl.destroy();
+      this.joystickControl = null;
+    }
+  }
+  
+  enableControls() {
+    // Инициализация управления мышью (для верхнего блока)
+    if (this.mouseControl) {
+      this.mouseControl.destroy();
+    }
+    this.mouseControl = new MouseRotationControl(this.tree, this.container);
+    this.mouseControl.init();
+    
+    // Инициализация управления джойстиком (для нижнего блока)
+    if (this.joystickControl) {
+      this.joystickControl.destroy();
+    }
+    const joystickPad = document.getElementById('joystick-pad');
+    const joystickThumb = document.getElementById('joystick-thumb');
+    if (joystickPad && joystickThumb) {
+      this.joystickControl = new JoystickControl(this.tree, joystickPad, joystickThumb);
     }
   }
   
@@ -347,34 +456,18 @@ class Game {
     // Инициализация сцены
     const scene = this.sceneManager.init();
     
-    // Отключаем fog для сцены, если хотим использовать чистый фон
-    // scene.fog = null; // Закомментируйте или удалите эту строку
-    
     // Инициализация рендерера
     this.rendererManager.init();
     
     // Инициализация камеры
     this.cameraController = new CameraController(this.rendererManager.getAspectRatio());
     
-    /*
-    // Загружаем текстуру для фона сцены
-    textureLoader.loadTexture(
-      BACKGROUND_IMAGE_PATH || 'textures/background.jpg',
-      (texture) => {
-        scene.background = texture;
-      },
-      (error) => {
-        console.warn('Не удалось загрузить фоновое изображение, использую цвет');
-        scene.background = new THREE.Color(0x87CEEB); // Запасной цвет
-      }
-    );*/
-    
     // Создание освещения
     this.createLights(scene);
 
     this.createEnvironment(scene);
     
-    // Создание игровых объектов
+    // Создание игровых объектов (но не активируем физику)
     this.createGameObjects();
     
     // Запуск анимации
@@ -382,6 +475,17 @@ class Game {
     
     // Настройка обработчика изменения размера окна
     window.addEventListener('resize', this.onResize.bind(this));
+    
+    // Показываем стартовое модальное окно
+    this.showStartModal();
+    
+    // Скрываем подсказки до старта игры
+    this.hideGameHint();
+    this.hideKillerIndicator();
+    this.hideScoreIndicator();
+    
+    // Добавляем подсказку по управлению звуком
+    console.log('Нажмите M для отключения/включения звука');
   }
   
   createGameObjects() {
@@ -400,23 +504,6 @@ class Game {
     
     // Инициализация физики с передачей gameState
     this.physics = new BallPhysics(this.ball, this.tree, this.gameState);
-    
-    // Инициализация управления мышью (для верхнего блока)
-    if (this.mouseControl) {
-      this.mouseControl.destroy();
-    }
-    this.mouseControl = new MouseRotationControl(this.tree, this.container);
-    this.mouseControl.init();
-    
-    // Инициализация управления джойстиком (для нижнего блока)
-    if (this.joystickControl) {
-      this.joystickControl.destroy();
-    }
-    const joystickPad = document.getElementById('joystick-pad');
-    const joystickThumb = document.getElementById('joystick-thumb');
-    if (joystickPad && joystickThumb) {
-      this.joystickControl = new JoystickControl(this.tree, joystickPad, joystickThumb);
-    }
     
     // Сброс счета
     this.currentScore = 0;
@@ -439,9 +526,8 @@ class Game {
     this.createGameObjects();
     
     // Сброс камеры
-    if (this.cameraController) {
-      this.cameraController.setPosition(0, CAMERA_START_Y, 9);
-    }
+    if (this.cameraController)
+      this.cameraController.reset();
     
     // Сброс счетчика отскоков
     if (this.ball) {
@@ -502,7 +588,6 @@ class Game {
   }
   
   createEnvironment(scene) {
-
     this.background = new Background(scene);
     this.background.init(BACKGROUND_IMAGE_PATH, {
       size: 50,
@@ -510,22 +595,6 @@ class Game {
       rotation: 0,
       repeat: { x: 1, y: 1 }
     });
-
-    // Пол
-    /*
-    const floorGeometry = new THREE.CircleGeometry(100, 64);
-    const floorMaterial = new THREE.MeshStandardMaterial({
-      color: FLOOR_COLOR,
-      metalness: 0.1,
-      roughness: 0.8,
-    });
-    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -TREE_HEIGHT / 2;
-    floor.receiveShadow = true;
-    scene.add(floor);
-    this.environmentObjects.push(floor);
-    */
   }
   
   onResize() {
@@ -547,14 +616,13 @@ class Game {
   }
   
   animate() {
-
     requestAnimationFrame(this.animate.bind(this));
     
     const time = performance.now();
     const dt = (time - this.lastTime) / 1000;
     this.lastTime = time;
     
-    // Обновление физики только если игра активна (не на паузе и не закончена)
+    // Обновление физики только если игра активна (не на паузе, не закончена и не в IDLE)
     if (this.gameState.isPlaying() && this.ball && this.physics) {
       this.tree.update();
       this.physics.update(dt);
@@ -603,7 +671,7 @@ class Game {
       this.cameraController.update(this.ball.getLastBounceY());
     }
     
-    // Рендеринг (всегда, чтобы видеть паузу)
+    // Рендеринг (всегда, чтобы видеть сцену)
     if (this.sceneManager.getScene() && this.cameraController) {
       this.rendererManager.render(this.sceneManager.getScene(), this.cameraController.getCamera());
     }

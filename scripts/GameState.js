@@ -4,17 +4,19 @@ export const GAME_STATE = {
   PLAYING: 'playing',
   PAUSED: 'paused',
   GAME_OVER: 'gameOver',
-  VICTORY: 'victory'
+  VICTORY: 'victory',
+  IDLE: 'idle'
 };
 
 export class GameState {
   constructor() {
-    this.state = GAME_STATE.PLAYING;
+    this.state = GAME_STATE.IDLE;
     this._gameOverCallbacks = [];
     this._victoryCallbacks = [];
     this.pauseCallbacks = [];
     this.resumeCallbacks = [];
     this.resetCallbacks = [];
+    this.startCallbacks = []; // Новый массив для колбэков старта
   }
   
   isPlaying() {
@@ -31,6 +33,19 @@ export class GameState {
   
   isVictory() {
     return this.state === GAME_STATE.VICTORY;
+  }
+  
+  isIdle() {
+    return this.state === GAME_STATE.IDLE;
+  }
+  
+  // Новый метод для начала игры из IDLE
+  start() {
+    if (this.state === GAME_STATE.IDLE) {
+      this.state = GAME_STATE.PLAYING;
+      console.log("GameState.start() вызван, колбэков:", this.startCallbacks.length);
+      this.startCallbacks.forEach(callback => callback());
+    }
   }
   
   gameOver() {
@@ -89,5 +104,10 @@ export class GameState {
   
   onReset(callback) {
     this.resetCallbacks.push(callback);
+  }
+  
+  // Новый метод для подписки на старт игры
+  onStart(callback) {
+    this.startCallbacks.push(callback);
   }
 }

@@ -21,8 +21,8 @@
     </div>
   </div>
   
-  <!-- Подсказка в игре -->
-  <div class="hint">
+  <!-- Подсказка в игре (будет скрыта до старта) -->
+  <div class="hint" id="game-hint" style="display: none;">
     <i class="bi bi-mouse"></i> Зажмите левую кнопку и тяните, чтобы вращать дерево
   </div>
   
@@ -31,9 +31,61 @@
     <i class="bi bi-trophy-fill"></i> Счет: <span id="current-score">0</span>
   </div>
   
-  <!-- Индикатор красных платформ -->
-  <div class="killer-indicator" id="killer-indicator">
+  <!-- Индикатор красных платформ (будет скрыт до старта) -->
+  <div class="killer-indicator" id="killer-indicator" style="display: none;">
     <i class="bi bi-exclamation-triangle-fill"></i> Красные платформы смертельны!
+  </div>
+
+  <!-- Bootstrap модальное окно для Start Game -->
+  <div class="modal fade" id="startModal" tabindex="-1" aria-labelledby="startModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="startModalLabel">
+            <i class="bi bi-tree-fill"></i> TREE JUMP
+          </h5>
+        </div>
+        <div class="modal-body text-center">
+          <i class="bi bi-arrow-up-circle" style="font-size: 4rem; color: #ff6b6b; margin-bottom: 20px;"></i>
+          
+          <div class="stats-container">
+            <div class="row">
+              <div class="col-12">
+                <div class="stat-value">🌲</div>
+                <div class="stat-label">Достигни вершины дерева</div>
+              </div>
+            </div>
+          </div>
+          
+          <p class="modal-subtitle">
+            <i class="bi bi-info-circle"></i> Управляйте вращением дерева, чтобы шарик отскакивал от платформ
+          </p>
+          <p class="modal-subtitle" style="color: #ff6b6b;">
+            <i class="bi bi-exclamation-triangle-fill"></i> Красные платформы смертельны при ударе сверху!
+          </p>
+          
+          <div class="pause-controls" style="text-align: left; margin-top: 20px;">
+            <div class="pause-shortcut">
+              <span class="key">Мышь</span> - вращать дерево
+            </div>
+            <div class="pause-shortcut">
+              <span class="key">ESC</span> - пауза
+            </div>
+            <div class="pause-shortcut">
+              <span class="key">R</span> - перезапуск
+            </div>
+            <div class="pause-shortcut">
+              <span class="key">M</span> - звук вкл/выкл
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-restart" id="startGameButton">
+            <i class="bi bi-play-fill"></i> Начать игру
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Bootstrap модальное окно для Game Over -->

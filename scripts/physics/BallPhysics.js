@@ -5,22 +5,29 @@ import {
   BASE_PLATFORM_TOP_Y, GRAVITY, BOUNCE_SPEED, MAX_VELOCITY,
   MAIN_RADIUS, TREE_HEIGHT, CYLINDER_HALF_HEIGHT
 } from '../constants.js';
-// Импортируем GameState для проверки состояния (опционально)
 import { GameState, GAME_STATE } from '../GameState.js';
+import { soundManager } from '../audio/SoundManager.js';
+import { eventBus } from '../utils/EventEmitter.js';
 
 export class BallPhysics {
-  constructor(ball, tree, gameState) { // Три параметра: ball, tree, gameState
+  constructor(ball, tree, gameState) {
     this.ball = ball;
     this.tree = tree;
-    this.gameState = gameState; // Сохраняем ссылку на состояние игры
+    this.gameState = gameState;
     this.gravity = GRAVITY;
     this.bounceSpeed = BOUNCE_SPEED;
     this.maxVelocity = MAX_VELOCITY;
     this.baseBounceY = -TREE_HEIGHT / 2;
-    this.victoryY = TREE_HEIGHT / 2; // Высота вершины дерева
+    this.victoryY = TREE_HEIGHT / 2;
+    
+    // Переменные для предотвращения повторных звуков при множественных коллизиях
+    this.lastBounceTime = 0;
   }
   
   update(dt) {
+    // Не обновляем физику, если игра в IDLE
+    if (this.gameState.isIdle()) return;
+    
     // Применение гравитации
     this.ball.applyGravity(dt, this.gravity);
     this.ball.limitVelocity(this.maxVelocity);

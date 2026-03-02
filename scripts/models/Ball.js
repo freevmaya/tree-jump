@@ -1,6 +1,7 @@
 // scripts/models/Ball.js
 import * as THREE from 'three';
 import { BALL_RADIUS, BALL_COLOR, BASE_PLATFORM_TOP_Y, BOUNCE_SPEED, MAIN_RADIUS } from '../constants.js';
+import { eventBus } from '../utils/EventEmitter.js';
 
 export class Ball {
   constructor(scene) {
@@ -72,6 +73,7 @@ export class Ball {
     this.velocity.y = bounceSpeed;
     this.lastBounceY = bounceY;
     this.bounceCount++;
+    eventBus.emit('bounce');
     return this.bounceCount;
   }
   

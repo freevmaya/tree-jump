@@ -4,13 +4,14 @@ import {
   BRANCH_MIN_RADIUS, BRANCH_MAX_RADIUS, BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH,
   BRANCH_ANGLE_MIN, BRANCH_ANGLE_MAX, BRANCH_CURVE_STRENGTH, BRANCH_SEGMENTS,
   STICK_OUT, BARK_TEXTURE_PATH, TREE_COLOR, BARK_NORMAL_PATH,
-  NEEDLE_COUNT_PER_BRANCH, NEEDLE_TEXTURE_PATH, NEEDLE_SIZE
+  NEEDLE_COUNT_PER_BRANCH, NEEDLE_SIZE
 } from '../constants.js';
 import { textureLoader } from '../utils/TextureLoader.js';
 import { Needle } from './Needle.js';
 
 export class Branch {
-  constructor(parentMesh, theta, y, scaleFactor = 1.0) {
+  constructor(options, parentMesh, theta, y, scaleFactor = 1.0) {
+    this.options = options;
     this.parentMesh = parentMesh;
     this.theta = theta;
     this.y = y;
@@ -250,7 +251,7 @@ export class Branch {
           scale
         );
         
-        needle.create(NEEDLE_TEXTURE_PATH);
+        needle.create(this.options.NEEDLE_TEXTURE_PATH);
         this.needles.push(needle);
       }
     }
@@ -271,7 +272,7 @@ export class Branch {
         scale
       );
       
-      tipNeedle.create(NEEDLE_TEXTURE_PATH);
+      tipNeedle.create(this.options.NEEDLE_TEXTURE_PATH);
       this.needles.push(tipNeedle);
     }
   }

@@ -52,7 +52,7 @@ export const MAX_VELOCITY = 5.2;
 
 // Камера
 export const CAMERA_FOLLOW_SPEED = 0.06;
-export const CAMERA_HEIGHT_OFFSET = 2.8;
+export const CAMERA_HEIGHT_OFFSET = 4;
 export const CAMERA_START_Y = -CYLINDER_HALF_HEIGHT;
 
 // Управление мышью
@@ -61,20 +61,18 @@ export const ROTATION_SMOOTH = 0.5;
 export const INERTIA = 0.6;
 
 // Цвета
-export const FLOOR_COLOR = 0x332211;
-export const BASE_PLATFORM_COLOR = 0x4a5568;
 export const BALL_COLOR = 0xff6b6b;
-export const AMBIENT_LIGHT_COLOR = 0x404080;
+export const AMBIENT_LIGHT_COLOR = 0x88FFFF;
 export const KEY_LIGHT_COLOR = 0xffffff;
-export const FILL_LIGHT_COLOR = 0x6366f1;
+export const FILL_LIGHT_COLOR = 0x63a188;
 export const RIM_LIGHT_COLOR = 0x818cf8;
 export const WIREFRAME_COLOR = 0xC4956A;
-export const BACKGROUND_COLOR = 0x113344;
+export const BACKGROUND_COLOR = 0xBBBBFF;
 
 // Свет
-export const AMBIENT_LIGHT_INTENSITY = 0.5;
-export const KEY_LIGHT_INTENSITY = 2;
-export const FILL_LIGHT_INTENSITY = 0.4;
+export const AMBIENT_LIGHT_INTENSITY = 1;
+export const KEY_LIGHT_INTENSITY = 3;
+export const FILL_LIGHT_INTENSITY = 2;
 export const RIM_LIGHT_INTENSITY = 0.6;
 export const RIM_LIGHT_DISTANCE = 12;
 
@@ -83,7 +81,9 @@ export const BARK_TEXTURE_PATH = 'textures/bark.jpg';
 export const BARK_NORMAL_PATH = 'textures/bark-normal.jpg';
 export const PLATFORM_TEXTURE_PATH = 'textures/platform.jpg';
 export const KILLER_PLATFORM_TEXTURE_PATH = 'textures/killer_platform.jpg';
-export const BACKGROUND_IMAGE_PATH = 'images/bk01.png';
+export const BACKGROUND_IMAGE_PATH = 'images/bk1.jpg';
+export const GRASS_IMAGE_PATH = 'textures/grass-s.png';
+export const GROUND_IMAGE_PATH = 'textures/ground.jpg';
 
 // Игровые параметры
 export const GAME_OVER_Y_OFFSET = -7; // Смещение относительно камеры для конца игры
@@ -98,3 +98,49 @@ export const PLATFORM_KILLER_COLOR = 0xFF3333; // Ярко-красный для
 
 // Процент платформ-убийц
 export const KILLER_PLATFORM_PERCENTAGE = 0.3; // 30%
+
+export const GAME_PARAMS = {
+	DEFAULT: 
+		{
+			ENV: {
+				BACKGROUND_COLOR: 0xBBBBFF,
+				KEY_LIGHT_COLOR: 0xffffff,
+				RIM_LIGHT_COLOR: 0x818cf8,
+				FILL_LIGHT_COLOR: 0x63a188,
+				BACKGROUND_IMAGE_PATH: 'images/bk1.jpg',
+				GRASS_IMAGE_PATH: 'textures/grass-s.png',
+				GROUND_IMAGE_PATH:'textures/ground.jpg',
+				AMBIENT_LIGHT_INTENSITY: 1,
+				KEY_LIGHT_INTENSITY: 3,
+				FILL_LIGHT_INTENSITY: 2,
+				RIM_LIGHT_INTENSITY: 0.6
+			},
+			TREE: {
+				BARK_TEXTURE_PATH: 'textures/bark-d.jpg',
+				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
+				KILLER_PLATFORM_TEXTURE_PATH: 'textures/killer_platform.jpg',
+				NEEDLE_TEXTURE_PATH: 'textures/oak-leaves.png'
+			}
+		},
+	DARK: {
+			ENV: {
+				BACKGROUND_COLOR: 0x367ddd,
+				KEY_LIGHT_COLOR: 0xffffff,
+				RIM_LIGHT_COLOR: 0x818cf8,
+				FILL_LIGHT_COLOR: 0x63a188,
+				BACKGROUND_IMAGE_PATH: 'images/dark-bg.jpg',
+				GRASS_IMAGE_PATH: 'textures/grass-s.png',
+				GROUND_IMAGE_PATH:'textures/ground.jpg',
+				AMBIENT_LIGHT_INTENSITY: 0.2,
+				KEY_LIGHT_INTENSITY: 3,
+				FILL_LIGHT_INTENSITY: 2,
+				RIM_LIGHT_INTENSITY: 0.6
+			},
+			TREE: {
+				BARK_TEXTURE_PATH: 'textures/bark.jpg',
+				BARK_NORMAL_PATH: 'textures/bark-normal.jpg',
+				KILLER_PLATFORM_TEXTURE_PATH: 'textures/killer_platform.jpg',
+				NEEDLE_TEXTURE_PATH: 'textures/needle.png'
+			}
+		}
+}

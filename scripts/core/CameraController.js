@@ -12,7 +12,7 @@ export class CameraController {
   }
 
   reset() {
-    this.camera.position.set(0, CAMERA_START_Y, 12);
+    this.camera.position.set(0, CAMERA_START_Y + CAMERA_HEIGHT_OFFSET, 12);
   }
   
   update(targetY) {

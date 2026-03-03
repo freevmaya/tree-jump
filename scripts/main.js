@@ -1,14 +1,13 @@
 // scripts/main.js
 import * as THREE from 'three';
 import { 
-  GRAVITY, BASE_PLATFORM_SIZE, BASE_PLATFORM_COLOR,
-  FLOOR_COLOR, AMBIENT_LIGHT_COLOR, AMBIENT_LIGHT_INTENSITY,
+  GRAVITY, BASE_PLATFORM_SIZE, AMBIENT_LIGHT_COLOR, AMBIENT_LIGHT_INTENSITY,
   KEY_LIGHT_COLOR, KEY_LIGHT_INTENSITY, FILL_LIGHT_COLOR,
   FILL_LIGHT_INTENSITY, RIM_LIGHT_COLOR, RIM_LIGHT_INTENSITY,
   RIM_LIGHT_DISTANCE, TREE_HEIGHT, MAIN_RADIUS,
   GAME_OVER_Y_OFFSET, RESET_POSITION_X, RESET_POSITION_Y,
   RESET_POSITION_Z, RESET_VELOCITY_Y, CAMERA_START_Y,
-  BACKGROUND_IMAGE_PATH
+  BACKGROUND_IMAGE_PATH, GRASS_IMAGE_PATH, GAME_PARAMS
 } from './constants.js';
 
 import { SceneManager } from './core/SceneManager.js';
@@ -25,6 +24,9 @@ import { Background } from './models/Background.js';
 import { textureLoader } from './utils/TextureLoader.js';
 import { eventBus } from './utils/EventEmitter.js';
 import { soundManager } from './audio/SoundManager.js';
+import { Grass } from './models/Grass.js';
+import { Ground } from './models/Ground.js';
+
 
 // Bootstrap доступен глобально через window.bootstrap
 const bootstrap = window.bootstrap;
@@ -48,16 +50,16 @@ class Game {
     this.lastTime = performance.now();
     this.crystal = null;
     this.background = null;
+    this.grass = null;
+    this.ground = null;
     this.currentScore = 0;
     this.soundsLoaded = false;
     this.gameStarted = false; // Флаг, что игра была запущена
     
     // Создаем gameState
     this.gameState = new GameState();
-    
-    // Хранилище для созданных объектов окружения
-    this.environmentObjects = [];
     this.lights = [];
+    this.paramsIndex = 'DARK';
     
     // Инициализация Bootstrap модальных окон
     this.initModals();
@@ -420,38 +422,6 @@ class Game {
     this.updateScoreIndicator();
   }
   
-  clearEnvironment() {
-    // Удаляем все объекты окружения из сцены
-    const scene = this.sceneManager.getScene();
-    
-    this.environmentObjects.forEach(obj => {
-      if (obj.parent) {
-        scene.remove(obj);
-      }
-    });
-    this.environmentObjects = [];
-    
-    // Удаляем старое дерево
-    if (this.tree && this.tree.mesh) {
-      scene.remove(this.tree.mesh);
-      this.tree = null;
-    }
-    
-    // Удаляем старый шарик
-    if (this.ball) {
-      this.ball.dispose();
-      this.ball = null;
-    }
-    
-    // Удаляем кристалл
-    if (this.crystal) {
-      this.crystal.dispose();
-      this.crystal = null;
-    }
-    
-    // Освещение не удаляем, оно остается
-  }
-  
   init() {
     // Инициализация сцены
     const scene = this.sceneManager.init();
@@ -464,8 +434,6 @@ class Game {
     
     // Создание освещения
     this.createLights(scene);
-
-    this.createEnvironment(scene);
     
     // Создание игровых объектов (но не активируем физику)
     this.createGameObjects();
@@ -490,10 +458,11 @@ class Game {
   
   createGameObjects() {
     const scene = this.sceneManager.getScene();
+    let env = GAME_PARAMS[this.paramsIndex].ENV;
     
     // Создание дерева
     this.tree = new Tree(scene);
-    this.tree.init();
+    this.tree.init(GAME_PARAMS[this.paramsIndex].TREE);
     
     // Создание кристалла на вершине дерева
     this.createCrystal();
@@ -501,6 +470,20 @@ class Game {
     // Создание шарика
     this.ball = new Ball(scene);
     this.ball.init(this.tree);
+
+    this.background = new Background(scene);
+    this.background.init(env.BACKGROUND_IMAGE_PATH, {
+      size: 50,
+      opacity: 1.0,
+      rotation: 0,
+      repeat: { x: 1, y: 1 }
+    });
+
+    this.grass = new Grass(scene, this.tree);
+    this.grass.init(env.GRASS_IMAGE_PATH);
+
+    this.ground = new Ground(scene, this.tree);
+    this.ground.init(env.GROUND_IMAGE_PATH);
     
     // Инициализация физики с передачей gameState
     this.physics = new BallPhysics(this.ball, this.tree, this.gameState);
@@ -509,20 +492,49 @@ class Game {
     this.currentScore = 0;
     this.updateScoreIndicator();
   }
-  
-  resetGame() {
-    console.log("Сброс игры...");
-  
-    // Очищаем старое окружение
-    this.clearEnvironment();
+
+  clearGameObject() {
+    // Удаляем все объекты окружения из сцены
+    const scene = this.sceneManager.getScene();
+
+    if (this.background) {
+      this.background.dispose();
+      this.background = null;
+    }
+    
+    // Удаляем старое дерево
+    if (this.tree && this.tree.mesh) {
+      scene.remove(this.tree.mesh);
+      this.tree = null;
+    }
+    
+    // Удаляем старый шарик
+    if (this.ball) {
+      this.ball.dispose();
+      this.ball = null;
+    }
     
     // Удаляем кристалл
     if (this.crystal) {
       this.crystal.dispose();
       this.crystal = null;
     }
-    
-    // Создаем новые игровые объекты с новыми случайными платформами
+
+    if (this.grass) {
+      this.grass.dispose();
+      this.grass = null;
+    }
+
+    if (this.ground) {
+      this.ground.dispose();
+      this.ground = null;
+    }
+  }
+  
+  resetGame() {
+    console.log("Сброс игры...");
+
+    this.clearGameObject();
     this.createGameObjects();
     
     // Сброс камеры
@@ -557,12 +569,17 @@ class Game {
       }
     });
     this.lights = [];
+
+    let env = GAME_PARAMS[this.paramsIndex].ENV;
+
+    scene.background = new THREE.Color(env.BACKGROUND_COLOR);
+    scene.fog = new THREE.Fog(env.BACKGROUND_COLOR, 12, 28);
     
-    const ambient = new THREE.AmbientLight(AMBIENT_LIGHT_COLOR, AMBIENT_LIGHT_INTENSITY);
+    const ambient = new THREE.AmbientLight(env.AMBIENT_LIGHT_COLOR, env.AMBIENT_LIGHT_INTENSITY);
     scene.add(ambient);
     this.lights.push(ambient);
     
-    const keyLight = new THREE.DirectionalLight(KEY_LIGHT_COLOR, KEY_LIGHT_INTENSITY);
+    const keyLight = new THREE.DirectionalLight(env.KEY_LIGHT_COLOR, env.KEY_LIGHT_INTENSITY);
     keyLight.position.set(20, 20, 20);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.set(1024, 1024);
@@ -576,25 +593,15 @@ class Game {
     scene.add(keyLight);
     this.lights.push(keyLight);
     
-    const fillLight = new THREE.DirectionalLight(FILL_LIGHT_COLOR, FILL_LIGHT_INTENSITY);
+    const fillLight = new THREE.DirectionalLight(env.FILL_LIGHT_COLOR, env.FILL_LIGHT_INTENSITY);
     fillLight.position.set(-3, 2, 3);
     scene.add(fillLight);
     this.lights.push(fillLight);
     
-    const rimLight = new THREE.PointLight(RIM_LIGHT_COLOR, RIM_LIGHT_INTENSITY, RIM_LIGHT_DISTANCE);
+    const rimLight = new THREE.PointLight(env.RIM_LIGHT_COLOR, env.RIM_LIGHT_INTENSITY, RIM_LIGHT_DISTANCE);
     rimLight.position.set(-2, -1, 4);
     scene.add(rimLight);
     this.lights.push(rimLight);
-  }
-  
-  createEnvironment(scene) {
-    this.background = new Background(scene);
-    this.background.init(BACKGROUND_IMAGE_PATH, {
-      size: 50,
-      opacity: 1.0,
-      rotation: 0,
-      repeat: { x: 1, y: 1 }
-    });
   }
   
   onResize() {
@@ -630,6 +637,16 @@ class Game {
       // Обновление фона
       if (this.background) {
         this.background.update(dt);
+      }
+
+      // Обновление травы
+      if (this.grass) {
+        this.grass.update(dt);
+      }
+    
+      // Обновление грунта (если нужно)
+      if (this.ground) {
+        this.ground.update(dt);
       }
       
       // Обновление вращения мыши

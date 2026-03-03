@@ -1,6 +1,7 @@
 // scripts/models/Background.js
 import * as THREE from 'three';
 import { textureLoader } from '../utils/TextureLoader.js';
+import { BACKGROUND_COLOR } from '../constants.js';
 
 export class Background {
   constructor(scene) {
@@ -56,12 +57,13 @@ export class Background {
     // Создаем материал с текстурой
     const material = new THREE.MeshBasicMaterial({
       map: this.texture,
-      color: 0x888888,
+      color: BACKGROUND_COLOR,
       side: THREE.DoubleSide,
       transparent: true,
       opacity: opacity,
       depthWrite: false,
-      depthTest: true
+      depthTest: true,
+      fog: false
     });
 
     // Создаем меш

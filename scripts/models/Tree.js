@@ -3,10 +3,10 @@ import * as THREE from 'three';
 import { 
   TREE_COLOR, TREE_HEIGHT, MAIN_RADIUS, STICK_OUT, 
   PLATFORM_RADIUS, PLATFORM_HEIGHT, PLATFORM_COUNT,
-  CYLINDER_HALF_HEIGHT, WIREFRAME_COLOR, BARK_TEXTURE_PATH,
+  CYLINDER_HALF_HEIGHT, WIREFRAME_COLOR,
   KILLER_PLATFORM_PERCENTAGE, ROTATION_SMOOTH,
   BRANCH_COUNT, BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH, BRANCH_DENSITY,
-  TRUNK_CURVE_STRENGTH, TRUNK_SEGMENTS, BARK_NORMAL_PATH
+  TRUNK_CURVE_STRENGTH, TRUNK_SEGMENTS
 } from '../constants.js';
 
 import { Platform } from './Platform.js';
@@ -25,6 +25,7 @@ export class Tree {
     this.minRadius = MAIN_RADIUS * 0.5;
     this.maxRadius = MAIN_RADIUS;
     this.points = [];
+    this.options = {};
     
     // Параметры изгиба ствола
     this.curveStrength = TRUNK_CURVE_STRENGTH * (0.7 + Math.random() * 0.6); // Случайная сила изгиба
@@ -36,7 +37,9 @@ export class Tree {
     this.segments = TRUNK_SEGMENTS;
   }
   
-  init() {
+  init(options) {
+    this.options = options;
+
     // Создаем группу для ствола, если нужно
     this.mesh = new THREE.Group();
     
@@ -182,7 +185,7 @@ export class Tree {
   loadTexture(material) {
     // Используем утилиту для загрузки текстуры
     textureLoader.loadTexture(
-      BARK_TEXTURE_PATH,
+      this.options.BARK_TEXTURE_PATH,
       (texture) => {
         // Настройки текстуры для дерева
         //texture.repeat.set(2, TREE_HEIGHT / 1.5);
@@ -191,7 +194,7 @@ export class Tree {
         material.color.setHex(0xffffff);
 
         textureLoader.loadTexture(
-          BARK_NORMAL_PATH, // Карта нормалей (обычно сине-фиолетовая)
+          this.options.BARK_NORMAL_PATH, // Карта нормалей (обычно сине-фиолетовая)
           (normalTexture) => {
             material.normalMap = normalTexture;
             material.normalScale = new THREE.Vector2(0.5, 0.5); // Интенсивность по X и Y
@@ -205,14 +208,14 @@ export class Tree {
         this.barkTexture = texture;
       },
       (error) => {
-        console.warn('Текстура не загружена: ' + BARK_TEXTURE_PATH);
+        console.warn('Текстура не загружена: ' + this.options.BARK_TEXTURE_PATH);
         // Создаем текстуру-заглушку
         const fallbackTexture = textureLoader.createFallbackTexture(0xA67C52);
         material.map = fallbackTexture;
         material.needsUpdate = true;
       },
       {
-        repeat: { x: 2, y: 4 },
+        repeat: { x: 2, y: 6 },
         rotation: Math.PI,
         anisotropy: 16
       }
@@ -416,7 +419,7 @@ export class Tree {
       const scaleFactor = 0.6 + heightFactor * 0.8; // Ветки внизу крупнее
       
       // Создаем ветку
-      const branch = new Branch(this.mesh, platform.theta, branchY, scaleFactor);
+      const branch = new Branch(this.options, this.mesh, platform.theta, branchY, scaleFactor);
       branch.create(0);
       
       // Корректируем позицию ветки с учетом изгиба ствола

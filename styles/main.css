@@ -1,5 +1,9 @@
 /* styles/main.css */
 
+:root {
+  --game-bg: radial-gradient(circle at top left, #7ed4e3, #223100);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -13,6 +17,7 @@ body {
   user-select: none;
   height: 100vh;
   width: 100vw;
+  background: radial-gradient(circle at top left, #7ed4e3, #223100);
 }
 
 .hide {
@@ -25,11 +30,13 @@ body {
   flex-direction: column;
   height: 100dvh;
   width: 100dvw;
+  max-width: 700px;
+  margin: auto;
 }
 
 /* Верхний блок с игрой (85%) */
 #game-canvas-container {
-  height: 90vh;
+  height: 100dvw;
   width: 100%;
   position: relative;
   overflow: hidden;
@@ -137,7 +144,7 @@ canvas {
 /* Подсказка внизу экрана */
 .hint {
   position: fixed;
-  bottom: calc(15vh + 20px);
+  bottom: calc(5vh + 20px);
   left: 50%;
   transform: translateX(-50%);
   color: black;

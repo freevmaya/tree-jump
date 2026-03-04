@@ -1,0 +1,120 @@
+
+
+/* Простая bounce анимация */
+@keyframes bounce {
+  0% { transform: scale(0.3); opacity: 0; rotate: 45deg; }
+  50% { transform: scale(1.1); opacity: 1; rotate: -10deg; }
+  80% { transform: scale(0.95); }
+  100% { transform: scale(1); rotate: 0deg;}
+}
+
+.modal {
+  overflow: hidden;
+  background: radial-gradient(circle at top left, #7ed4e3, #223100);
+}
+
+.modal .modal-dialog {
+  animation: bounce 0.4s ease-out;
+}
+
+.dialog-1.modal-content {
+  border: none;
+  background: none;
+}
+
+.dialog-1 .top {
+  background-image: url(dialog/dialog-top.png);
+  background-position: center;
+  height: 124px;
+  flex-shrink: 0;
+}
+
+.dialog-1 .middle {
+  background-image: url(dialog/dialog-middle.png);
+  background-position: center;
+  flex: 1 1 auto;
+}
+
+.dialog-1 .bottom {
+  background-image: url(dialog/dialog-bottom.png);
+  background-position: center;
+  height: 80px;
+  flex-shrink: 0;
+}
+
+.dialog-1 .dialog-content {
+  margin: -20px 120px;
+}
+
+.dialog-1 .dialog-content p {
+  padding: 1em 1em;
+  margin-bottom: 10px;
+}
+
+.dialog-1 .background {
+  margin-left: 50px;
+  margin-right: 50px;
+  margin-top: 50px;
+  margin-bottom: 10px;
+  position: absolute;
+  width: calc(100% - 100px);
+  height: calc(100% - 60px);
+  z-index: -1;
+  background-image: url(dialog/dialog-bg.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.dialog-1 .wrapper {
+  /*background-image: url(dialog/dialog-bg.png);*/
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  max-width: 500px;
+  color: #d9c0a9;
+  font-size: 14px;
+  margin: auto;
+}
+
+.dialog-1 .btn {
+  background-image: url(dialog/button.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  font-size: 12px;
+  color:black;
+  width: 103px;
+  height: 39px;
+  filter: drop-shadow(1px 1px 2px black);
+  border: none !important;
+}
+
+.dialog-1 .btn:hover {
+  filter: drop-shadow(3px 3px 4px black);
+}
+
+.dialog-1 .btn:active {
+  filter: brightness(0.8) drop-shadow(1px 1px 2px black);
+  color: white;
+}
+
+@media (max-width: 440px) {
+
+  .dialog-1 .background {
+    width: 100%;
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+
+  .modal .modal-dialog {
+    margin: 0;
+  }
+
+  .dialog-1 .dialog-content {
+    margin: -20px 60px;
+  }
+
+  .dialog-1 .wrapper {
+    margin: 0px;
+  }
+}

@@ -4,7 +4,6 @@ import { textureLoader } from '../utils/TextureLoader.js';
 import { 
   BASE_PLATFORM_TOP_Y, 
   MAIN_RADIUS,
-  TREE_HEIGHT,
   CYLINDER_HALF_HEIGHT,
   GRASS_IMAGE_PATH
 } from '../constants.js';
@@ -18,11 +17,11 @@ export class Grass {
     this.texture = null;
     
     // Параметры травы
-    this.Count = 100; // Количество плоскостей травы
+    this.Count = window.game.testResult < 25 ? 50 : 10; // Количество плоскостей травы
     this.Radius = MAIN_RADIUS * 1.2; // Радиус размещения травы
     this.Height = 1.2; // Высота травы
     this.Width = 1.2; // Ширина травы
-    this.Density = 4;
+    this.Density = 3;
   }
   
   init(texturePath = GRASS_IMAGE_PATH) {

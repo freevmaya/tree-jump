@@ -279,7 +279,7 @@ export class Branch {
   
   loadTexture() {
     textureLoader.loadTexture(
-      BARK_TEXTURE_PATH,
+      this.options.BARK_TEXTURE_PATH,
       (texture) => {
 
         if (this.branchMesh && this.branchMesh.material) {
@@ -289,7 +289,7 @@ export class Branch {
 
         
           textureLoader.loadTexture(
-            BARK_NORMAL_PATH, // Карта нормалей (обычно сине-фиолетовая)
+            this.options.BARK_NORMAL_PATH, // Карта нормалей (обычно сине-фиолетовая)
             (normalTexture) => {
               this.branchMesh.material.normalMap = normalTexture;
               this.branchMesh.material.normalScale = new THREE.Vector2(0.5, 0.5); // Интенсивность по X и Y

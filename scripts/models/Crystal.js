@@ -25,7 +25,7 @@ export class Crystal {
     this.group = new THREE.Group();
     
     // Получаем позицию на самом верху дерева
-    const treeTopY = TREE_HEIGHT / 2; // Верхняя точка дерева (так как дерево центрировано по Y=0)
+    const treeTopY = this.tree.options.TREE_HEIGHT / 2; // Верхняя точка дерева (так как дерево центрировано по Y=0)
     
     // Устанавливаем позицию кристалла на вершине дерева
     this.group.position.set(0, treeTopY + 0.8, 0); // Немного выше вершины для лучшей видимости

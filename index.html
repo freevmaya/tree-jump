@@ -11,10 +11,11 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <!-- Custom CSS -->
   <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/dialog.css">
 </head>
 <body>
   <!-- Основной контейнер игры -->
-  <div id="game-container">
+  <div id="game-container" class="hide">
     <!-- Верхний блок с игрой (85%) -->
     <div id="game-canvas-container">
       <div id="canvas-container"></div>
@@ -39,165 +40,135 @@
   <!-- Bootstrap модальное окно для Start Game -->
   <div class="modal fade" id="startModal" tabindex="-1" aria-labelledby="startModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="startModalLabel">
-            <i class="bi bi-tree-fill"></i> TREE JUMP
-          </h5>
+      <div class="dialog-1 modal-content">
+        <div class="background">
         </div>
-        <div class="modal-body text-center">
-          <i class="bi bi-arrow-up-circle" style="font-size: 4rem; color: #ff6b6b; margin-bottom: 20px;"></i>
-          
-          <div class="stats-container">
-            <div class="row">
-              <div class="col-12">
-                <div class="stat-value">🌲</div>
-                <div class="stat-label">Достигни вершины дерева</div>
+        <div class="wrapper">
+          <div class="top">
+            
+          </div>
+          <div class="middle">
+            <div class="dialog-content">
+              <p>
+                <i class="bi bi-info-circle"></i> Управляйте вращением дерева, чтобы шарик отскакивал от платформ
+              </p>
+              <p>
+                <i class="bi bi-exclamation-triangle-fill"></i> Красные платформы смертельны при ударе сверху!
+              </p>
+              <p>GPU speed: <span id="testResult"></span></p>
+              <div class="text-center">
+                <button type="button" class="btn" id="startGameButton">Начать игру</button>
               </div>
             </div>
           </div>
-          
-          <p class="modal-subtitle">
-            <i class="bi bi-info-circle"></i> Управляйте вращением дерева, чтобы шарик отскакивал от платформ
-          </p>
-          <p class="modal-subtitle" style="color: #ff6b6b;">
-            <i class="bi bi-exclamation-triangle-fill"></i> Красные платформы смертельны при ударе сверху!
-          </p>
-          
-          <div class="pause-controls" style="text-align: left; margin-top: 20px;">
-            <div class="pause-shortcut">
-              <span class="key">Мышь</span> - вращать дерево
-            </div>
-            <div class="pause-shortcut">
-              <span class="key">ESC</span> - пауза
-            </div>
-            <div class="pause-shortcut">
-              <span class="key">R</span> - перезапуск
-            </div>
-            <div class="pause-shortcut">
-              <span class="key">M</span> - звук вкл/выкл
-            </div>
+          <div class="bottom">
+            
           </div>
-        </div>
-        <div class="modal-footer justify-content-center">
-          <button type="button" class="btn btn-restart" id="startGameButton">
-            <i class="bi bi-play-fill"></i> Начать игру
-          </button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Bootstrap модальное окно для Game Over -->
-  <div class="modal fade" id="gameOverModal" tabindex="-1" aria-labelledby="gameOverModalLabel" aria-hidden="true">
+  <div class="modal fade" id="gameOverModal" tabindex="-1" aria-labelledby="startModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="gameOverModalLabel">
-            <i class="bi bi-skull"></i> ИГРА ОКОНЧЕНА
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="dialog-1 modal-content">
+        <div class="background">
         </div>
-        <div class="modal-body text-center">
-          <!-- Статистика игры -->
-          <div class="stats-container">
-            <div class="row">
-              <div class="col-12">
-                <div class="stat-value" id="finalBounceCount">0</div>
-                <div class="stat-label">Отскоков</div>
+        <div class="wrapper">
+          <div class="top">
+            
+          </div>
+          <div class="middle">
+            <div class="dialog-content">
+              <p>ИГРА ОКОНЧЕНА
+              </p>
+              <div class="stats-container">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="stat-value" id="finalBounceCount">0</div>
+                    <div class="stat-label">Отскоков</div>
+                  </div>
+                </div>
+              </div>
+              <div class="text-center">
+                <button type="button" class="btn" id="restartButton">Новая игра</button>
               </div>
             </div>
           </div>
-          
-          <p class="modal-subtitle">
-            <i class="bi bi-arrow-up-circle"></i> Нажмите R для перезапуска
-          </p>
-        </div>
-        <div class="modal-footer justify-content-center">
-          <button type="button" class="btn btn-restart" id="restartButton">
-            <i class="bi bi-arrow-repeat"></i> Новая игра
-          </button>
+          <div class="bottom">
+            
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Bootstrap модальное окно для Victory (Победа) -->
-  <div class="modal fade" id="victoryModal" tabindex="-1" aria-labelledby="victoryModalLabel" aria-hidden="true">
+  <div class="modal fade" id="victoryModal" tabindex="-1" aria-labelledby="startModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content victory-modal">
-        <div class="modal-header victory-header">
-          <h5 class="modal-title" id="victoryModalLabel">
-            <i class="bi bi-trophy-fill"></i> ПОБЕДА!
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="dialog-1 modal-content">
+        <div class="background">
         </div>
-        <div class="modal-body text-center">
-          <i class="bi bi-star-fill victory-star" style="font-size: 4rem; color: gold; margin-bottom: 20px;"></i>
-          <i class="bi bi-star-fill victory-star" style="font-size: 3rem; color: gold; margin-bottom: 20px;"></i>
-          <i class="bi bi-star-fill victory-star" style="font-size: 4rem; color: gold; margin-bottom: 20px;"></i>
-          
-          <!-- Статистика игры -->
-          <div class="stats-container victory-stats">
-            <div class="row">
-              <div class="col-6">
-                <div class="stat-value" id="victoryBounceCount">0</div>
-                <div class="stat-label">Отскоков</div>
+        <div class="wrapper">
+          <div class="top">
+            
+          </div>
+          <div class="middle">
+            <div class="dialog-content">
+              <p class="modal-subtitle victory-message">
+                <i class="bi bi-emoji-sunglasses"></i> Вы достигли вершины дерева!
+              </p>
+              <!-- Статистика игры -->
+              <div class="stats-container victory-stats">
+                <div class="row">
+                  <div class="col-6">
+                    <div class="stat-value" id="victoryBounceCount">0</div>
+                    <div class="stat-label">Отскоков</div>
+                  </div>
+                  <div class="col-6">
+                    <div class="stat-value" id="victoryScore">0</div>
+                    <div class="stat-label">Очки</div>
+                  </div>
+                </div>
               </div>
-              <div class="col-6">
-                <div class="stat-value" id="victoryScore">0</div>
-                <div class="stat-label">Очки</div>
+
+              <div class="text-center">
+                <button type="button" class="btn" id="victoryRestartButton">Продолжить</button>
               </div>
             </div>
           </div>
-          
-          <p class="modal-subtitle victory-message">
-            <i class="bi bi-emoji-sunglasses"></i> Вы достигли вершины дерева!
-          </p>
-          <p class="modal-subtitle">
-            <i class="bi bi-arrow-up-circle"></i> Нажмите R для новой игры
-          </p>
-        </div>
-        <div class="modal-footer justify-content-center victory-footer">
-          <button type="button" class="btn btn-restart" id="victoryRestartButton">
-            <i class="bi bi-arrow-repeat"></i> Новая игра
-          </button>
+          <div class="bottom">
+            
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Bootstrap модальное окно для Pause (Пауза) -->
-  <div class="modal fade" id="pauseModal" tabindex="-1" aria-labelledby="pauseModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal fade" id="pauseModal" tabindex="-1" aria-labelledby="startModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content pause-modal">
-        <div class="modal-header pause-header">
-          <h5 class="modal-title" id="pauseModalLabel">
-            <i class="bi bi-pause-circle-fill"></i> ПАУЗА
-          </h5>
+      <div class="dialog-1 modal-content">
+        <div class="background">
         </div>
-        <div class="modal-body text-center">
-          
-          <p class="modal-subtitle pause-message">
-            Игра приостановлена
-          </p>
-          
-          <div class="pause-controls">
-            <div class="pause-shortcut">
-              <span class="key">ESC</span> - продолжить игру
-            </div>
-            <div class="pause-shortcut">
-              <span class="key">R</span> - начать заново
+        <div class="wrapper">
+          <div class="top">
+            
+          </div>
+          <div class="middle">
+            <div class="dialog-content">
+              <p>Игра приостановлена
+              </p>
+              <div class="text-center">
+                <button type="button" class="btn" id="resumeButton">Продолжить</button>
+                <button type="button" class="btn" id="pauseRestartButton">Новая игра</button>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="modal-footer justify-content-center pause-footer">
-          <button type="button" class="btn btn-resume" id="resumeButton">
-            <i class="bi bi-play-fill"></i> Продолжить
-          </button>
-          <button type="button" class="btn btn-restart" id="pauseRestartButton">
-            <i class="bi bi-arrow-repeat"></i> Новая игра
-          </button>
+          <div class="bottom">
+            
+          </div>
         </div>
       </div>
     </div>

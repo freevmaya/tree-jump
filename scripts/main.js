@@ -7,7 +7,7 @@ import {
   RIM_LIGHT_DISTANCE, TREE_HEIGHT, MAIN_RADIUS,
   GAME_OVER_Y_OFFSET, RESET_POSITION_X, RESET_POSITION_Y,
   RESET_POSITION_Z, RESET_VELOCITY_Y, CAMERA_START_Y,
-  BACKGROUND_IMAGE_PATH, GRASS_IMAGE_PATH, GAME_PARAMS
+  BACKGROUND_IMAGE_PATH, GRASS_IMAGE_PATH, GAME_PARAMS, START_GAME
 } from './constants.js';
 
 import { SceneManager } from './core/SceneManager.js';
@@ -34,6 +34,7 @@ const bootstrap = window.bootstrap;
 
 class Game {
   constructor() {
+    this.game_container = document.getElementById('game-container');
     this.container = document.getElementById('canvas-container');
     this.sceneManager = new SceneManager();
     this.rendererManager = new RendererManager(this.container);
@@ -55,17 +56,46 @@ class Game {
     this.currentScore = 0;
     this.soundsLoaded = false;
     this.gameStarted = false; // Флаг, что игра была запущена
+    this.testResult = this.quickGPUTest();
+
+    console.log(this.testResult);
     
     // Создаем gameState
     this.gameState = new GameState();
     this.lights = [];
-    this.paramsIndex = 'DARK';
+    this.paramsIndex = START_GAME;
     
     // Инициализация Bootstrap модальных окон
     this.initModals();
     
     // Загрузка звуков
     this.initAudio();
+  }
+
+  quickGPUTest() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1000;
+    canvas.height = 1000;
+    const ctx = canvas.getContext('2d');
+    
+    const startTime = performance.now();
+    
+    // Рисуем 10000 прямоугольников
+    for (let i = 0; i < 10000; i++) {
+      ctx.fillStyle = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+      ctx.fillRect(
+        Math.random() * 1000,
+        Math.random() * 1000,
+        50 + Math.random() * 50,
+        50 + Math.random() * 50
+      );
+    }
+    
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    
+    console.log(`Canvas 2D тест: ${duration.toFixed(2)}ms`);
+    return duration;
   }
   
   async initAudio() {
@@ -84,6 +114,16 @@ class Game {
     this.initGameOverModal();
     this.initVictoryModal();
     this.initPauseModal();
+
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('shown.bs.modal', () => {
+        this.game_container.classList.add('hide');
+      });
+      
+      modal.addEventListener('hide.bs.modal', () => {
+        this.game_container.classList.remove('hide');
+      });
+    });
     
     // Настройка обработчика нажатия клавиш
     window.addEventListener('keydown', (e) => {
@@ -120,9 +160,7 @@ class Game {
     
     this.gameState.onVictory(() => {
       console.log("Victory callback вызван");
-      this.calculateScore();
-      this.showVictoryModal();
-      this.disableControls();
+      this.Victory();
     });
     
     this.gameState.onPause(() => {
@@ -164,10 +202,24 @@ class Game {
       this.gameStarted = true;
     });
   }
+
+  Victory() {
+      this.calculateScore();
+      this.showVictoryModal();
+      this.disableControls();
+      this.nextGameIndex();
+  }
+
+  nextGameIndex() {
+    let keys = Object.keys(GAME_PARAMS);
+    this.paramsIndex = keys[(keys.indexOf(this.paramsIndex) + 1) % keys.length];
+  }
   
   initStartModal() {
     // Получаем элемент модального окна Start
     this.startModalElement = document.getElementById('startModal');
+
+    document.getElementById('testResult').textContent = Math.round(this.testResult);
     
     if (this.startModalElement && bootstrap) {
       // Создаем экземпляр Bootstrap модального окна
@@ -429,14 +481,14 @@ class Game {
     // Инициализация рендерера
     this.rendererManager.init();
     
-    // Инициализация камеры
-    this.cameraController = new CameraController(this.rendererManager.getAspectRatio());
-    
     // Создание освещения
     this.createLights(scene);
     
     // Создание игровых объектов (но не активируем физику)
     this.createGameObjects();
+    
+    // Инициализация камеры
+    this.cameraController = new CameraController(this);
     
     // Запуск анимации
     this.animate();
@@ -722,6 +774,6 @@ class Game {
 
 // Запуск игры
 document.addEventListener('DOMContentLoaded', () => {
-  const game = new Game();
-  game.init();
+  window.game = new Game();
+  window.game.init();
 });

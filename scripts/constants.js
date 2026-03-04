@@ -5,7 +5,7 @@
 export const TREE_COLOR = 0xA67C52;
 export const TREE_HEIGHT = 20;
 export const TEXTURE_SCALE_Y = 1.5;
-export const MAIN_RADIUS = 1;
+export const MAIN_RADIUS = 0.8;
 export const MAIN_DIAMETER = MAIN_RADIUS * 2;
 
 // Параметры изгиба ствола
@@ -98,6 +98,7 @@ export const PLATFORM_KILLER_COLOR = 0xFF3333; // Ярко-красный для
 
 // Процент платформ-убийц
 export const KILLER_PLATFORM_PERCENTAGE = 0.3; // 30%
+export const START_GAME = 'DEFAULT';
 
 export const GAME_PARAMS = {
 	DEFAULT: 
@@ -119,12 +120,13 @@ export const GAME_PARAMS = {
 				BARK_TEXTURE_PATH: 'textures/bark-d.jpg',
 				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
 				KILLER_PLATFORM_TEXTURE_PATH: 'textures/killer_platform.jpg',
-				NEEDLE_TEXTURE_PATH: 'textures/oak-leaves.png'
+				NEEDLE_TEXTURE_PATH: 'textures/oak-leaves.png',
+				TREE_HEIGHT: 20
 			}
 		},
 	DARK: {
 			ENV: {
-				BACKGROUND_COLOR: 0x367ddd,
+				BACKGROUND_COLOR: 0x93b1ff,
 				KEY_LIGHT_COLOR: 0xffffff,
 				RIM_LIGHT_COLOR: 0x818cf8,
 				FILL_LIGHT_COLOR: 0x63a188,
@@ -140,7 +142,30 @@ export const GAME_PARAMS = {
 				BARK_TEXTURE_PATH: 'textures/bark.jpg',
 				BARK_NORMAL_PATH: 'textures/bark-normal.jpg',
 				KILLER_PLATFORM_TEXTURE_PATH: 'textures/killer_platform.jpg',
-				NEEDLE_TEXTURE_PATH: 'textures/needle.png'
+				NEEDLE_TEXTURE_PATH: 'textures/needle.png',
+				TREE_HEIGHT: 20
+			}
+		},
+	BIRCH: {
+			ENV: {
+				BACKGROUND_COLOR: 0xBBBBFF,
+				KEY_LIGHT_COLOR: 0xffffff,
+				RIM_LIGHT_COLOR: 0x818cf8,
+				FILL_LIGHT_COLOR: 0x63a188,
+				BACKGROUND_IMAGE_PATH: 'images/bk1.jpg',
+				GRASS_IMAGE_PATH: 'textures/grass-s.png',
+				GROUND_IMAGE_PATH:'textures/ground.jpg',
+				AMBIENT_LIGHT_INTENSITY: 0.5,
+				KEY_LIGHT_INTENSITY: 3,
+				FILL_LIGHT_INTENSITY: 2,
+				RIM_LIGHT_INTENSITY: 0.6
+			},
+			TREE: {
+				BARK_TEXTURE_PATH: 'textures/birch.jfif',
+				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
+				KILLER_PLATFORM_TEXTURE_PATH: 'textures/bark-b.jpg',
+				NEEDLE_TEXTURE_PATH: 'textures/birch-leaves.png',
+				TREE_HEIGHT: 20
 			}
 		}
 }

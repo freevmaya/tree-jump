@@ -15,6 +15,10 @@ body {
   width: 100vw;
 }
 
+.hide {
+  opacity: 0 !important;
+}
+
 /* Основной контейнер игры */
 #game-container {
   display: flex;
@@ -136,7 +140,7 @@ canvas {
   bottom: calc(15vh + 20px);
   left: 50%;
   transform: translateX(-50%);
-  color: rgba(0, 0, 0, 0.6);
+  color: black;
   background: rgba(255, 255, 240, 0.25);
   backdrop-filter: blur(4px);
   padding: 8px 18px;
@@ -266,14 +270,14 @@ canvas {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 15px;
   padding: 20px;
-  margin: 20px 0;
+  margin: 20px;
   text-align: center;
 }
 
 .stat-value {
   font-size: 3rem;
   font-weight: bold;
-  color: #ff6b6b;
+  color: #f1ff38;
   line-height: 1.2;
 }
 

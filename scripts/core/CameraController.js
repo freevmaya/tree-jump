@@ -3,8 +3,9 @@ import * as THREE from 'three';
 import { CAMERA_FOLLOW_SPEED, CAMERA_HEIGHT_OFFSET, CAMERA_START_Y } from '../constants.js';
 
 export class CameraController {
-  constructor(aspectRatio) {
-    this.camera = new THREE.PerspectiveCamera(50, aspectRatio, 0.1, 100);
+  constructor(game) {
+    this.game = game;
+    this.camera = new THREE.PerspectiveCamera(50, this.game.rendererManager.getAspectRatio(), 0.1, 100);
     this.targetY = 0;
     this.followSpeed = CAMERA_FOLLOW_SPEED;
     this.heightOffset = CAMERA_HEIGHT_OFFSET;
@@ -12,7 +13,7 @@ export class CameraController {
   }
 
   reset() {
-    this.camera.position.set(0, CAMERA_START_Y + CAMERA_HEIGHT_OFFSET, 12);
+    this.camera.position.set(0, CAMERA_HEIGHT_OFFSET - this.game.tree.half_height, 12);
   }
   
   update(targetY) {

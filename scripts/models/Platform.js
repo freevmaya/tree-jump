@@ -17,7 +17,7 @@ export class Platform {
     this.mesh = null;
     this.texture = null;
 
-    this.platformGeometry = new THREE.CylinderGeometry(PLATFORM_RADIUS, PLATFORM_RADIUS * 0.9, PLATFORM_HEIGHT, 16);
+    this.platformGeometry = new THREE.CylinderGeometry(PLATFORM_RADIUS, PLATFORM_RADIUS * 0.9, PLATFORM_HEIGHT, 8);
 
     textureLoader.rotateUV(this.platformGeometry, Math.PI * 0.5);
     

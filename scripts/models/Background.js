@@ -70,7 +70,7 @@ export class Background {
     this.mesh = new THREE.Mesh(geometry, material);
     
     // Позиционируем фон позади сцены
-    this.mesh.position.set(0, 0, -20);
+    this.mesh.position.set(0, 8, -20);
     
     // Поворачиваем чтобы смотрела на камеру
     this.mesh.rotation.y = rotation;

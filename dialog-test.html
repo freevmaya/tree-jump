@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tree Jump — отскоки от дерева</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/dialog.css">
+</head>
+<body>
+  <!-- Основной контейнер игры -->
+  <div id="game-container">
+    <!-- Верхний блок с игрой (85%) -->
+    <div id="game-canvas-container">
+      <div id="canvas-container"></div>
+    </div>
+  </div>
+
+  <!-- Bootstrap модальное окно для Start Game -->
+  <div class="modal fade" id="startModal" tabindex="-1" aria-labelledby="startModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="dialog-1 modal-content">
+        <div class="background">
+          <div class="top">
+            
+          </div>
+          <div class="middle">
+            <div class="dialog-content">
+              <p>
+                <i class="bi bi-info-circle"></i> Управляйте вращением дерева, чтобы шарик отскакивал от платформ
+              </p>
+              <p>
+                <i class="bi bi-exclamation-triangle-fill"></i> Красные платформы смертельны при ударе сверху!
+              </p>
+              <div class="text-center">
+                <button type="button" class="btn" id="startGameButton">Начать игру</button>
+              </div>
+            </div>
+          </div>
+          <div class="bottom">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="startModal2" tabindex="-1" aria-labelledby="startModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="startModalLabel">
+            <i class="bi bi-tree-fill"></i> TREE JUMP
+          </h5>
+        </div>
+        <div class="modal-body text-center">
+          
+          <p class="modal-subtitle">
+            <i class="bi bi-info-circle"></i> Управляйте вращением дерева, чтобы шарик отскакивал от платформ
+          </p>
+          <p class="modal-subtitle" style="color: #ff6b6b;">
+            <i class="bi bi-exclamation-triangle-fill"></i> Красные платформы смертельны при ударе сверху!
+          </p>
+          
+          <div class="pause-controls" style="text-align: left; margin-top: 20px;">
+            <div class="pause-shortcut">
+              <span class="key">Мышь</span> - вращать дерево
+            </div>
+            <div class="pause-shortcut">
+              <span class="key">ESC</span> - пауза
+            </div>
+            <div class="pause-shortcut">
+              <span class="key">R</span> - перезапуск
+            </div>
+            <div class="pause-shortcut">
+              <span class="key">M</span> - звук вкл/выкл
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-restart" id="startGameButton">
+            <i class="bi bi-play-fill"></i> Начать игру
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Подключаем Bootstrap JS глобально -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="text/javascript">
+    
+    (new bootstrap.Modal(document.getElementById('startModal'))).show();
+  </script>
+</body>
+</html>

@@ -1,9 +1,8 @@
 // scripts/models/Tree.js
 import * as THREE from 'three';
 import { 
-  TREE_COLOR, TREE_HEIGHT, MAIN_RADIUS, STICK_OUT, 
-  PLATFORM_RADIUS, PLATFORM_HEIGHT, PLATFORM_COUNT,
-  CYLINDER_HALF_HEIGHT, WIREFRAME_COLOR,
+  TREE_COLOR, MAIN_RADIUS, STICK_OUT, 
+  PLATFORM_RADIUS, PLATFORM_HEIGHT, PLATFORM_COUNT, WIREFRAME_COLOR,
   KILLER_PLATFORM_PERCENTAGE, ROTATION_SMOOTH,
   BRANCH_COUNT, BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH, BRANCH_DENSITY,
   TRUNK_CURVE_STRENGTH, TRUNK_SEGMENTS
@@ -40,6 +39,8 @@ export class Tree {
   init(options) {
     this.options = options;
 
+    this.half_height = this.options.TREE_HEIGHT / 2;
+
     // Создаем группу для ствола, если нужно
     this.mesh = new THREE.Group();
     
@@ -66,7 +67,7 @@ export class Tree {
       const t = i / segments; // Параметр от 0 до 1
       
       // Вертикальная координата (от низа до верха)
-      const y = -CYLINDER_HALF_HEIGHT + t * TREE_HEIGHT;
+      const y = -this.half_height + t * this.options.TREE_HEIGHT;
       
       // Прогрессия изгиба (сильнее всего в середине, меньше у концов)
       const curveProgress = Math.sin(t * Math.PI * 2); // Плавное нарастание и затухание
@@ -223,7 +224,7 @@ export class Tree {
   }
 
   calcDistance(y) {
-    let k = (TREE_HEIGHT - (CYLINDER_HALF_HEIGHT + y)) / TREE_HEIGHT; 
+    let k = (this.options.TREE_HEIGHT - (this.half_height + y)) / this.options.TREE_HEIGHT; 
     return this.minRadius * (1 - k) + this.maxRadius * k;
   }
   
@@ -234,8 +235,8 @@ export class Tree {
     }
     
     // Находим параметр t (от 0 до 1) на основе высоты y
-    const minY = -CYLINDER_HALF_HEIGHT;
-    const maxY = CYLINDER_HALF_HEIGHT;
+    const minY = -this.half_height;
+    const maxY = this.half_height;
     
     // Нормализуем y в диапазон [0, 1] относительно высоты дерева
     let t = (y - minY) / (maxY - minY);
@@ -278,13 +279,13 @@ export class Tree {
     // Создаем массив для хранения углов обычных платформ, чтобы разместить напротив них убийц
     const normalPlatformAngles = [];
     
-    let base_y = CYLINDER_HALF_HEIGHT / PLATFORM_COUNT;
+    let base_y = this.half_height / PLATFORM_COUNT;
     let previousTheta = null;
     const MIN_ANGLE_DIFF = Math.PI / 3;
     
     // Сначала создаем все обычные платформы (isKiller = false)
     for (let i = 0; i < PLATFORM_COUNT; i++) {
-      const y = base_y + (i / PLATFORM_COUNT * 2 - 1) * (CYLINDER_HALF_HEIGHT - base_y);
+      const y = base_y + (i / PLATFORM_COUNT * 2 - 1) * (this.half_height - base_y);
       
       let theta;
       
@@ -415,7 +416,7 @@ export class Tree {
       const branchY = platform.y - PLATFORM_HEIGHT / 2 - 0.5;   
       
       // Определяем масштаб ветки (чем выше, тем меньше)
-      const heightFactor = (CYLINDER_HALF_HEIGHT - branchY) / TREE_HEIGHT;
+      const heightFactor = (this.half_height - branchY) / this.options.TREE_HEIGHT;
       const scaleFactor = 0.6 + heightFactor * 0.8; // Ветки внизу крупнее
       
       // Создаем ветку

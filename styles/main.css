@@ -36,7 +36,7 @@ body {
 
 /* Верхний блок с игрой (85%) */
 #game-canvas-container {
-  height: 100dvw;
+  height: 100dvh;
   width: 100%;
   position: relative;
   overflow: hidden;

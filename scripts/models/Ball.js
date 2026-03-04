@@ -34,7 +34,7 @@ export class Ball {
   }
   
   setPosition(x, y, z) {
-    this.mesh.position.set(x, y, this.tree.calcDistance(y) * this.k_distance);
+    this.mesh.position.set(x, y, z);
   }
   
   getPosition() {
@@ -64,7 +64,11 @@ export class Ball {
   }
   
   updatePosition(dt) {
-    let v = this.getPosition().add(this.velocity.clone().multiplyScalar(dt));
+    let angle = this.tree.mesh.rotation.y;
+    let a_v = this.getPosition().add(this.velocity.clone().multiplyScalar(dt));
+    let v = this.tree.getPointOnTrunk(a_v.y, this.k_distance, angle + Math.PI / 2);
+
+    v.applyMatrix4(new THREE.Matrix4().makeRotationY(angle));
     this.setPosition(v.x, v.y, v.z);
   }
   

@@ -444,6 +444,8 @@ class Game {
     if (joystickPad && joystickThumb) {
       this.joystickControl = new JoystickControl(this.tree, joystickPad, joystickThumb);
     }
+
+    this.cameraController.begin();
   }
   
   updateScoreIndicator() {

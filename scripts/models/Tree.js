@@ -73,8 +73,7 @@ export class Tree {
       const curveProgress = Math.sin(t * Math.PI * 2); // Плавное нарастание и затухание
       
       // Применяем изгиб в заданном направлении
-      // Чем выше t, тем сильнее изгиб (накапливается)
-      const curveOffset = this.curveStrength * curveProgress * t;
+      const curveOffset = this.curveStrength * curveProgress;
       const xy_influnce = Math.random();
       
       const x = this.curveDirection.x * curveOffset * xy_influnce;

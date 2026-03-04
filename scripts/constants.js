@@ -9,7 +9,7 @@ export const MAIN_RADIUS = 0.8;
 export const MAIN_DIAMETER = MAIN_RADIUS * 2;
 
 // Параметры изгиба ствола
-export const TRUNK_CURVE_STRENGTH = 0.6; // Сила максимального изгиба ствола
+export const TRUNK_CURVE_STRENGTH = 0.5; // Сила максимального изгиба ствола
 export const TRUNK_SEGMENTS = 12; // Количество сегментов на весь ствол (больше = более плавный изгиб)
 
 // Ветки

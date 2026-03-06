@@ -11,16 +11,207 @@
 # Processed extensions: .js, .html, .css
 
 # ============================================================
+# FILE: .\styles\dialog.css
+# TYPE: .CSS
+# ============================================================
+
+.modal {
+  --bs-modal-width: 500px;
+}
+
+/* Простая bounce анимация */
+@keyframes bounce {
+  /* Начало - прозрачный, маленький, повернутый */
+  0% { 
+    transform: scale(0.3) rotate(30deg); 
+    opacity: 0; 
+  }
+  
+  /* Первый отскок (максимальный) - появляется */
+  20% { 
+    transform: scale(1.2) rotate(-10deg); 
+    opacity: 1; 
+  }
+  
+  /* Первое затухание после первого отскока */
+  35% { 
+    transform: scale(0.9) rotate(0deg); 
+    opacity: 1; 
+  }
+  
+  /* Второй отскок (средний) */
+  50% { 
+    transform: scale(1.1) rotate(1deg); 
+    opacity: 1; 
+  }
+  
+  /* Второе затухание */
+  65% { 
+    transform: scale(0.95) rotate(2deg); 
+    opacity: 1; 
+  }
+  
+  /* Третий отскок (маленький) */
+  80% { 
+    transform: scale(1.02) rotate(1deg); 
+    opacity: 1; 
+  }
+  
+  /* Финальная позиция */
+  100% { 
+    transform: scale(1) rotate(0deg); 
+    opacity: 1; 
+  }
+}
+
+.modal {
+  overflow: hidden;
+  background: radial-gradient(circle at top left, #7ed4e3, #223100);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.modal .modal-dialog {
+  animation: bounce 1s ease-out;
+  margin: auto;
+}
+
+.dialog-1.modal-content {
+  border: none;
+  background: none;
+  width: var(--bs-modal-width);
+}
+
+.dialog-1 .top, .dialog-1 .middle, .dialog-1 .bottom {
+  background-position: center;
+  background-repeat: repeat-y;
+}
+
+.dialog-1 .top {
+  background-image: url(dialog/dialog-top.png);
+  height: 124px;
+  flex-shrink: 0;
+}
+
+.dialog-1 .middle {
+  background-image: url(dialog/dialog-middle.png);
+  flex: 1 1 auto;
+}
+
+.dialog-1 .bottom {
+  background-image: url(dialog/dialog-bottom.png);
+  height: 80px;
+  flex-shrink: 0;
+}
+
+.dialog-1 .dialog-content {
+  margin: -20px 120px;
+}
+
+.dialog-1 .dialog-content p {
+  padding: 1em 1em;
+  margin-bottom: 10px;
+}
+
+.dialog-1 .background {
+  margin-left: 50px;
+  margin-right: 50px;
+  margin-top: 50px;
+  margin-bottom: 10px;
+  position: absolute;
+  width: calc(100% - 100px);
+  height: calc(100% - 60px);
+  z-index: -1;
+  background-image: url(dialog/dialog-bg.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.dialog-1 .wrapper {
+  /*background-image: url(dialog/dialog-bg.png);*/
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  color: #d9c0a9;
+  font-size: 14px;
+  margin: auto;
+  width: var(--bs-modal-width);
+}
+
+.dialog-1 .btn {
+  background-image: url(dialog/button.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  font-size: 12px;
+  color:black;
+  width: 103px;
+  height: 39px;
+  filter: drop-shadow(1px 1px 2px black);
+  border: none !important;
+}
+
+.dialog-1 .btn:hover {
+  filter: drop-shadow(3px 3px 4px black);
+}
+
+.dialog-1 .btn:active {
+  filter: brightness(0.8) drop-shadow(1px 1px 2px black);
+  color: white;
+}
+
+@media (max-width: 576px) {
+  .modal .modal-dialog {
+    width: var(--bs-modal-width);
+    scale: calc(100dvw / var(--bs-modal-width));
+    margin-left: calc((100dvw - var(--bs-modal-width)) / 2);
+  }
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .modal {
+    background-image: url(dialog/background-512.jpg);
+  }
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .modal {
+    background-image: url(dialog/background-23-512.jpg);
+  }
+}
+
+
+# ============================================================
 # FILE: .\styles\main.css
 # TYPE: .CSS
 # ============================================================
 
 /* styles/main.css */
 
+:root {
+  --game-bg: radial-gradient(circle at top left, #7ed4e3, #223100);
+}
+
+/*
+@font-face {
+  font-family: 'game-font';
+  src: url('fonts/19510.otf') format('opentype');
+  font-display: swap;
+}
+*/
+
+@font-face {
+  font-family: 'game-font';
+  src: url('fonts/20686.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
+  font-family: 'game-font', sans-serif;
+  font-size: 16px;
 }
 
 body {
@@ -30,6 +221,11 @@ body {
   user-select: none;
   height: 100vh;
   width: 100vw;
+  background: radial-gradient(circle at top left, #7ed4e3, #223100);
+}
+
+.hide {
+  opacity: 0 !important;
 }
 
 /* Основной контейнер игры */
@@ -38,11 +234,28 @@ body {
   flex-direction: column;
   height: 100dvh;
   width: 100dvw;
+  max-width: 700px;
+  margin: auto;
+  position: relative;
+}
+
+.game-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: max(150px, 20dvw);
+  background-image: url(images/game-top.png);
+  z-index: 1;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position-y: top;
+  pointer-events: none;
 }
 
 /* Верхний блок с игрой (85%) */
 #game-canvas-container {
-  height: 85vh;
+  height: 100dvh;
   width: 100%;
   position: relative;
   overflow: hidden;
@@ -63,7 +276,7 @@ canvas {
 
 /* Нижний блок с джойстиком (15%) */
 #joystick-container {
-  height: 15vh;
+  height: 10vh;
   width: 100%;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(8px);
@@ -96,24 +309,6 @@ canvas {
   z-index: 1002;
 }
 
-.joystick-pad {
-  width: 60%;
-  height: 70%;
-  background: rgba(255, 255, 255, 0.15);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 20px;
-  position: relative;
-  cursor: grab;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.2s;
-  margin: 0 auto;
-}
-
-.joystick-pad:active {
-  cursor: grabbing;
-  background: rgba(255, 255, 255, 0.2);
-}
-
 .joystick-thumb {
   width: 40px;
   height: 40px;
@@ -134,26 +329,13 @@ canvas {
   z-index: 1003;
 }
 
-.joystick-thumb i {
-  font-size: 20px;
-}
-
-.joystick-hint {
-  position: absolute;
-  bottom: 5px;
-  right: 20px;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 12px;
-  z-index: 1002;
-}
-
 /* Подсказка внизу экрана */
 .hint {
   position: fixed;
-  bottom: calc(15vh + 20px);
+  bottom: calc(5vh + 20px);
   left: 50%;
   transform: translateX(-50%);
-  color: rgba(0, 0, 0, 0.6);
+  color: black;
   background: rgba(255, 255, 240, 0.25);
   backdrop-filter: blur(4px);
   padding: 8px 18px;
@@ -209,7 +391,6 @@ canvas {
 /* Bootstrap модальное окно - кастомизация */
 .modal-content {
   background: rgba(20, 20, 30, 0.95);
-  backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.2);
   color: white;
   border-radius: 20px;
@@ -239,6 +420,13 @@ canvas {
   font-size: 1.2rem;
   margin-bottom: 1rem;
   color: #aaa;
+}
+
+.btn {
+  font-size: 18px !important;
+  line-height: 1.8em;
+  text-shadow: 0 0 3px #000000ad;
+  color: #2d1904;
 }
 
 .btn-restart {
@@ -283,14 +471,14 @@ canvas {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 15px;
   padding: 20px;
-  margin: 20px 0;
+  margin: 20px;
   text-align: center;
 }
 
 .stat-value {
   font-size: 3rem;
   font-weight: bold;
-  color: #ff6b6b;
+  color: #f1ff38;
   line-height: 1.2;
 }
 
@@ -303,24 +491,9 @@ canvas {
 
 /* Адаптация для мобильных устройств */
 @media (max-width: 768px) {
-  .joystick-pad {
-    width: calc(100% - 20px);
-  }
   
   .hint {
     font-size: 12px;
-    bottom: calc(15vh + 10px);
-    padding: 5px 12px;
-  }
-  
-  .joystick-instruction {
-    font-size: 12px;
-    left: 10px;
-  }
-  
-  .joystick-hint {
-    font-size: 10px;
-    right: 10px;
   }
   
   .bounce-indicator,
@@ -354,11 +527,13 @@ canvas {
   font-weight: bold;
   text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
-.victory-message {
-  color: #ffd700;
-  font-size: 1.2rem;
-  margin-top: 15px;
+
+.status {
+  font-size: 26px;
+  text-align: center;
+  text-shadow: 2px 2px 3px #000000c4;
 }
+
 .victory-footer {
   border-top: 1px solid rgba(255, 215, 0, 0.3);
 }
@@ -441,14 +616,37 @@ canvas {
   z-index: 100;
   backdrop-filter: blur(5px);
 }
+
 .score-indicator i {
   color: gold;
   margin-right: 8px;
 }
 
+.phone {
+  display: none !important;
+}
+
+.desktop {
+  display: none !important;
+}
+
+
+@media (hover: none) {
+  .desktop {
+    display: inherit !important;
+  }
+}
+
+
+@media (hover: hover) {
+  .phone {
+    display: inherit !important;
+  }
+}
+
 
 # ============================================================
-# FILE: .\index.html
+# FILE: .\dialog-test.html
 # TYPE: .HTML
 # ============================================================
 
@@ -465,6 +663,7 @@ canvas {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <!-- Custom CSS -->
   <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/dialog.css">
 </head>
 <body>
   <!-- Основной контейнер игры -->
@@ -474,24 +673,37 @@ canvas {
       <div id="canvas-container"></div>
     </div>
   </div>
-  
-  <!-- Подсказка в игре (будет скрыта до старта) -->
-  <div class="hint" id="game-hint" style="display: none;">
-    <i class="bi bi-mouse"></i> Зажмите левую кнопку и тяните, чтобы вращать дерево
-  </div>
-  
-  <!-- Индикатор очков (только при победе) -->
-  <div class="score-indicator" id="score-indicator" style="display: none;">
-    <i class="bi bi-trophy-fill"></i> Счет: <span id="current-score">0</span>
-  </div>
-  
-  <!-- Индикатор красных платформ (будет скрыт до старта) -->
-  <div class="killer-indicator" id="killer-indicator" style="display: none;">
-    <i class="bi bi-exclamation-triangle-fill"></i> Красные платформы смертельны!
-  </div>
 
   <!-- Bootstrap модальное окно для Start Game -->
   <div class="modal fade" id="startModal" tabindex="-1" aria-labelledby="startModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="dialog-1 modal-content">
+        <div class="background">
+          <div class="top">
+            
+          </div>
+          <div class="middle">
+            <div class="dialog-content">
+              <p>
+                <i class="bi bi-info-circle"></i> Управляйте вращением дерева, чтобы шарик отскакивал от платформ
+              </p>
+              <p>
+                <i class="bi bi-exclamation-triangle-fill"></i> Красные платформы смертельны при ударе сверху!
+              </p>
+              <div class="text-center">
+                <button type="button" class="btn" id="startGameButton">Начать игру</button>
+              </div>
+            </div>
+          </div>
+          <div class="bottom">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="startModal2" tabindex="-1" aria-labelledby="startModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
@@ -500,16 +712,6 @@ canvas {
           </h5>
         </div>
         <div class="modal-body text-center">
-          <i class="bi bi-arrow-up-circle" style="font-size: 4rem; color: #ff6b6b; margin-bottom: 20px;"></i>
-          
-          <div class="stats-container">
-            <div class="row">
-              <div class="col-12">
-                <div class="stat-value">🌲</div>
-                <div class="stat-label">Достигни вершины дерева</div>
-              </div>
-            </div>
-          </div>
           
           <p class="modal-subtitle">
             <i class="bi bi-info-circle"></i> Управляйте вращением дерева, чтобы шарик отскакивал от платформ
@@ -542,137 +744,12 @@ canvas {
     </div>
   </div>
 
-  <!-- Bootstrap модальное окно для Game Over -->
-  <div class="modal fade" id="gameOverModal" tabindex="-1" aria-labelledby="gameOverModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="gameOverModalLabel">
-            <i class="bi bi-skull"></i> ИГРА ОКОНЧЕНА
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body text-center">
-          <!-- Статистика игры -->
-          <div class="stats-container">
-            <div class="row">
-              <div class="col-12">
-                <div class="stat-value" id="finalBounceCount">0</div>
-                <div class="stat-label">Отскоков</div>
-              </div>
-            </div>
-          </div>
-          
-          <p class="modal-subtitle">
-            <i class="bi bi-arrow-up-circle"></i> Нажмите R для перезапуска
-          </p>
-        </div>
-        <div class="modal-footer justify-content-center">
-          <button type="button" class="btn btn-restart" id="restartButton">
-            <i class="bi bi-arrow-repeat"></i> Новая игра
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bootstrap модальное окно для Victory (Победа) -->
-  <div class="modal fade" id="victoryModal" tabindex="-1" aria-labelledby="victoryModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content victory-modal">
-        <div class="modal-header victory-header">
-          <h5 class="modal-title" id="victoryModalLabel">
-            <i class="bi bi-trophy-fill"></i> ПОБЕДА!
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body text-center">
-          <i class="bi bi-star-fill victory-star" style="font-size: 4rem; color: gold; margin-bottom: 20px;"></i>
-          <i class="bi bi-star-fill victory-star" style="font-size: 3rem; color: gold; margin-bottom: 20px;"></i>
-          <i class="bi bi-star-fill victory-star" style="font-size: 4rem; color: gold; margin-bottom: 20px;"></i>
-          
-          <!-- Статистика игры -->
-          <div class="stats-container victory-stats">
-            <div class="row">
-              <div class="col-6">
-                <div class="stat-value" id="victoryBounceCount">0</div>
-                <div class="stat-label">Отскоков</div>
-              </div>
-              <div class="col-6">
-                <div class="stat-value" id="victoryScore">0</div>
-                <div class="stat-label">Очки</div>
-              </div>
-            </div>
-          </div>
-          
-          <p class="modal-subtitle victory-message">
-            <i class="bi bi-emoji-sunglasses"></i> Вы достигли вершины дерева!
-          </p>
-          <p class="modal-subtitle">
-            <i class="bi bi-arrow-up-circle"></i> Нажмите R для новой игры
-          </p>
-        </div>
-        <div class="modal-footer justify-content-center victory-footer">
-          <button type="button" class="btn btn-restart" id="victoryRestartButton">
-            <i class="bi bi-arrow-repeat"></i> Новая игра
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bootstrap модальное окно для Pause (Пауза) -->
-  <div class="modal fade" id="pauseModal" tabindex="-1" aria-labelledby="pauseModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content pause-modal">
-        <div class="modal-header pause-header">
-          <h5 class="modal-title" id="pauseModalLabel">
-            <i class="bi bi-pause-circle-fill"></i> ПАУЗА
-          </h5>
-        </div>
-        <div class="modal-body text-center">
-          
-          <p class="modal-subtitle pause-message">
-            Игра приостановлена
-          </p>
-          
-          <div class="pause-controls">
-            <div class="pause-shortcut">
-              <span class="key">ESC</span> - продолжить игру
-            </div>
-            <div class="pause-shortcut">
-              <span class="key">R</span> - начать заново
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer justify-content-center pause-footer">
-          <button type="button" class="btn btn-resume" id="resumeButton">
-            <i class="bi bi-play-fill"></i> Продолжить
-          </button>
-          <button type="button" class="btn btn-restart" id="pauseRestartButton">
-            <i class="bi bi-arrow-repeat"></i> Новая игра
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Подключаем Bootstrap JS глобально -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
-  <!-- Import maps для Three.js -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
-      "@scripts/": "./scripts/"
-    }
-  }
+  <script type="text/javascript">
+    
+    (new bootstrap.Modal(document.getElementById('startModal'))).show();
   </script>
-  
-  <!-- Main script -->
-  <script type="module" src="./scripts/main.js"></script>
 </body>
 </html>
 
@@ -1039,11 +1116,11 @@ export const soundManager = new SoundManager();
 export const TREE_COLOR = 0xA67C52;
 export const TREE_HEIGHT = 20;
 export const TEXTURE_SCALE_Y = 1.5;
-export const MAIN_RADIUS = 1;
+export const MAIN_RADIUS = 0.8;
 export const MAIN_DIAMETER = MAIN_RADIUS * 2;
 
 // Параметры изгиба ствола
-export const TRUNK_CURVE_STRENGTH = 0.6; // Сила максимального изгиба ствола
+export const TRUNK_CURVE_STRENGTH = 0.5; // Сила максимального изгиба ствола
 export const TRUNK_SEGMENTS = 12; // Количество сегментов на весь ствол (больше = более плавный изгиб)
 
 // Ветки
@@ -1071,6 +1148,7 @@ export const PLATFORM_HEIGHT = 0.2;
 export const CYLINDER_HALF_HEIGHT = TREE_HEIGHT / 2;
 export const PLATFORM_DENSITY = 0.6;
 export const PLATFORM_COUNT = Math.floor(TREE_HEIGHT * PLATFORM_DENSITY);
+export const PLATFORM_DISTANCE = 1.3;
 
 // Базовая платформа
 export const BASE_PLATFORM_SIZE = 20;
@@ -1086,7 +1164,7 @@ export const MAX_VELOCITY = 5.2;
 
 // Камера
 export const CAMERA_FOLLOW_SPEED = 0.06;
-export const CAMERA_HEIGHT_OFFSET = 2.8;
+export const CAMERA_HEIGHT_OFFSET = 4;
 export const CAMERA_START_Y = -CYLINDER_HALF_HEIGHT;
 
 // Управление мышью
@@ -1130,12 +1208,12 @@ export const RESET_VELOCITY_Y = BOUNCE_SPEED;
 export const PLATFORM_NORMAL_COLOR = 0xA67C52; // Используем существующий TREE_COLOR для обычных платформ
 export const PLATFORM_KILLER_COLOR = 0xFF3333; // Ярко-красный для платформ-убийц
 
-// Процент платформ-убийц
-export const KILLER_PLATFORM_PERCENTAGE = 0.3; // 30%
+export const START_GAME = 'DEFAULT';
 
 export const GAME_PARAMS = {
 	DEFAULT: 
 		{
+			NAME: 'Ознакомительный',
 			ENV: {
 				BACKGROUND_COLOR: 0xBBBBFF,
 				KEY_LIGHT_COLOR: 0xffffff,
@@ -1150,10 +1228,72 @@ export const GAME_PARAMS = {
 				RIM_LIGHT_INTENSITY: 0.6
 			},
 			TREE: {
-				BARK_TEXTURE_PATH: 'textures/bark.jpg',
+				BARK_TEXTURE_REPEAT: {x: 4, y: 1},
+				BARK_TEXTURE_PATH: 'textures/oak-bark.jpg',
+				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
+				KILLER_PLATFORM_TEXTURE_PATH: 'textures/killer_platform.jpg',
+				NEEDLE_TEXTURE_PATH: 'textures/oak-leaves.png',
+				TREE_HEIGHT: 15,
+				PLATFORM_STEP: 1.6,
+				KILLER_DENSITY: 0.1,
+				PLATFORM_ROTATE_DENSITY: 0.2,
+				PLATFORM_RADIUS: { MIN: 0.5, MAX: 0.5 }
+			}
+		},
+	DARK: {
+			NAME: 'Начинаются сложности',
+			ENV: {
+				BACKGROUND_COLOR: 0x93b1ff,
+				KEY_LIGHT_COLOR: 0xffffff,
+				RIM_LIGHT_COLOR: 0x818cf8,
+				FILL_LIGHT_COLOR: 0x63a188,
+				BACKGROUND_IMAGE_PATH: 'images/dark-bg.jpg',
+				GRASS_IMAGE_PATH: 'textures/grass-s.png',
+				GROUND_IMAGE_PATH:'textures/ground.jpg',
+				AMBIENT_LIGHT_INTENSITY: 1,
+				KEY_LIGHT_INTENSITY: 3,
+				FILL_LIGHT_INTENSITY: 2,
+				RIM_LIGHT_INTENSITY: 0.6
+			},
+			TREE: {
+				BARK_TEXTURE_REPEAT: {x: 2, y: 1},
+				BARK_TEXTURE_PATH: 'textures/pine-bark.jpg',
 				BARK_NORMAL_PATH: 'textures/bark-normal.jpg',
 				KILLER_PLATFORM_TEXTURE_PATH: 'textures/killer_platform.jpg',
-				NEEDLE_TEXTURE_PATH: 'textures/needle.png'
+				NEEDLE_TEXTURE_PATH: 'textures/needle.png',
+				TREE_HEIGHT: 20,
+				PLATFORM_STEP: 1.6,
+				KILLER_DENSITY: 0.2,
+				PLATFORM_ROTATE_DENSITY: 0.3,
+				PLATFORM_RADIUS: { MIN: 0.3, MAX: 0.4 }
+			}
+		},
+	BIRCH: {
+			NAME: 'Придется постараться',
+			ENV: {
+				BACKGROUND_COLOR: 0xBBBBFF,
+				KEY_LIGHT_COLOR: 0xffffff,
+				RIM_LIGHT_COLOR: 0x818cf8,
+				FILL_LIGHT_COLOR: 0x63a188,
+				BACKGROUND_IMAGE_PATH: 'images/bk1.jpg',
+				GRASS_IMAGE_PATH: 'textures/grass-s.png',
+				GROUND_IMAGE_PATH:'textures/ground.jpg',
+				AMBIENT_LIGHT_INTENSITY: 0.5,
+				KEY_LIGHT_INTENSITY: 3,
+				FILL_LIGHT_INTENSITY: 2,
+				RIM_LIGHT_INTENSITY: 0.6
+			},
+			TREE: {
+				BARK_TEXTURE_REPEAT: {x: 2, y: 1},
+				BARK_TEXTURE_PATH: 'textures/birch.jfif',
+				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
+				KILLER_PLATFORM_TEXTURE_PATH: 'textures/bark-b.jpg',
+				NEEDLE_TEXTURE_PATH: 'textures/birch-leaves.png',
+				TREE_HEIGHT: 20,
+				PLATFORM_STEP: 1.6,
+				KILLER_DENSITY: 0.3,
+				PLATFORM_ROTATE_DENSITY: 0.5,
+				PLATFORM_RADIUS: { MIN: 0.2, MAX: 0.3 }
 			}
 		}
 }
@@ -1481,22 +1621,38 @@ import * as THREE from 'three';
 import { CAMERA_FOLLOW_SPEED, CAMERA_HEIGHT_OFFSET, CAMERA_START_Y } from '../constants.js';
 
 export class CameraController {
-  constructor(aspectRatio) {
-    this.camera = new THREE.PerspectiveCamera(50, aspectRatio, 0.1, 100);
+
+  constructor(game) {
+
+    this.targetFocus = game.rendererManager.renderer.domElement.clientWidth < 500 ? 70 : 50;
+    this.game = game;
+    this.camera = new THREE.PerspectiveCamera(this.targetFocus, this.game.rendererManager.getAspectRatio(), 0.1, 100);
     this.targetY = 0;
     this.followSpeed = CAMERA_FOLLOW_SPEED;
     this.heightOffset = CAMERA_HEIGHT_OFFSET;
     this.reset();
   }
 
+  setFocus(f) {
+    this.camera.fov = f; // меньше значение = больше приближение
+    this.camera.updateProjectionMatrix();
+  }
+
+  begin() {
+    this.camera.fov = this.targetFocus * 2;
+  }
+
   reset() {
-    this.camera.position.set(0, CAMERA_START_Y, 12);
+    this.camera.position.set(0, CAMERA_HEIGHT_OFFSET - this.game.tree.half_height, 12);
   }
   
   update(targetY) {
     this.targetY = targetY + this.heightOffset;
     this.camera.position.y += (this.targetY - this.camera.position.y) * this.followSpeed;
     this.camera.lookAt(0, this.camera.position.y, 0);
+    let diff = this.targetFocus - this.camera.fov;
+    if (Math.abs(diff) > 0.1)
+      this.setFocus(this.camera.fov + diff * 0.05);
   }
   
   setPosition(x, y, z) {
@@ -1583,8 +1739,6 @@ export class SceneManager {
   
   init() {
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(BACKGROUND_COLOR);
-    this.scene.fog = new THREE.Fog(BACKGROUND_COLOR, 12, 28);
     return this.scene;
   }
   
@@ -1616,7 +1770,7 @@ import {
   RIM_LIGHT_DISTANCE, TREE_HEIGHT, MAIN_RADIUS,
   GAME_OVER_Y_OFFSET, RESET_POSITION_X, RESET_POSITION_Y,
   RESET_POSITION_Z, RESET_VELOCITY_Y, CAMERA_START_Y,
-  BACKGROUND_IMAGE_PATH, GRASS_IMAGE_PATH, GAME_PARAMS
+  BACKGROUND_IMAGE_PATH, GRASS_IMAGE_PATH, GAME_PARAMS, START_GAME
 } from './constants.js';
 
 import { SceneManager } from './core/SceneManager.js';
@@ -1630,7 +1784,7 @@ import { JoystickControl } from './controls/JoystickControl.js';
 import { GameState, GAME_STATE } from './GameState.js';
 import { Crystal } from './models/Crystal.js';
 import { Background } from './models/Background.js';
-import { textureLoader } from './utils/TextureLoader.js';
+import { textureLoader, collectPaths } from './utils/TextureLoader.js';
 import { eventBus } from './utils/EventEmitter.js';
 import { soundManager } from './audio/SoundManager.js';
 import { Grass } from './models/Grass.js';
@@ -1643,6 +1797,7 @@ const bootstrap = window.bootstrap;
 
 class Game {
   constructor() {
+    this.game_container = document.getElementById('game-container');
     this.container = document.getElementById('canvas-container');
     this.sceneManager = new SceneManager();
     this.rendererManager = new RendererManager(this.container);
@@ -1664,17 +1819,52 @@ class Game {
     this.currentScore = 0;
     this.soundsLoaded = false;
     this.gameStarted = false; // Флаг, что игра была запущена
+    this.testResult = this.quickGPUTest();
+
+    console.log(this.testResult);
     
     // Создаем gameState
     this.gameState = new GameState();
     this.lights = [];
-    this.paramsIndex = 'DEFAULT';
+    this.setGameIndex(START_GAME);
     
     // Инициализация Bootstrap модальных окон
     this.initModals();
     
     // Загрузка звуков
     this.initAudio();
+
+    if (!DEV)
+      window.addEventListener('blur', () => {
+        if (this.gameState.isPlaying())
+          this.gameState.pause();
+      });
+  }
+
+  quickGPUTest() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1000;
+    canvas.height = 1000;
+    const ctx = canvas.getContext('2d');
+    
+    const startTime = performance.now();
+    
+    // Рисуем 10000 прямоугольников
+    for (let i = 0; i < 10000; i++) {
+      ctx.fillStyle = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+      ctx.fillRect(
+        Math.random() * 1000,
+        Math.random() * 1000,
+        50 + Math.random() * 50,
+        50 + Math.random() * 50
+      );
+    }
+    
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    
+    console.log(`Canvas 2D тест: ${duration.toFixed(2)}ms`);
+    return duration;
   }
   
   async initAudio() {
@@ -1693,6 +1883,16 @@ class Game {
     this.initGameOverModal();
     this.initVictoryModal();
     this.initPauseModal();
+
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('shown.bs.modal', () => {
+        this.game_container.classList.add('hide');
+      });
+      
+      modal.addEventListener('hide.bs.modal', () => {
+        this.game_container.classList.remove('hide');
+      });
+    });
     
     // Настройка обработчика нажатия клавиш
     window.addEventListener('keydown', (e) => {
@@ -1729,9 +1929,7 @@ class Game {
     
     this.gameState.onVictory(() => {
       console.log("Victory callback вызван");
-      this.calculateScore();
-      this.showVictoryModal();
-      this.disableControls();
+      this.Victory();
     });
     
     this.gameState.onPause(() => {
@@ -1773,10 +1971,35 @@ class Game {
       this.gameStarted = true;
     });
   }
+
+  Victory() {
+      this.calculateScore();
+      this.showVictoryModal();
+      this.disableControls();
+      this.nextGameIndex();
+  }
+
+  nextGameIndex() {
+    let keys = Object.keys(GAME_PARAMS);
+    this.setGameIndex(keys[(keys.indexOf(this.paramsIndex) + 1) % keys.length]);
+  }
+
+  setGameIndex(value) {
+    this.paramsIndex = value;
+    this.loadLevelTextures();
+  }
+
+  loadLevelTextures(onComplete) {
+
+    let textures = collectPaths(GAME_PARAMS[this.paramsIndex]);
+    textureLoader.loadTexturesParallel(textures, onComplete);
+  }
   
   initStartModal() {
     // Получаем элемент модального окна Start
     this.startModalElement = document.getElementById('startModal');
+
+    document.getElementById('testResult').textContent = Math.round(this.testResult);
     
     if (this.startModalElement && bootstrap) {
       // Создаем экземпляр Bootstrap модального окна
@@ -2001,6 +2224,8 @@ class Game {
     if (joystickPad && joystickThumb) {
       this.joystickControl = new JoystickControl(this.tree, joystickPad, joystickThumb);
     }
+
+    this.cameraController.begin();
   }
   
   updateScoreIndicator() {
@@ -2038,14 +2263,14 @@ class Game {
     // Инициализация рендерера
     this.rendererManager.init();
     
-    // Инициализация камеры
-    this.cameraController = new CameraController(this.rendererManager.getAspectRatio());
-    
     // Создание освещения
     this.createLights(scene);
     
     // Создание игровых объектов (но не активируем физику)
     this.createGameObjects();
+    
+    // Инициализация камеры
+    this.cameraController = new CameraController(this);
     
     // Запуск анимации
     this.animate();
@@ -2077,8 +2302,7 @@ class Game {
     this.createCrystal();
     
     // Создание шарика
-    this.ball = new Ball(scene);
-    this.ball.init(this.tree);
+    this.ball = new Ball(scene, this.tree);
 
     this.background = new Background(scene);
     this.background.init(env.BACKGROUND_IMAGE_PATH, {
@@ -2180,6 +2404,9 @@ class Game {
     this.lights = [];
 
     let env = GAME_PARAMS[this.paramsIndex].ENV;
+
+    scene.background = new THREE.Color(env.BACKGROUND_COLOR);
+    scene.fog = new THREE.Fog(env.BACKGROUND_COLOR, 12, 28);
     
     const ambient = new THREE.AmbientLight(env.AMBIENT_LIGHT_COLOR, env.AMBIENT_LIGHT_INTENSITY);
     scene.add(ambient);
@@ -2237,7 +2464,7 @@ class Game {
     
     // Обновление физики только если игра активна (не на паузе, не закончена и не в IDLE)
     if (this.gameState.isPlaying() && this.ball && this.physics) {
-      this.tree.update();
+      this.tree.update(dt);
       this.physics.update(dt);
     
       // Обновление фона
@@ -2269,34 +2496,24 @@ class Game {
       this.checkGameOver();
       
       // Показываем индикатор очков при приближении к вершине
-      if (this.ball && this.ball.getPosition().y > TREE_HEIGHT / 2 - 2) {
+      if (this.ball && this.ball.getPosition().y > this.tree.half_height - 2) {
         this.showScoreIndicator();
         this.calculateScore();
-      } else {
-        this.hideScoreIndicator();
       }
-    } else if (this.gameState.isPaused()) {
-      // На паузе ничего не обновляем, но дерево может продолжать вращаться по инерции?
-      // Для чистоты эксперимента - останавливаем всё
-      if (this.mouseControl) {
-        this.mouseControl.velocityY = 0;
+    
+      // Обновление кристалла
+      this.updateCrystal(dt);
+      
+      // Обновление камеры (всегда, чтобы камера не улетала)
+      if (this.ball) {
+        this.cameraController.update(this.ball.getLastBounceY());
       }
-      if (this.joystickControl) {
-        this.joystickControl.normalizedDirect = 0;
+      
+      // Рендеринг (всегда, чтобы видеть сцену)
+      if (this.sceneManager.getScene() && this.cameraController) {
+        this.rendererManager.render(this.sceneManager.getScene(), this.cameraController.getCamera());
       }
-    }
-    
-    // Обновление кристалла
-    this.updateCrystal(dt);
-    
-    // Обновление камеры (всегда, чтобы камера не улетала)
-    if (this.ball) {
-      this.cameraController.update(this.ball.getLastBounceY());
-    }
-    
-    // Рендеринг (всегда, чтобы видеть сцену)
-    if (this.sceneManager.getScene() && this.cameraController) {
-      this.rendererManager.render(this.sceneManager.getScene(), this.cameraController.getCamera());
+
     }
   }
 
@@ -2328,8 +2545,8 @@ class Game {
 
 // Запуск игры
 document.addEventListener('DOMContentLoaded', () => {
-  const game = new Game();
-  game.init();
+  window.game = new Game();
+  window.game.init();
 });
 
 
@@ -2410,7 +2627,7 @@ export class Background {
     this.mesh = new THREE.Mesh(geometry, material);
     
     // Позиционируем фон позади сцены
-    this.mesh.position.set(0, 0, -20);
+    this.mesh.position.set(0, 8, -20);
     
     // Поворачиваем чтобы смотрела на камеру
     this.mesh.rotation.y = rotation;
@@ -2590,23 +2807,20 @@ export class Background {
 
 // scripts/models/Ball.js
 import * as THREE from 'three';
-import { BALL_RADIUS, BALL_COLOR, BASE_PLATFORM_TOP_Y, BOUNCE_SPEED, MAIN_RADIUS } from '../constants.js';
+import { BALL_RADIUS, BALL_COLOR, BOUNCE_SPEED, MAIN_RADIUS } from '../constants.js';
 import { eventBus } from '../utils/EventEmitter.js';
 
 export class Ball {
-  constructor(scene) {
+  constructor(scene, tree) {
+
+    this.tree = tree;
     this.scene = scene;
     this.mesh = null;
     this.velocity = new THREE.Vector3(0, BOUNCE_SPEED, 0);
-    this.lastBounceY = BASE_PLATFORM_TOP_Y;
+    this.lastBounceY = -this.tree.half_height;
     this.bounceCount = 0;
     this.k_distance = 1.3;
-    this.tree = null;
-  }
-  
-  init(tree) {
 
-    this.tree = tree;
     const geometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16);
     const material = new THREE.MeshStandardMaterial({
       color: BALL_COLOR,
@@ -2615,16 +2829,15 @@ export class Ball {
     });
     
     this.mesh = new THREE.Mesh(geometry, material);
-    this.mesh.position.set(0, BASE_PLATFORM_TOP_Y + BALL_RADIUS, this.tree.maxRadius * this.k_distance);
+    this.mesh.position.set(0, BALL_RADIUS - this.tree.half_height, this.tree.maxRadius * this.k_distance);
     this.mesh.castShadow = true;
     this.mesh.receiveShadow = true;
     
     this.scene.add(this.mesh);
-    return this.mesh;
   }
   
   setPosition(x, y, z) {
-    this.mesh.position.set(x, y, this.tree.calcDistance(y) * this.k_distance);
+    this.mesh.position.set(x, y, z);
   }
   
   getPosition() {
@@ -2654,14 +2867,20 @@ export class Ball {
   }
   
   updatePosition(dt) {
-    let v = this.getPosition().add(this.velocity.clone().multiplyScalar(dt));
-    this.setPosition(v.x, v.y, v.z);
+    let angle = this.tree.mesh.rotation.y;
+    let a_v = this.getPosition().add(this.velocity.clone().multiplyScalar(dt));
+    let v = this.tree.getPointOnTrunk(a_v.y, this.k_distance, angle + Math.PI / 2);
+
+    v.applyMatrix4(new THREE.Matrix4().makeRotationY(angle));
+    this.setPosition(a_v.x, v.y, v.z);
   }
   
   bounce(bounceY, bounceSpeed) {
     this.mesh.position.y = bounceY + BALL_RADIUS * Math.sign(bounceSpeed);
     this.velocity.y = bounceSpeed;
-    this.lastBounceY = bounceY;
+    if (bounceSpeed > 0)
+      this.lastBounceY = bounceY;
+
     this.bounceCount++;
     eventBus.emit('bounce');
     return this.bounceCount;
@@ -2696,7 +2915,7 @@ import {
   BRANCH_MIN_RADIUS, BRANCH_MAX_RADIUS, BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH,
   BRANCH_ANGLE_MIN, BRANCH_ANGLE_MAX, BRANCH_CURVE_STRENGTH, BRANCH_SEGMENTS,
   STICK_OUT, BARK_TEXTURE_PATH, TREE_COLOR, BARK_NORMAL_PATH,
-  NEEDLE_COUNT_PER_BRANCH, NEEDLE_TEXTURE_PATH, NEEDLE_SIZE
+  NEEDLE_COUNT_PER_BRANCH, NEEDLE_SIZE
 } from '../constants.js';
 import { textureLoader } from '../utils/TextureLoader.js';
 import { Needle } from './Needle.js';
@@ -2964,14 +3183,14 @@ export class Branch {
         scale
       );
       
-      tipNeedle.create(NEEDLE_TEXTURE_PATH);
+      tipNeedle.create(this.options.NEEDLE_TEXTURE_PATH);
       this.needles.push(tipNeedle);
     }
   }
   
   loadTexture() {
     textureLoader.loadTexture(
-      BARK_TEXTURE_PATH,
+      this.options.BARK_TEXTURE_PATH,
       (texture) => {
 
         if (this.branchMesh && this.branchMesh.material) {
@@ -2981,7 +3200,7 @@ export class Branch {
 
         
           textureLoader.loadTexture(
-            BARK_NORMAL_PATH, // Карта нормалей (обычно сине-фиолетовая)
+            this.options.BARK_NORMAL_PATH, // Карта нормалей (обычно сине-фиолетовая)
             (normalTexture) => {
               this.branchMesh.material.normalMap = normalTexture;
               this.branchMesh.material.normalScale = new THREE.Vector2(0.5, 0.5); // Интенсивность по X и Y
@@ -3002,6 +3221,10 @@ export class Branch {
         anisotropy: 8
       }
     );
+  }
+
+  update(dt) {
+    
   }
   
   dispose() {
@@ -3059,7 +3282,7 @@ export class Crystal {
     this.group = new THREE.Group();
     
     // Получаем позицию на самом верху дерева
-    const treeTopY = TREE_HEIGHT / 2; // Верхняя точка дерева (так как дерево центрировано по Y=0)
+    const treeTopY = this.tree.options.TREE_HEIGHT / 2; // Верхняя точка дерева (так как дерево центрировано по Y=0)
     
     // Устанавливаем позицию кристалла на вершине дерева
     this.group.position.set(0, treeTopY + 0.8, 0); // Немного выше вершины для лучшей видимости
@@ -3402,11 +3625,8 @@ export class Crystal {
 // scripts/models/Grass.js
 import * as THREE from 'three';
 import { textureLoader } from '../utils/TextureLoader.js';
-import { 
-  BASE_PLATFORM_TOP_Y, 
+import {
   MAIN_RADIUS,
-  TREE_HEIGHT,
-  CYLINDER_HALF_HEIGHT,
   GRASS_IMAGE_PATH
 } from '../constants.js';
 
@@ -3419,18 +3639,18 @@ export class Grass {
     this.texture = null;
     
     // Параметры травы
-    this.Count = 100; // Количество плоскостей травы
+    this.Count = window.game.testResult < 25 ? 50 : 10; // Количество плоскостей травы
     this.Radius = MAIN_RADIUS * 1.2; // Радиус размещения травы
     this.Height = 1.2; // Высота травы
     this.Width = 1.2; // Ширина травы
-    this.Density = 4;
+    this.Density = 3;
   }
   
   init(texturePath = GRASS_IMAGE_PATH) {
     this.group = new THREE.Group();
     
     // Позиция у подножия дерева (чуть выше основания)
-    const baseY = BASE_PLATFORM_TOP_Y + 0.1;
+    const baseY = 0.1 - this.tree.half_height;
     this.group.position.y = baseY;
     
     // Загружаем текстуру травы
@@ -3538,7 +3758,7 @@ export class Grass {
       const z = Math.sin(finalAngle) * radius;
       
       // Получаем точку на изогнутом стволе для коррекции позиции
-      const trunkPoint = this.tree.getPointOnTrunk(BASE_PLATFORM_TOP_Y + 0.2, 0, 0);
+      const trunkPoint = this.tree.getPointOnTrunk(0.2 - this.tree.half_height, 0, 0);
       
       // Создаем группу травинок в этой точке (может быть несколько плоскостей)
       const bladesInCluster = 2 + Math.floor(Math.random() * 3); // 2-4 травинки в кластере
@@ -3579,7 +3799,7 @@ export class Grass {
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
       
-      const trunkPoint = this.tree.getPointOnTrunk(BASE_PLATFORM_TOP_Y + 0.2, 0, 0);
+      const trunkPoint = this.tree.getPointOnTrunk(0.2 - this.tree.half_height, 0, 0);
       
       const rotY = angle + (Math.random() - 0.5) * 0.5;
       const rotX = (Math.random() - 0.5) * 0.3;
@@ -3688,7 +3908,7 @@ export class Grass {
 import * as THREE from 'three';
 import { textureLoader } from '../utils/TextureLoader.js';
 import { 
-  BASE_PLATFORM_TOP_Y,
+  BASE_PLATFORM_SIZE,
   GROUND_IMAGE_PATH
 } from '../constants.js';
 
@@ -3700,8 +3920,9 @@ export class Ground {
     this.texture = null;
     
     // Параметры плоскости грунта
-    this.size = 30; // Размер плоскости
-    this.segments = 32; // Сегментация для лучшего отображения текстуры
+    this.size = BASE_PLATFORM_SIZE; // Размер плоскости
+    this.segments = 8; // Сегментация для лучшего отображения текстуры
+    this.position_y = -this.tree.half_height;
   }
   
   init(texturePath = GROUND_IMAGE_PATH) {
@@ -3722,8 +3943,8 @@ export class Ground {
     
     // Позиционируем плоскость на уровне начала ствола
     // Получаем точку на стволе у основания
-    const basePoint = this.tree.getPointOnTrunk(BASE_PLATFORM_TOP_Y, 0, 0);
-    this.mesh.position.set(basePoint.x, BASE_PLATFORM_TOP_Y, basePoint.z);
+    const basePoint = this.tree.getPointOnTrunk(this.position_y, 0, 0);
+    this.mesh.position.set(basePoint.x, this.position_y, basePoint.z);
     
     // Поворачиваем плоскость горизонтально (по умолчанию CircleGeometry смотрит вверх по Y)
     // THREE.CircleGeometry уже ориентирован правильно (нормаль по +Y)
@@ -3738,7 +3959,7 @@ export class Ground {
     
     this.scene.add(this.mesh);
     
-    console.log('Грунт создан на уровне:', BASE_PLATFORM_TOP_Y);
+    console.log('Грунт создан на уровне:', this.position_y);
     
     return this.mesh;
   }
@@ -4033,15 +4254,16 @@ export class Needle {
 // scripts/models/Platform.js
 import * as THREE from 'three';
 import { 
-  STICK_OUT, PLATFORM_RADIUS, PLATFORM_HEIGHT, 
+  STICK_OUT, PLATFORM_HEIGHT, 
   PLATFORM_NORMAL_COLOR, PLATFORM_KILLER_COLOR,
   PLATFORM_TEXTURE_PATH, KILLER_PLATFORM_TEXTURE_PATH
 } from '../constants.js';
 import { textureLoader } from '../utils/TextureLoader.js';
+import { When } from '../utils/Utils.js';
 
 export class Platform {
-  constructor(parentMesh, theta, y, isKiller = false) {
-    this.parentMesh = parentMesh;
+  constructor(tree, theta, y, isKiller = false) {
+    this.tree = tree;
     this.theta = theta;
     this.y = y;
     this.isKiller = isKiller;
@@ -4049,7 +4271,9 @@ export class Platform {
     this.mesh = null;
     this.texture = null;
 
-    this.platformGeometry = new THREE.CylinderGeometry(PLATFORM_RADIUS, PLATFORM_RADIUS * 0.9, PLATFORM_HEIGHT, 16);
+    this.radius = this.tree.options.PLATFORM_RADIUS.MIN + Math.random() * (this.tree.options.PLATFORM_RADIUS.MAX - this.tree.options.PLATFORM_RADIUS.MIN);
+
+    this.platformGeometry = new THREE.CylinderGeometry(this.radius, this.radius * 0.8, PLATFORM_HEIGHT, 8);
 
     textureLoader.rotateUV(this.platformGeometry, Math.PI * 0.5);
     
@@ -4062,16 +4286,15 @@ export class Platform {
       roughness: isKiller ? 0.4 : 0.9,
       emissive: isKiller ? new THREE.Color(0x330000) : new THREE.Color(0x000000),
     });
-  }
-  
-  create(distance) {
+
+    let distance = 0.9;
     this.group = new THREE.Group();
     this.group.position.set(distance * Math.cos(this.theta), this.y, distance * Math.sin(this.theta));
     this.group.rotation.y = -this.theta;
     
     // Создание площадки
     this.mesh = new THREE.Mesh(this.platformGeometry, this.material);
-    this.mesh.position.set(STICK_OUT, 0, 0);
+    this.mesh.position.set(0, 0, 0);
     this.mesh.castShadow = true;
     this.mesh.receiveShadow = true;
     this.group.add(this.mesh);
@@ -4084,7 +4307,7 @@ export class Platform {
       this.addSpikes();
     }
     
-    this.parentMesh.add(this.group);
+    this.tree.mesh.add(this.group);
   }
   
   loadTexture() {
@@ -4121,7 +4344,7 @@ export class Platform {
   
   addSpikes() {
     const spikeCount = 6; // Количество шипов
-    const spikeRadius = PLATFORM_RADIUS * 0.7; // Радиус размещения шипов
+    const spikeRadius = this.radius * 0.7; // Радиус размещения шипов
     const spikeHeight = PLATFORM_HEIGHT * 0.4; // Высота шипа
     
     // Создаем материал для шипов (более яркий красный)
@@ -4150,7 +4373,7 @@ export class Platform {
       const angle = (i / spikeCount) * Math.PI * 2;
       
       // Создаем конус (пирамидку) для шипа
-      const spikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.1, spikeHeight, 8);
+      const spikeGeometry = new THREE.ConeGeometry(this.radius * 0.1, spikeHeight, 8);
       const spike = new THREE.Mesh(spikeGeometry, spikeMaterial);
       
       // Позиционируем шип на краю платформы
@@ -4167,7 +4390,7 @@ export class Platform {
     }
     
     // Добавляем один центральный шип для большей угрозы
-    const centerSpikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.1, spikeHeight * 1.2, 8);
+    const centerSpikeGeometry = new THREE.ConeGeometry(this.radius * 0.1, spikeHeight * 1.2, 8);
     const centerSpike = new THREE.Mesh(centerSpikeGeometry, spikeMaterial);
     centerSpike.position.set(STICK_OUT, PLATFORM_HEIGHT / 2 + spikeHeight * 1.2 / 2, 0);
     centerSpike.castShadow = true;
@@ -4177,12 +4400,12 @@ export class Platform {
     // Добавляем маленькие шипы на выступе (боксе)
     const boxSpikeCount = 3;
     for (let i = 0; i < boxSpikeCount; i++) {
-      const boxSpikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.15, spikeHeight * 0.8, 6);
+      const boxSpikeGeometry = new THREE.ConeGeometry(this.radius * 0.15, spikeHeight * 0.8, 6);
       const boxSpike = new THREE.Mesh(boxSpikeGeometry, spikeMaterial);
       
-      const offset = (i - 1) * PLATFORM_RADIUS * 0.3;
+      const offset = (i - 1) * this.radius * 0.3;
       boxSpike.position.set(
-        -PLATFORM_RADIUS - PLATFORM_RADIUS * 0.2,
+        -this.radius - this.radius * 0.2,
         PLATFORM_HEIGHT / 2 + spikeHeight * 0.8 / 2,
         offset
       );
@@ -4225,6 +4448,36 @@ export class Platform {
       this.group.removeFromParent();
     }
     // Материалы и геометрии удаляются автоматически сборщиком мусора
+  }
+
+  update(dt) {
+
+  }
+}
+
+
+# ============================================================
+# FILE: .\scripts\models\RotatePlatform.js
+# TYPE: .JS
+# ============================================================
+
+// scripts/models/RotatePlatform.js
+import { Platform } from './Platform.js';
+
+import { 
+  PLATFORM_DISTANCE
+} from '../constants.js';
+
+export class RotatePlatform extends Platform {
+  constructor(parentMesh, theta, y, isKiller = false, speed = 0.3) {
+    super(parentMesh, theta, y, isKiller);
+    this.speed = speed;
+  }
+
+  update(dt) {
+    super.update(dt);
+    this.theta += Math.PI * this.speed * dt;
+    this.group.position.copy(this.tree.getPointOnTrunk(this.group.position.y, PLATFORM_DISTANCE, this.theta));
   }
 }
 
@@ -4398,17 +4651,18 @@ export class Skybox {
 // scripts/models/Tree.js
 import * as THREE from 'three';
 import { 
-  TREE_COLOR, TREE_HEIGHT, MAIN_RADIUS, STICK_OUT, 
-  PLATFORM_RADIUS, PLATFORM_HEIGHT, PLATFORM_COUNT,
-  CYLINDER_HALF_HEIGHT, WIREFRAME_COLOR,
-  KILLER_PLATFORM_PERCENTAGE, ROTATION_SMOOTH,
+  TREE_COLOR, MAIN_RADIUS, STICK_OUT, 
+  PLATFORM_RADIUS, PLATFORM_HEIGHT, WIREFRAME_COLOR,
+  ROTATION_SMOOTH,
   BRANCH_COUNT, BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH, BRANCH_DENSITY,
-  TRUNK_CURVE_STRENGTH, TRUNK_SEGMENTS
+  TRUNK_CURVE_STRENGTH, TRUNK_SEGMENTS, PLATFORM_DISTANCE
 } from '../constants.js';
 
 import { Platform } from './Platform.js';
+import { RotatePlatform } from './RotatePlatform.js';
 import { Branch } from './Branch.js';
 import { textureLoader } from '../utils/TextureLoader.js';
+import { randomArray } from '../utils/Utils.js';
 
 export class Tree {
   constructor(scene) {
@@ -4437,6 +4691,9 @@ export class Tree {
   init(options) {
     this.options = options;
 
+    this.half_height = this.options.TREE_HEIGHT / 2;
+    this.platform_count = Math.floor(this.options.TREE_HEIGHT / this.options.PLATFORM_STEP);
+
     // Создаем группу для ствола, если нужно
     this.mesh = new THREE.Group();
     
@@ -4463,14 +4720,13 @@ export class Tree {
       const t = i / segments; // Параметр от 0 до 1
       
       // Вертикальная координата (от низа до верха)
-      const y = -CYLINDER_HALF_HEIGHT + t * TREE_HEIGHT;
+      const y = -this.half_height + t * this.options.TREE_HEIGHT;
       
       // Прогрессия изгиба (сильнее всего в середине, меньше у концов)
       const curveProgress = Math.sin(t * Math.PI * 2); // Плавное нарастание и затухание
       
       // Применяем изгиб в заданном направлении
-      // Чем выше t, тем сильнее изгиб (накапливается)
-      const curveOffset = this.curveStrength * curveProgress * t;
+      const curveOffset = this.curveStrength * curveProgress;
       const xy_influnce = Math.random();
       
       const x = this.curveDirection.x * curveOffset * xy_influnce;
@@ -4585,7 +4841,7 @@ export class Tree {
       this.options.BARK_TEXTURE_PATH,
       (texture) => {
         // Настройки текстуры для дерева
-        //texture.repeat.set(2, TREE_HEIGHT / 1.5);
+        texture.repeat.set(this.options.BARK_TEXTURE_REPEAT.x, this.options.TREE_HEIGHT * this.options.BARK_TEXTURE_REPEAT.y);
         material.map = texture;
 
         material.color.setHex(0xffffff);
@@ -4620,7 +4876,7 @@ export class Tree {
   }
 
   calcDistance(y) {
-    let k = (TREE_HEIGHT - (CYLINDER_HALF_HEIGHT + y)) / TREE_HEIGHT; 
+    let k = (this.options.TREE_HEIGHT - (this.half_height + y)) / this.options.TREE_HEIGHT; 
     return this.minRadius * (1 - k) + this.maxRadius * k;
   }
   
@@ -4631,8 +4887,8 @@ export class Tree {
     }
     
     // Находим параметр t (от 0 до 1) на основе высоты y
-    const minY = -CYLINDER_HALF_HEIGHT;
-    const maxY = CYLINDER_HALF_HEIGHT;
+    const minY = -this.half_height;
+    const maxY = this.half_height;
     
     // Нормализуем y в диапазон [0, 1] относительно высоты дерева
     let t = (y - minY) / (maxY - minY);
@@ -4668,20 +4924,21 @@ export class Tree {
     this.platforms = [];
     
     // Рассчитываем количество платформ-убийц
-    const killerCount = Math.floor(PLATFORM_COUNT * KILLER_PLATFORM_PERCENTAGE);
+    const killerCount = Math.floor(this.platform_count * this.options.KILLER_DENSITY);
     
-    console.log(`Создание платформ: всего ${PLATFORM_COUNT}, убийц: ${killerCount}`);
+    console.log(`Создание платформ: всего ${this.platform_count}, убийц: ${killerCount}`);
     
     // Создаем массив для хранения углов обычных платформ, чтобы разместить напротив них убийц
     const normalPlatformAngles = [];
+    const rotatePlatform = randomArray(this.platform_count, this.options.PLATFORM_ROTATE_DENSITY);
     
-    let base_y = CYLINDER_HALF_HEIGHT / PLATFORM_COUNT;
+    let base_y = this.half_height / this.platform_count;
     let previousTheta = null;
     const MIN_ANGLE_DIFF = Math.PI / 3;
     
     // Сначала создаем все обычные платформы (isKiller = false)
-    for (let i = 0; i < PLATFORM_COUNT; i++) {
-      const y = base_y + (i / PLATFORM_COUNT * 2 - 1) * (CYLINDER_HALF_HEIGHT - base_y);
+    for (let i = 0; i < this.platform_count; i++) {
+      const y = base_y + (i / this.platform_count * 2 - 1) * (this.half_height - base_y);
       
       let theta;
       
@@ -4705,16 +4962,20 @@ export class Tree {
         } while (Math.abs(theta - previousTheta) < MIN_ANGLE_DIFF);
       }
       
-      // Создаем обычную платформу (не убийцу)0
-      const platform = new Platform(this.mesh, theta, y, false);
-      platform.create(this.calcDistance(y));
+      // Создаем обычную платформу
 
-      platform.group.position.copy(this.getPointOnTrunk(y, 0.9, theta));
+      let platform;
+      if (rotatePlatform[i])
+        platform = new RotatePlatform(this, theta, y, false, 0.3 * (Math.random() > 0.5 ? 1 : -1));
+      else {
+        platform = new Platform(this, theta, y, false);
+      
+        // Сохраняем угол для возможного создания платформы-убийцы напротив
+        normalPlatformAngles.push(platform);
+      }
+      platform.group.position.copy(this.getPointOnTrunk(y, PLATFORM_DISTANCE, theta));
       
       this.platforms.push(platform);
-      
-      // Сохраняем угол для возможного создания платформы-убийцы напротив
-      normalPlatformAngles.push(platform);
       
       previousTheta = theta;
     }
@@ -4738,9 +4999,8 @@ export class Tree {
       while (normalizedTheta < -Math.PI) normalizedTheta += Math.PI * 2;
       
       // Создаем платформу-убийцу на той же высоте, но с противоположной стороны
-      const killerPlatform = new Platform(this.mesh, normalizedTheta, item.y, true);
-      killerPlatform.create(0);
-      killerPlatform.group.position.copy(this.getPointOnTrunk(item.y, 0.9, normalizedTheta));
+      const killerPlatform = new Platform(this, normalizedTheta, item.y, true);
+      killerPlatform.group.position.copy(this.getPointOnTrunk(item.y, PLATFORM_DISTANCE, normalizedTheta));
       
       this.platforms.push(killerPlatform);
     });
@@ -4756,7 +5016,7 @@ export class Tree {
     if (this.platforms.length === 0) return;
     
     // Рассчитываем количество веток на основе плотности
-    const targetBranchCount = Math.floor(PLATFORM_COUNT * BRANCH_DENSITY);
+    const targetBranchCount = Math.floor(this.platform_count * BRANCH_DENSITY);
     console.log(`Создание веток под платформами: ${targetBranchCount} шт. (плотность ${BRANCH_DENSITY})`);
     
     // Сортируем платформы по высоте
@@ -4812,7 +5072,7 @@ export class Tree {
       const branchY = platform.y - PLATFORM_HEIGHT / 2 - 0.5;   
       
       // Определяем масштаб ветки (чем выше, тем меньше)
-      const heightFactor = (CYLINDER_HALF_HEIGHT - branchY) / TREE_HEIGHT;
+      const heightFactor = (this.half_height - branchY) / this.options.TREE_HEIGHT;
       const scaleFactor = 0.6 + heightFactor * 0.8; // Ветки внизу крупнее
       
       // Создаем ветку
@@ -4820,11 +5080,8 @@ export class Tree {
       branch.create(0);
       
       // Корректируем позицию ветки с учетом изгиба ствола
-      if (branch.group) {
-      
-        // Получаем точку на изогнутом стволе для ветки
-        branch.group.position.copy(this.getPointOnTrunk(branchY, 0.8, platform.theta));
-      }
+      if (branch.group)
+        branch.group.position.copy(this.getPointOnTrunk(branchY, 0.7, platform.theta));
       
       // Сохраняем данные ветки
       this.branches.push(branch);
@@ -4857,8 +5114,10 @@ export class Tree {
     return this.mesh ? this.mesh.rotation.y : 0;
   }
 
-  update() {
+  update(dt) {
     this.setRotation(this.mesh.rotation.y + (this.targetRotation - this.mesh.rotation.y) * ROTATION_SMOOTH);
+    this.branches.forEach(branch => branch.update(dt));
+    this.platforms.forEach(platform => platform.update(dt));
   }
 }
 
@@ -4871,8 +5130,7 @@ export class Tree {
 // scripts/physics/BallPhysics.js
 import * as THREE from 'three';
 import { 
-  BALL_RADIUS, PLATFORM_RADIUS, PLATFORM_HEIGHT, 
-  BASE_PLATFORM_TOP_Y, GRAVITY, BOUNCE_SPEED, MAX_VELOCITY,
+  BALL_RADIUS, PLATFORM_HEIGHT, GRAVITY, BOUNCE_SPEED, MAX_VELOCITY,
   MAIN_RADIUS, TREE_HEIGHT, CYLINDER_HALF_HEIGHT
 } from '../constants.js';
 import { GameState, GAME_STATE } from '../GameState.js';
@@ -4887,11 +5145,8 @@ export class BallPhysics {
     this.gravity = GRAVITY;
     this.bounceSpeed = BOUNCE_SPEED;
     this.maxVelocity = MAX_VELOCITY;
-    this.baseBounceY = -TREE_HEIGHT / 2;
-    this.victoryY = TREE_HEIGHT / 2;
-    
-    // Переменные для предотвращения повторных звуков при множественных коллизиях
-    this.lastBounceTime = 0;
+    this.baseBounceY = - this.tree.half_height;
+    this.victoryY = this.tree.half_height;
   }
   
   update(dt) {
@@ -4949,7 +5204,7 @@ export class BallPhysics {
       const distance2D = Math.sqrt(dx * dx + dz * dz);
       
       // Проверка горизонтального расстояния
-      if (distance2D < PLATFORM_RADIUS + BALL_RADIUS) {
+      if (distance2D < platformData.radius + BALL_RADIUS) {
         
         // Проверка столкновения с ВЕРХНЕЙ поверхностью платформы
         if (ballPos.y - BALL_RADIUS <= platformTop && 
@@ -5181,7 +5436,7 @@ export class TextureLoaderUtil {
    * @param {Object.<string, string>} textureMap - объект с путями к текстурам
    * @param {function} onComplete - колбэк после загрузки всех текстур
    */
-  loadTexturesParallel(textureMap, onComplete) {
+  loadTexturesParallel(textureMap, onComplete = null) {
     const entries = Object.entries(textureMap);
     const results = {};
     let loadedCount = 0;
@@ -5397,7 +5652,67 @@ export class TextureLoaderUtil {
   }
 }
 
+export function collectPaths(obj) {
+  const paths = [];
+  
+  function recursiveCollect(current) {
+    if (current && typeof current === 'object') {
+      Object.entries(current).forEach(([key, value]) => {
+        // Проверяем, оканчивается ли ключ на _PATH (регистронезависимо)
+        if (key.toUpperCase().endsWith('_PATH') && typeof value === 'string') {
+          paths.push(value);
+        }
+        // Рекурсивно обходим вложенные объекты
+        if (value && typeof value === 'object') {
+          recursiveCollect(value);
+        }
+      });
+    }
+  }
+  
+  recursiveCollect(obj);
+  return paths;
+}
+
 // Создаем и экспортируем синглтон для использования во всем приложении
 export const textureLoader = new TextureLoaderUtil();
+
+
+# ============================================================
+# FILE: .\scripts\utils\Utils.js
+# TYPE: .JS
+# ============================================================
+
+export function When(conditionFn, timeout = 5000) {
+  return new Promise((resolve, reject) => {
+    const startTime = Date.now();
+    
+    const check = setInterval(() => {
+      if (conditionFn()) {
+        clearInterval(check);
+        resolve();
+      } else if (Date.now() - startTime > timeout) {
+        clearInterval(check);
+        reject(new Error('Таймаут ожидания условия'));
+      }
+    }, 100);
+  });
+}
+
+export function randomArray(length, density) {
+  const result = new Array(length).fill(0);
+  const onesCount = Math.floor(length * density);
+  
+  for (let i = 0; i < onesCount; i++) {
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * length);
+    } while (result[randomIndex]);
+    
+    result[randomIndex] = true;
+  }
+  
+  return result;
+}
 
 

@@ -57,9 +57,7 @@
               <p>
                 <i class="bi bi-exclamation-triangle-fill"></i> Красные платформы смертельны при ударе сверху!
               </p>
-              <?if (DEV) {?>
-              <p>GPU speed: <span id="testResult"></span></p>
-              <?}?>
+              <p <?=DEV ? '' : 'style="display:none"'?>GPU speed: <span id="testResult"></span></p>
               <div class="text-center">
                 <button type="button" class="btn" id="startGameButton">Начать</button>
               </div>

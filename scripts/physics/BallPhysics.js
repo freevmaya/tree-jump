@@ -1,7 +1,7 @@
 // scripts/physics/BallPhysics.js
 import * as THREE from 'three';
 import { 
-  BALL_RADIUS, PLATFORM_RADIUS, PLATFORM_HEIGHT, GRAVITY, BOUNCE_SPEED, MAX_VELOCITY,
+  BALL_RADIUS, PLATFORM_HEIGHT, GRAVITY, BOUNCE_SPEED, MAX_VELOCITY,
   MAIN_RADIUS, TREE_HEIGHT, CYLINDER_HALF_HEIGHT
 } from '../constants.js';
 import { GameState, GAME_STATE } from '../GameState.js';
@@ -75,7 +75,7 @@ export class BallPhysics {
       const distance2D = Math.sqrt(dx * dx + dz * dz);
       
       // Проверка горизонтального расстояния
-      if (distance2D < PLATFORM_RADIUS + BALL_RADIUS) {
+      if (distance2D < platformData.radius + BALL_RADIUS) {
         
         // Проверка столкновения с ВЕРХНЕЙ поверхностью платформы
         if (ballPos.y - BALL_RADIUS <= platformTop && 

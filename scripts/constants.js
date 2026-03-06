@@ -102,6 +102,7 @@ export const START_GAME = 'DEFAULT';
 export const GAME_PARAMS = {
 	DEFAULT: 
 		{
+			NAME: 'Ознакомительный',
 			ENV: {
 				BACKGROUND_COLOR: 0xBBBBFF,
 				KEY_LIGHT_COLOR: 0xffffff,
@@ -124,10 +125,12 @@ export const GAME_PARAMS = {
 				TREE_HEIGHT: 15,
 				PLATFORM_STEP: 1.6,
 				KILLER_DENSITY: 0.1,
-				PLATFORM_ROTATE_DENSITY: 0.2
+				PLATFORM_ROTATE_DENSITY: 0.2,
+				PLATFORM_RADIUS: { MIN: 0.5, MAX: 0.5 }
 			}
 		},
 	DARK: {
+			NAME: 'Начинаются сложности',
 			ENV: {
 				BACKGROUND_COLOR: 0x93b1ff,
 				KEY_LIGHT_COLOR: 0xffffff,
@@ -150,10 +153,12 @@ export const GAME_PARAMS = {
 				TREE_HEIGHT: 20,
 				PLATFORM_STEP: 1.6,
 				KILLER_DENSITY: 0.2,
-				PLATFORM_ROTATE_DENSITY: 0.3
+				PLATFORM_ROTATE_DENSITY: 0.3,
+				PLATFORM_RADIUS: { MIN: 0.3, MAX: 0.4 }
 			}
 		},
 	BIRCH: {
+			NAME: 'Придется постараться',
 			ENV: {
 				BACKGROUND_COLOR: 0xBBBBFF,
 				KEY_LIGHT_COLOR: 0xffffff,
@@ -176,7 +181,8 @@ export const GAME_PARAMS = {
 				TREE_HEIGHT: 20,
 				PLATFORM_STEP: 1.6,
 				KILLER_DENSITY: 0.3,
-				PLATFORM_ROTATE_DENSITY: 0.5
+				PLATFORM_ROTATE_DENSITY: 0.5,
+				PLATFORM_RADIUS: { MIN: 0.2, MAX: 0.3 }
 			}
 		}
 }

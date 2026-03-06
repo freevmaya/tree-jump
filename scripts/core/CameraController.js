@@ -5,7 +5,8 @@ import { CAMERA_FOLLOW_SPEED, CAMERA_HEIGHT_OFFSET, CAMERA_START_Y } from '../co
 export class CameraController {
 
   constructor(game) {
-    this.targetFocus = 50;
+
+    this.targetFocus = game.rendererManager.renderer.domElement.clientWidth < 500 ? 70 : 50;
     this.game = game;
     this.camera = new THREE.PerspectiveCamera(this.targetFocus, this.game.rendererManager.getAspectRatio(), 0.1, 100);
     this.targetY = 0;

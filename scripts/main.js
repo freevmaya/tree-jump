@@ -70,6 +70,11 @@ class Game {
     
     // Загрузка звуков
     this.initAudio();
+
+    window.addEventListener('blur', () => {
+      if (this.gameState.isPlaying())
+        this.gameState.pause();
+    });
   }
 
   quickGPUTest() {

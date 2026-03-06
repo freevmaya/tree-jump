@@ -1,7 +1,7 @@
 // scripts/models/Platform.js
 import * as THREE from 'three';
 import { 
-  STICK_OUT, PLATFORM_RADIUS, PLATFORM_HEIGHT, 
+  STICK_OUT, PLATFORM_HEIGHT, 
   PLATFORM_NORMAL_COLOR, PLATFORM_KILLER_COLOR,
   PLATFORM_TEXTURE_PATH, KILLER_PLATFORM_TEXTURE_PATH
 } from '../constants.js';
@@ -18,7 +18,9 @@ export class Platform {
     this.mesh = null;
     this.texture = null;
 
-    this.platformGeometry = new THREE.CylinderGeometry(PLATFORM_RADIUS, PLATFORM_RADIUS * 0.8, PLATFORM_HEIGHT, 8);
+    this.radius = this.tree.options.PLATFORM_RADIUS.MIN + Math.random() * (this.tree.options.PLATFORM_RADIUS.MAX - this.tree.options.PLATFORM_RADIUS.MIN);
+
+    this.platformGeometry = new THREE.CylinderGeometry(this.radius, this.radius * 0.8, PLATFORM_HEIGHT, 8);
 
     textureLoader.rotateUV(this.platformGeometry, Math.PI * 0.5);
     
@@ -89,7 +91,7 @@ export class Platform {
   
   addSpikes() {
     const spikeCount = 6; // Количество шипов
-    const spikeRadius = PLATFORM_RADIUS * 0.7; // Радиус размещения шипов
+    const spikeRadius = this.radius * 0.7; // Радиус размещения шипов
     const spikeHeight = PLATFORM_HEIGHT * 0.4; // Высота шипа
     
     // Создаем материал для шипов (более яркий красный)
@@ -118,7 +120,7 @@ export class Platform {
       const angle = (i / spikeCount) * Math.PI * 2;
       
       // Создаем конус (пирамидку) для шипа
-      const spikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.1, spikeHeight, 8);
+      const spikeGeometry = new THREE.ConeGeometry(this.radius * 0.1, spikeHeight, 8);
       const spike = new THREE.Mesh(spikeGeometry, spikeMaterial);
       
       // Позиционируем шип на краю платформы
@@ -135,7 +137,7 @@ export class Platform {
     }
     
     // Добавляем один центральный шип для большей угрозы
-    const centerSpikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.1, spikeHeight * 1.2, 8);
+    const centerSpikeGeometry = new THREE.ConeGeometry(this.radius * 0.1, spikeHeight * 1.2, 8);
     const centerSpike = new THREE.Mesh(centerSpikeGeometry, spikeMaterial);
     centerSpike.position.set(STICK_OUT, PLATFORM_HEIGHT / 2 + spikeHeight * 1.2 / 2, 0);
     centerSpike.castShadow = true;
@@ -145,12 +147,12 @@ export class Platform {
     // Добавляем маленькие шипы на выступе (боксе)
     const boxSpikeCount = 3;
     for (let i = 0; i < boxSpikeCount; i++) {
-      const boxSpikeGeometry = new THREE.ConeGeometry(PLATFORM_RADIUS * 0.15, spikeHeight * 0.8, 6);
+      const boxSpikeGeometry = new THREE.ConeGeometry(this.radius * 0.15, spikeHeight * 0.8, 6);
       const boxSpike = new THREE.Mesh(boxSpikeGeometry, spikeMaterial);
       
-      const offset = (i - 1) * PLATFORM_RADIUS * 0.3;
+      const offset = (i - 1) * this.radius * 0.3;
       boxSpike.position.set(
-        -PLATFORM_RADIUS - PLATFORM_RADIUS * 0.2,
+        -this.radius - this.radius * 0.2,
         PLATFORM_HEIGHT / 2 + spikeHeight * 0.8 / 2,
         offset
       );

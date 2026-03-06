@@ -4,10 +4,25 @@
   --game-bg: radial-gradient(circle at top left, #7ed4e3, #223100);
 }
 
+/*
+@font-face {
+  font-family: 'game-font';
+  src: url('fonts/19510.otf') format('opentype');
+  font-display: swap;
+}
+*/
+
+@font-face {
+  font-family: 'game-font';
+  src: url('fonts/20686.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
+  font-family: 'game-font', sans-serif;
+  font-size: 16px;
 }
 
 body {
@@ -172,7 +187,6 @@ canvas {
 /* Bootstrap модальное окно - кастомизация */
 .modal-content {
   background: rgba(20, 20, 30, 0.95);
-  backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.2);
   color: white;
   border-radius: 20px;
@@ -389,7 +403,30 @@ canvas {
   z-index: 100;
   backdrop-filter: blur(5px);
 }
+
 .score-indicator i {
   color: gold;
   margin-right: 8px;
+}
+
+.phone {
+  display: none !important;
+}
+
+.desktop {
+  display: none !important;
+}
+
+
+@media (hover: none) {
+  .desktop {
+    display: inherit !important;
+  }
+}
+
+
+@media (hover: hover) {
+  .phone {
+    display: inherit !important;
+  }
 }

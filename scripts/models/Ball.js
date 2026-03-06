@@ -71,7 +71,9 @@ export class Ball {
   bounce(bounceY, bounceSpeed) {
     this.mesh.position.y = bounceY + BALL_RADIUS * Math.sign(bounceSpeed);
     this.velocity.y = bounceSpeed;
-    this.lastBounceY = bounceY;
+    if (bounceSpeed > 0)
+      this.lastBounceY = bounceY;
+
     this.bounceCount++;
     eventBus.emit('bounce');
     return this.bounceCount;

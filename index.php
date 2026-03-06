@@ -1,3 +1,6 @@
+<?
+  include("config/config.php");
+?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -13,7 +16,7 @@
   <link rel="stylesheet" href="./styles/main.css?v=9">
   <link rel="stylesheet" href="./styles/dialog.css?v=9">
   <script type="text/javascript">
-    var DEV = true;
+    var DEV = <?=DEV ? 'true' : 'false'?>;
   </script>
 </head>
 <body>
@@ -54,7 +57,9 @@
               <p>
                 <i class="bi bi-exclamation-triangle-fill"></i> Красные платформы смертельны при ударе сверху!
               </p>
+              <?if (DEV) {?>
               <p>GPU speed: <span id="testResult"></span></p>
+              <?}?>
               <div class="text-center">
                 <button type="button" class="btn" id="startGameButton">Начать</button>
               </div>

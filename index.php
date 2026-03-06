@@ -1,5 +1,6 @@
 <?
   include("config/config.php");
+  $v = 10;
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -13,8 +14,8 @@
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="./styles/main.css?v=9">
-  <link rel="stylesheet" href="./styles/dialog.css?v=9">
+  <link rel="stylesheet" href="./styles/main.css?v=<?=$v?>">
+  <link rel="stylesheet" href="./styles/dialog.css?v=<?=$v?>">
   <script type="text/javascript">
     var DEV = <?=DEV ? 'true' : 'false'?>;
   </script>
@@ -57,7 +58,7 @@
               <p>
                 <i class="bi bi-exclamation-triangle-fill"></i> Красные платформы смертельны при ударе сверху!
               </p>
-              <p <?=DEV ? '' : 'style="display:none"'?>GPU speed: <span id="testResult"></span></p>
+              <p <?=DEV ? '' : 'style="display:none"'?>>GPU speed: <span id="testResult"></span></p>
               <div class="text-center">
                 <button type="button" class="btn" id="startGameButton">Начать</button>
               </div>
@@ -189,6 +190,6 @@
   </script>
   
   <!-- Main script -->
-  <script type="module" src="./scripts/main.js?v=9"></script>
+  <script type="module" src="./scripts/main.js?v=<?=$v?>"></script>
 </body>
 </html>

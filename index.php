@@ -191,5 +191,11 @@
   
   <!-- Main script -->
   <script type="module" src="./scripts/main.js?v=<?=$v?>"></script>
+
+  <?if (DEV) {?>
+  <!-- Eruda is console for mobile browsers-->
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+  <script>eruda.init();</script>
+  <?}?>
 </body>
 </html>

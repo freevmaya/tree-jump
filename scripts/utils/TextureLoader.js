@@ -317,27 +317,5 @@ export class TextureLoaderUtil {
   }
 }
 
-export function collectPaths(obj) {
-  const paths = [];
-  
-  function recursiveCollect(current) {
-    if (current && typeof current === 'object') {
-      Object.entries(current).forEach(([key, value]) => {
-        // Проверяем, оканчивается ли ключ на _PATH (регистронезависимо)
-        if (key.toUpperCase().endsWith('_PATH') && typeof value === 'string') {
-          paths.push(value);
-        }
-        // Рекурсивно обходим вложенные объекты
-        if (value && typeof value === 'object') {
-          recursiveCollect(value);
-        }
-      });
-    }
-  }
-  
-  recursiveCollect(obj);
-  return paths;
-}
-
 // Создаем и экспортируем синглтон для использования во всем приложении
 export const textureLoader = new TextureLoaderUtil();

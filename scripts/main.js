@@ -22,7 +22,6 @@ import { GameState, GAME_STATE } from './GameState.js';
 import { Crystal } from './models/Crystal.js';
 import { Background } from './models/Background.js';
 import { textureLoader } from './utils/TextureLoader.js';
-import { collectPaths } from './utils/TextureLoader.js';
 import { eventBus } from './utils/EventEmitter.js';
 import { soundManager } from './audio/SoundManager.js';
 import { Grass } from './models/Grass.js';
@@ -32,6 +31,27 @@ import { Ground } from './models/Ground.js';
 // Bootstrap доступен глобально через window.bootstrap
 const bootstrap = window.bootstrap;
 
+function collectPaths(obj) {
+  const paths = [];
+  
+  function recursiveCollect(current) {
+    if (current && typeof current === 'object') {
+      Object.entries(current).forEach(([key, value]) => {
+        // Проверяем, оканчивается ли ключ на _PATH (регистронезависимо)
+        if (key.toUpperCase().endsWith('_PATH') && typeof value === 'string') {
+          paths.push(value);
+        }
+        // Рекурсивно обходим вложенные объекты
+        if (value && typeof value === 'object') {
+          recursiveCollect(value);
+        }
+      });
+    }
+  }
+  
+  recursiveCollect(obj);
+  return paths;
+}
 
 class Game {
   constructor() {

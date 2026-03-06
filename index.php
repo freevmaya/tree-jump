@@ -1,6 +1,6 @@
 <?
   include("config/config.php");
-  $v = 11;
+  $v = 12;
 ?>
 <!DOCTYPE html>
 <html lang="ru">

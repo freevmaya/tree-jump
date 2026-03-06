@@ -6,7 +6,7 @@
   header('X-XSS-Protection: 1; mode=block');
 
   include("config/config.php");
-  $v = 14;
+  $v = 15;
 ?>
 <!DOCTYPE html>
 <html lang="ru">

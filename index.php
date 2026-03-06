@@ -1,4 +1,10 @@
 <?
+  header('Content-Type: text/html; charset=utf-8');
+  header('Content-Language: ru');
+  header('X-Content-Type-Options: nosniff');
+  header('X-Frame-Options: SAMEORIGIN');
+  header('X-XSS-Protection: 1; mode=block');
+  
   include("config/config.php");
   $v = 12;
 ?>

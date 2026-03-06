@@ -426,7 +426,7 @@ export class Tree {
       const scaleFactor = 0.6 + heightFactor * 0.8; // Ветки внизу крупнее
       
       // Создаем ветку
-      const branch = new Branch(this.options, this.mesh, platform.theta, branchY, scaleFactor);
+      const branch = new Branch(this.options, this.mesh, platform.theta + Math.PI * 0.1, branchY, scaleFactor);
       branch.create(0);
       
       // Корректируем позицию ветки с учетом изгиба ствола

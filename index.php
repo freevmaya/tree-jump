@@ -4,9 +4,9 @@
   header('X-Content-Type-Options: nosniff');
   header('X-Frame-Options: SAMEORIGIN');
   header('X-XSS-Protection: 1; mode=block');
-  
+
   include("config/config.php");
-  $v = 12;
+  $v = 14;
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -28,22 +28,23 @@
 </head>
 <body>
   <!-- Основной контейнер игры -->
-  <div id="game-container" class="hide">
-    <div class="game-top"></div>
-    <!-- Верхний блок с игрой (85%) -->
+  <div id="game-container" class="start-blocking">
+
+    <div class="game-ui">
+      <div class="game-top"></div>
+      <div class="hint" id="game-hint">
+        <i class="bi bi-mouse"></i> Нажмите и тяните, чтобы вращать дерево
+      </div>
+
+      <!-- Индикатор очков (только при победе) -->
+      <div class="score-indicator" id="score-indicator">
+        <i class="bi bi-trophy-fill"></i> Счет: <span id="current-score">0</span>
+      </div>
+    </div>
+    
     <div id="game-canvas-container">
       <div id="canvas-container"></div>
     </div>
-  </div>
-  
-  <!-- Подсказка в игре (будет скрыта до старта) -->
-  <div class="hint desktop" id="game-hint" style="display: none;">
-    <i class="bi bi-mouse"></i> Зажмите левую кнопку и тяните, чтобы вращать дерево
-  </div>
-  
-  <!-- Индикатор очков (только при победе) -->
-  <div class="score-indicator" id="score-indicator" style="display: none;">
-    <i class="bi bi-trophy-fill"></i> Счет: <span id="current-score">0</span>
   </div>
 
   <!-- Bootstrap модальное окно для Start Game -->

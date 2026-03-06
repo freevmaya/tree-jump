@@ -35,10 +35,6 @@ body {
   background: radial-gradient(circle at top left, #7ed4e3, #223100);
 }
 
-.hide {
-  opacity: 0 !important;
-}
-
 /* Основной контейнер игры */
 #game-container {
   display: flex;
@@ -48,6 +44,14 @@ body {
   max-width: 700px;
   margin: auto;
   position: relative;
+}
+
+.modal-open #game-container {
+  display: none;
+}
+
+.start-blocking .game-ui {
+  display: none;
 }
 
 .game-top {
@@ -158,6 +162,10 @@ canvas {
   border: 1px solid rgba(255, 255, 255, 0.3);
   white-space: nowrap;
   z-index: 100;
+}
+
+.modal-open .hint {
+  display: none;
 }
 
 /* Счетчик отскоков */
@@ -431,26 +439,4 @@ canvas {
 .score-indicator i {
   color: gold;
   margin-right: 8px;
-}
-
-.phone {
-  display: none !important;
-}
-
-.desktop {
-  display: none !important;
-}
-
-
-@media (hover: none) {
-  .desktop {
-    display: inherit !important;
-  }
-}
-
-
-@media (hover: hover) {
-  .phone {
-    display: inherit !important;
-  }
 }

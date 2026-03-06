@@ -56,9 +56,8 @@ function collectPaths(obj) {
 class Game {
   constructor() {
     this.game_container = document.getElementById('game-container');
-    this.container = document.getElementById('canvas-container');
+    this.container      = document.getElementById('canvas-container');
     this.sceneManager = new SceneManager();
-    this.rendererManager = new RendererManager(this.container);
     this.cameraController = null;
     this.tree = null;
     this.ball = null;
@@ -97,6 +96,9 @@ class Game {
         if (this.gameState.isPlaying())
           this.gameState.pause();
       });
+    
+    // Настройка обработчика изменения размера окна
+    window.addEventListener('resize', this.onResize.bind(this));
   }
 
   quickGPUTest() {
@@ -141,16 +143,6 @@ class Game {
     this.initGameOverModal();
     this.initVictoryModal();
     this.initPauseModal();
-
-    document.querySelectorAll('.modal').forEach(modal => {
-      modal.addEventListener('shown.bs.modal', () => {
-        this.game_container.classList.add('hide');
-      });
-      
-      modal.addEventListener('hide.bs.modal', () => {
-        this.game_container.classList.remove('hide');
-      });
-    });
     
     // Настройка обработчика нажатия клавиш
     window.addEventListener('keydown', (e) => {
@@ -222,6 +214,7 @@ class Game {
     // Подписка на старт игры
     this.gameState.onStart(() => {
       console.log("Start callback вызван");
+      this.game_container.classList.remove('start-blocking');
       this.hideStartModal();
       this.showGameHint();
       this.showKillerIndicator();
@@ -517,6 +510,8 @@ class Game {
   init() {
     // Инициализация сцены
     const scene = this.sceneManager.init();
+      
+    this.rendererManager = new RendererManager(this.container);
     
     // Инициализация рендерера
     this.rendererManager.init();
@@ -533,12 +528,6 @@ class Game {
     // Запуск анимации
     this.animate();
     
-    // Настройка обработчика изменения размера окна
-    window.addEventListener('resize', this.onResize.bind(this));
-    
-    // Показываем стартовое модальное окно
-    this.showStartModal();
-    
     // Скрываем подсказки до старта игры
     this.hideGameHint();
     this.hideKillerIndicator();
@@ -546,6 +535,8 @@ class Game {
     
     // Добавляем подсказку по управлению звуком
     console.log('Нажмите M для отключения/включения звука');
+
+    this.showStartModal();
   }
   
   createGameObjects() {

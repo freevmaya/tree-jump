@@ -25,7 +25,7 @@ export class CameraController {
   }
 
   reset() {
-    this.camera.position.set(0, CAMERA_HEIGHT_OFFSET - this.game.tree.half_height, 12);
+    this.camera.position.set(1, CAMERA_HEIGHT_OFFSET - this.game.tree.half_height, 12);
   }
   
   update(targetY) {

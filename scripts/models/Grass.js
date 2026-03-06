@@ -1,10 +1,8 @@
 // scripts/models/Grass.js
 import * as THREE from 'three';
 import { textureLoader } from '../utils/TextureLoader.js';
-import { 
-  BASE_PLATFORM_TOP_Y, 
+import {
   MAIN_RADIUS,
-  CYLINDER_HALF_HEIGHT,
   GRASS_IMAGE_PATH
 } from '../constants.js';
 
@@ -28,7 +26,7 @@ export class Grass {
     this.group = new THREE.Group();
     
     // Позиция у подножия дерева (чуть выше основания)
-    const baseY = BASE_PLATFORM_TOP_Y + 0.1;
+    const baseY = 0.1 - this.tree.half_height;
     this.group.position.y = baseY;
     
     // Загружаем текстуру травы
@@ -136,7 +134,7 @@ export class Grass {
       const z = Math.sin(finalAngle) * radius;
       
       // Получаем точку на изогнутом стволе для коррекции позиции
-      const trunkPoint = this.tree.getPointOnTrunk(BASE_PLATFORM_TOP_Y + 0.2, 0, 0);
+      const trunkPoint = this.tree.getPointOnTrunk(0.2 - this.tree.half_height, 0, 0);
       
       // Создаем группу травинок в этой точке (может быть несколько плоскостей)
       const bladesInCluster = 2 + Math.floor(Math.random() * 3); // 2-4 травинки в кластере
@@ -177,7 +175,7 @@ export class Grass {
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
       
-      const trunkPoint = this.tree.getPointOnTrunk(BASE_PLATFORM_TOP_Y + 0.2, 0, 0);
+      const trunkPoint = this.tree.getPointOnTrunk(0.2 - this.tree.half_height, 0, 0);
       
       const rotY = angle + (Math.random() - 0.5) * 0.5;
       const rotX = (Math.random() - 0.5) * 0.3;

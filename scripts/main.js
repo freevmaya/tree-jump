@@ -21,7 +21,7 @@ import { JoystickControl } from './controls/JoystickControl.js';
 import { GameState, GAME_STATE } from './GameState.js';
 import { Crystal } from './models/Crystal.js';
 import { Background } from './models/Background.js';
-import { textureLoader } from './utils/TextureLoader.js';
+import { textureLoader, collectPaths } from './utils/TextureLoader.js';
 import { eventBus } from './utils/EventEmitter.js';
 import { soundManager } from './audio/SoundManager.js';
 import { Grass } from './models/Grass.js';
@@ -63,7 +63,7 @@ class Game {
     // Создаем gameState
     this.gameState = new GameState();
     this.lights = [];
-    this.paramsIndex = START_GAME;
+    this.setGameIndex(START_GAME);
     
     // Инициализация Bootstrap модальных окон
     this.initModals();
@@ -212,7 +212,18 @@ class Game {
 
   nextGameIndex() {
     let keys = Object.keys(GAME_PARAMS);
-    this.paramsIndex = keys[(keys.indexOf(this.paramsIndex) + 1) % keys.length];
+    this.setGameIndex(keys[(keys.indexOf(this.paramsIndex) + 1) % keys.length]);
+  }
+
+  setGameIndex(value) {
+    this.paramsIndex = value;
+    this.loadLevelTextures();
+  }
+
+  loadLevelTextures(onComplete) {
+
+    let textures = collectPaths(GAME_PARAMS[this.paramsIndex]);
+    textureLoader.loadTexturesParallel(textures, onComplete);
   }
   
   initStartModal() {
@@ -522,8 +533,7 @@ class Game {
     this.createCrystal();
     
     // Создание шарика
-    this.ball = new Ball(scene);
-    this.ball.init(this.tree);
+    this.ball = new Ball(scene, this.tree);
 
     this.background = new Background(scene);
     this.background.init(env.BACKGROUND_IMAGE_PATH, {
@@ -685,7 +695,7 @@ class Game {
     
     // Обновление физики только если игра активна (не на паузе, не закончена и не в IDLE)
     if (this.gameState.isPlaying() && this.ball && this.physics) {
-      this.tree.update();
+      this.tree.update(dt);
       this.physics.update(dt);
     
       // Обновление фона
@@ -717,34 +727,24 @@ class Game {
       this.checkGameOver();
       
       // Показываем индикатор очков при приближении к вершине
-      if (this.ball && this.ball.getPosition().y > TREE_HEIGHT / 2 - 2) {
+      if (this.ball && this.ball.getPosition().y > this.tree.half_height - 2) {
         this.showScoreIndicator();
         this.calculateScore();
-      } else {
-        this.hideScoreIndicator();
       }
-    } else if (this.gameState.isPaused()) {
-      // На паузе ничего не обновляем, но дерево может продолжать вращаться по инерции?
-      // Для чистоты эксперимента - останавливаем всё
-      if (this.mouseControl) {
-        this.mouseControl.velocityY = 0;
+    
+      // Обновление кристалла
+      this.updateCrystal(dt);
+      
+      // Обновление камеры (всегда, чтобы камера не улетала)
+      if (this.ball) {
+        this.cameraController.update(this.ball.getLastBounceY());
       }
-      if (this.joystickControl) {
-        this.joystickControl.normalizedDirect = 0;
+      
+      // Рендеринг (всегда, чтобы видеть сцену)
+      if (this.sceneManager.getScene() && this.cameraController) {
+        this.rendererManager.render(this.sceneManager.getScene(), this.cameraController.getCamera());
       }
-    }
-    
-    // Обновление кристалла
-    this.updateCrystal(dt);
-    
-    // Обновление камеры (всегда, чтобы камера не улетала)
-    if (this.ball) {
-      this.cameraController.update(this.ball.getLastBounceY());
-    }
-    
-    // Рендеринг (всегда, чтобы видеть сцену)
-    if (this.sceneManager.getScene() && this.cameraController) {
-      this.rendererManager.render(this.sceneManager.getScene(), this.cameraController.getCamera());
+
     }
   }
 

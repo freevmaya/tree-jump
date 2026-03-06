@@ -101,7 +101,7 @@ export class TextureLoaderUtil {
    * @param {Object.<string, string>} textureMap - объект с путями к текстурам
    * @param {function} onComplete - колбэк после загрузки всех текстур
    */
-  loadTexturesParallel(textureMap, onComplete) {
+  loadTexturesParallel(textureMap, onComplete = null) {
     const entries = Object.entries(textureMap);
     const results = {};
     let loadedCount = 0;
@@ -315,6 +315,28 @@ export class TextureLoaderUtil {
 
     uvAttribute.needsUpdate = true;
   }
+}
+
+export function collectPaths(obj) {
+  const paths = [];
+  
+  function recursiveCollect(current) {
+    if (current && typeof current === 'object') {
+      Object.entries(current).forEach(([key, value]) => {
+        // Проверяем, оканчивается ли ключ на _PATH (регистронезависимо)
+        if (key.toUpperCase().endsWith('_PATH') && typeof value === 'string') {
+          paths.push(value);
+        }
+        // Рекурсивно обходим вложенные объекты
+        if (value && typeof value === 'object') {
+          recursiveCollect(value);
+        }
+      });
+    }
+  }
+  
+  recursiveCollect(obj);
+  return paths;
 }
 
 // Создаем и экспортируем синглтон для использования во всем приложении

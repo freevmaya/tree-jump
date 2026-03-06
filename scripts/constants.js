@@ -37,6 +37,7 @@ export const PLATFORM_HEIGHT = 0.2;
 export const CYLINDER_HALF_HEIGHT = TREE_HEIGHT / 2;
 export const PLATFORM_DENSITY = 0.6;
 export const PLATFORM_COUNT = Math.floor(TREE_HEIGHT * PLATFORM_DENSITY);
+export const PLATFORM_DISTANCE = 1.3;
 
 // Базовая платформа
 export const BASE_PLATFORM_SIZE = 20;
@@ -96,8 +97,6 @@ export const RESET_VELOCITY_Y = BOUNCE_SPEED;
 export const PLATFORM_NORMAL_COLOR = 0xA67C52; // Используем существующий TREE_COLOR для обычных платформ
 export const PLATFORM_KILLER_COLOR = 0xFF3333; // Ярко-красный для платформ-убийц
 
-// Процент платформ-убийц
-export const KILLER_PLATFORM_PERCENTAGE = 0.3; // 30%
 export const START_GAME = 'DEFAULT';
 
 export const GAME_PARAMS = {
@@ -117,11 +116,15 @@ export const GAME_PARAMS = {
 				RIM_LIGHT_INTENSITY: 0.6
 			},
 			TREE: {
-				BARK_TEXTURE_PATH: 'textures/bark-d.jpg',
+				BARK_TEXTURE_REPEAT: {x: 4, y: 1},
+				BARK_TEXTURE_PATH: 'textures/oak-bark.jpg',
 				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
 				KILLER_PLATFORM_TEXTURE_PATH: 'textures/killer_platform.jpg',
 				NEEDLE_TEXTURE_PATH: 'textures/oak-leaves.png',
-				TREE_HEIGHT: 20
+				TREE_HEIGHT: 15,
+				PLATFORM_STEP: 1.6,
+				KILLER_DENSITY: 0.1,
+				PLATFORM_ROTATE_DENSITY: 0.2
 			}
 		},
 	DARK: {
@@ -133,17 +136,21 @@ export const GAME_PARAMS = {
 				BACKGROUND_IMAGE_PATH: 'images/dark-bg.jpg',
 				GRASS_IMAGE_PATH: 'textures/grass-s.png',
 				GROUND_IMAGE_PATH:'textures/ground.jpg',
-				AMBIENT_LIGHT_INTENSITY: 0.2,
+				AMBIENT_LIGHT_INTENSITY: 1,
 				KEY_LIGHT_INTENSITY: 3,
 				FILL_LIGHT_INTENSITY: 2,
 				RIM_LIGHT_INTENSITY: 0.6
 			},
 			TREE: {
-				BARK_TEXTURE_PATH: 'textures/bark.jpg',
+				BARK_TEXTURE_REPEAT: {x: 2, y: 1},
+				BARK_TEXTURE_PATH: 'textures/pine-bark.jpg',
 				BARK_NORMAL_PATH: 'textures/bark-normal.jpg',
 				KILLER_PLATFORM_TEXTURE_PATH: 'textures/killer_platform.jpg',
 				NEEDLE_TEXTURE_PATH: 'textures/needle.png',
-				TREE_HEIGHT: 20
+				TREE_HEIGHT: 20,
+				PLATFORM_STEP: 1.6,
+				KILLER_DENSITY: 0.2,
+				PLATFORM_ROTATE_DENSITY: 0.3
 			}
 		},
 	BIRCH: {
@@ -161,11 +168,15 @@ export const GAME_PARAMS = {
 				RIM_LIGHT_INTENSITY: 0.6
 			},
 			TREE: {
+				BARK_TEXTURE_REPEAT: {x: 2, y: 1},
 				BARK_TEXTURE_PATH: 'textures/birch.jfif',
 				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
 				KILLER_PLATFORM_TEXTURE_PATH: 'textures/bark-b.jpg',
 				NEEDLE_TEXTURE_PATH: 'textures/birch-leaves.png',
-				TREE_HEIGHT: 20
+				TREE_HEIGHT: 20,
+				PLATFORM_STEP: 1.6,
+				KILLER_DENSITY: 0.3,
+				PLATFORM_ROTATE_DENSITY: 0.5
 			}
 		}
 }

@@ -2,15 +2,17 @@
 import * as THREE from 'three';
 import { 
   TREE_COLOR, MAIN_RADIUS, STICK_OUT, 
-  PLATFORM_RADIUS, PLATFORM_HEIGHT, PLATFORM_COUNT, WIREFRAME_COLOR,
-  KILLER_PLATFORM_PERCENTAGE, ROTATION_SMOOTH,
+  PLATFORM_RADIUS, PLATFORM_HEIGHT, WIREFRAME_COLOR,
+  ROTATION_SMOOTH,
   BRANCH_COUNT, BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH, BRANCH_DENSITY,
-  TRUNK_CURVE_STRENGTH, TRUNK_SEGMENTS
+  TRUNK_CURVE_STRENGTH, TRUNK_SEGMENTS, PLATFORM_DISTANCE
 } from '../constants.js';
 
 import { Platform } from './Platform.js';
+import { RotatePlatform } from './RotatePlatform.js';
 import { Branch } from './Branch.js';
 import { textureLoader } from '../utils/TextureLoader.js';
+import { randomArray } from '../utils/Utils.js';
 
 export class Tree {
   constructor(scene) {
@@ -40,6 +42,7 @@ export class Tree {
     this.options = options;
 
     this.half_height = this.options.TREE_HEIGHT / 2;
+    this.platform_count = Math.floor(this.options.TREE_HEIGHT / this.options.PLATFORM_STEP);
 
     // Создаем группу для ствола, если нужно
     this.mesh = new THREE.Group();
@@ -188,7 +191,7 @@ export class Tree {
       this.options.BARK_TEXTURE_PATH,
       (texture) => {
         // Настройки текстуры для дерева
-        //texture.repeat.set(2, TREE_HEIGHT / 1.5);
+        texture.repeat.set(this.options.BARK_TEXTURE_REPEAT.x, this.options.TREE_HEIGHT * this.options.BARK_TEXTURE_REPEAT.y);
         material.map = texture;
 
         material.color.setHex(0xffffff);
@@ -271,20 +274,21 @@ export class Tree {
     this.platforms = [];
     
     // Рассчитываем количество платформ-убийц
-    const killerCount = Math.floor(PLATFORM_COUNT * KILLER_PLATFORM_PERCENTAGE);
+    const killerCount = Math.floor(this.platform_count * this.options.KILLER_DENSITY);
     
-    console.log(`Создание платформ: всего ${PLATFORM_COUNT}, убийц: ${killerCount}`);
+    console.log(`Создание платформ: всего ${this.platform_count}, убийц: ${killerCount}`);
     
     // Создаем массив для хранения углов обычных платформ, чтобы разместить напротив них убийц
     const normalPlatformAngles = [];
+    const rotatePlatform = randomArray(this.platform_count, this.options.PLATFORM_ROTATE_DENSITY);
     
-    let base_y = this.half_height / PLATFORM_COUNT;
+    let base_y = this.half_height / this.platform_count;
     let previousTheta = null;
     const MIN_ANGLE_DIFF = Math.PI / 3;
     
     // Сначала создаем все обычные платформы (isKiller = false)
-    for (let i = 0; i < PLATFORM_COUNT; i++) {
-      const y = base_y + (i / PLATFORM_COUNT * 2 - 1) * (this.half_height - base_y);
+    for (let i = 0; i < this.platform_count; i++) {
+      const y = base_y + (i / this.platform_count * 2 - 1) * (this.half_height - base_y);
       
       let theta;
       
@@ -308,16 +312,20 @@ export class Tree {
         } while (Math.abs(theta - previousTheta) < MIN_ANGLE_DIFF);
       }
       
-      // Создаем обычную платформу (не убийцу)0
-      const platform = new Platform(this.mesh, theta, y, false);
-      platform.create(this.calcDistance(y));
+      // Создаем обычную платформу
 
-      platform.group.position.copy(this.getPointOnTrunk(y, 0.9, theta));
+      let platform;
+      if (rotatePlatform[i])
+        platform = new RotatePlatform(this, theta, y, false, 0.3 * (Math.random() > 0.5 ? 1 : -1));
+      else {
+        platform = new Platform(this, theta, y, false);
+      
+        // Сохраняем угол для возможного создания платформы-убийцы напротив
+        normalPlatformAngles.push(platform);
+      }
+      platform.group.position.copy(this.getPointOnTrunk(y, PLATFORM_DISTANCE, theta));
       
       this.platforms.push(platform);
-      
-      // Сохраняем угол для возможного создания платформы-убийцы напротив
-      normalPlatformAngles.push(platform);
       
       previousTheta = theta;
     }
@@ -341,9 +349,8 @@ export class Tree {
       while (normalizedTheta < -Math.PI) normalizedTheta += Math.PI * 2;
       
       // Создаем платформу-убийцу на той же высоте, но с противоположной стороны
-      const killerPlatform = new Platform(this.mesh, normalizedTheta, item.y, true);
-      killerPlatform.create(0);
-      killerPlatform.group.position.copy(this.getPointOnTrunk(item.y, 0.9, normalizedTheta));
+      const killerPlatform = new Platform(this, normalizedTheta, item.y, true);
+      killerPlatform.group.position.copy(this.getPointOnTrunk(item.y, PLATFORM_DISTANCE, normalizedTheta));
       
       this.platforms.push(killerPlatform);
     });
@@ -359,7 +366,7 @@ export class Tree {
     if (this.platforms.length === 0) return;
     
     // Рассчитываем количество веток на основе плотности
-    const targetBranchCount = Math.floor(PLATFORM_COUNT * BRANCH_DENSITY);
+    const targetBranchCount = Math.floor(this.platform_count * BRANCH_DENSITY);
     console.log(`Создание веток под платформами: ${targetBranchCount} шт. (плотность ${BRANCH_DENSITY})`);
     
     // Сортируем платформы по высоте
@@ -423,11 +430,8 @@ export class Tree {
       branch.create(0);
       
       // Корректируем позицию ветки с учетом изгиба ствола
-      if (branch.group) {
-      
-        // Получаем точку на изогнутом стволе для ветки
-        branch.group.position.copy(this.getPointOnTrunk(branchY, 0.8, platform.theta));
-      }
+      if (branch.group)
+        branch.group.position.copy(this.getPointOnTrunk(branchY, 0.7, platform.theta));
       
       // Сохраняем данные ветки
       this.branches.push(branch);
@@ -460,7 +464,9 @@ export class Tree {
     return this.mesh ? this.mesh.rotation.y : 0;
   }
 
-  update() {
+  update(dt) {
     this.setRotation(this.mesh.rotation.y + (this.targetRotation - this.mesh.rotation.y) * ROTATION_SMOOTH);
+    this.branches.forEach(branch => branch.update(dt));
+    this.platforms.forEach(platform => platform.update(dt));
   }
 }

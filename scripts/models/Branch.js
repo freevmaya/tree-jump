@@ -311,6 +311,10 @@ export class Branch {
       }
     );
   }
+
+  update(dt) {
+    
+  }
   
   dispose() {
     // Удаляем хвою

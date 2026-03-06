@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { textureLoader } from '../utils/TextureLoader.js';
 import { 
-  BASE_PLATFORM_TOP_Y,
+  BASE_PLATFORM_SIZE,
   GROUND_IMAGE_PATH
 } from '../constants.js';
 
@@ -14,8 +14,9 @@ export class Ground {
     this.texture = null;
     
     // Параметры плоскости грунта
-    this.size = 30; // Размер плоскости
-    this.segments = 32; // Сегментация для лучшего отображения текстуры
+    this.size = BASE_PLATFORM_SIZE; // Размер плоскости
+    this.segments = 8; // Сегментация для лучшего отображения текстуры
+    this.position_y = -this.tree.half_height;
   }
   
   init(texturePath = GROUND_IMAGE_PATH) {
@@ -36,8 +37,8 @@ export class Ground {
     
     // Позиционируем плоскость на уровне начала ствола
     // Получаем точку на стволе у основания
-    const basePoint = this.tree.getPointOnTrunk(BASE_PLATFORM_TOP_Y, 0, 0);
-    this.mesh.position.set(basePoint.x, BASE_PLATFORM_TOP_Y, basePoint.z);
+    const basePoint = this.tree.getPointOnTrunk(this.position_y, 0, 0);
+    this.mesh.position.set(basePoint.x, this.position_y, basePoint.z);
     
     // Поворачиваем плоскость горизонтально (по умолчанию CircleGeometry смотрит вверх по Y)
     // THREE.CircleGeometry уже ориентирован правильно (нормаль по +Y)
@@ -52,7 +53,7 @@ export class Ground {
     
     this.scene.add(this.mesh);
     
-    console.log('Грунт создан на уровне:', BASE_PLATFORM_TOP_Y);
+    console.log('Грунт создан на уровне:', this.position_y);
     
     return this.mesh;
   }

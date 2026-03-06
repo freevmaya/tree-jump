@@ -1,22 +1,19 @@
 // scripts/models/Ball.js
 import * as THREE from 'three';
-import { BALL_RADIUS, BALL_COLOR, BASE_PLATFORM_TOP_Y, BOUNCE_SPEED, MAIN_RADIUS } from '../constants.js';
+import { BALL_RADIUS, BALL_COLOR, BOUNCE_SPEED, MAIN_RADIUS } from '../constants.js';
 import { eventBus } from '../utils/EventEmitter.js';
 
 export class Ball {
-  constructor(scene) {
+  constructor(scene, tree) {
+
+    this.tree = tree;
     this.scene = scene;
     this.mesh = null;
     this.velocity = new THREE.Vector3(0, BOUNCE_SPEED, 0);
-    this.lastBounceY = BASE_PLATFORM_TOP_Y;
+    this.lastBounceY = -this.tree.half_height;
     this.bounceCount = 0;
     this.k_distance = 1.3;
-    this.tree = null;
-  }
-  
-  init(tree) {
 
-    this.tree = tree;
     const geometry = new THREE.SphereGeometry(BALL_RADIUS, 16, 16);
     const material = new THREE.MeshStandardMaterial({
       color: BALL_COLOR,
@@ -25,12 +22,11 @@ export class Ball {
     });
     
     this.mesh = new THREE.Mesh(geometry, material);
-    this.mesh.position.set(0, BASE_PLATFORM_TOP_Y + BALL_RADIUS, this.tree.maxRadius * this.k_distance);
+    this.mesh.position.set(0, BALL_RADIUS - this.tree.half_height, this.tree.maxRadius * this.k_distance);
     this.mesh.castShadow = true;
     this.mesh.receiveShadow = true;
     
     this.scene.add(this.mesh);
-    return this.mesh;
   }
   
   setPosition(x, y, z) {
@@ -69,7 +65,7 @@ export class Ball {
     let v = this.tree.getPointOnTrunk(a_v.y, this.k_distance, angle + Math.PI / 2);
 
     v.applyMatrix4(new THREE.Matrix4().makeRotationY(angle));
-    this.setPosition(v.x, v.y, v.z);
+    this.setPosition(a_v.x, v.y, v.z);
   }
   
   bounce(bounceY, bounceSpeed) {

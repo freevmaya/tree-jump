@@ -1,8 +1,7 @@
 // scripts/physics/BallPhysics.js
 import * as THREE from 'three';
 import { 
-  BALL_RADIUS, PLATFORM_RADIUS, PLATFORM_HEIGHT, 
-  BASE_PLATFORM_TOP_Y, GRAVITY, BOUNCE_SPEED, MAX_VELOCITY,
+  BALL_RADIUS, PLATFORM_RADIUS, PLATFORM_HEIGHT, GRAVITY, BOUNCE_SPEED, MAX_VELOCITY,
   MAIN_RADIUS, TREE_HEIGHT, CYLINDER_HALF_HEIGHT
 } from '../constants.js';
 import { GameState, GAME_STATE } from '../GameState.js';
@@ -17,11 +16,8 @@ export class BallPhysics {
     this.gravity = GRAVITY;
     this.bounceSpeed = BOUNCE_SPEED;
     this.maxVelocity = MAX_VELOCITY;
-    this.baseBounceY = -TREE_HEIGHT / 2;
-    this.victoryY = TREE_HEIGHT / 2;
-    
-    // Переменные для предотвращения повторных звуков при множественных коллизиях
-    this.lastBounceTime = 0;
+    this.baseBounceY = - this.tree.half_height;
+    this.victoryY = this.tree.half_height;
   }
   
   update(dt) {

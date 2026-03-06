@@ -6,10 +6,11 @@ import {
   PLATFORM_TEXTURE_PATH, KILLER_PLATFORM_TEXTURE_PATH
 } from '../constants.js';
 import { textureLoader } from '../utils/TextureLoader.js';
+import { When } from '../utils/Utils.js';
 
 export class Platform {
-  constructor(parentMesh, theta, y, isKiller = false) {
-    this.parentMesh = parentMesh;
+  constructor(tree, theta, y, isKiller = false) {
+    this.tree = tree;
     this.theta = theta;
     this.y = y;
     this.isKiller = isKiller;
@@ -17,7 +18,7 @@ export class Platform {
     this.mesh = null;
     this.texture = null;
 
-    this.platformGeometry = new THREE.CylinderGeometry(PLATFORM_RADIUS, PLATFORM_RADIUS * 0.9, PLATFORM_HEIGHT, 8);
+    this.platformGeometry = new THREE.CylinderGeometry(PLATFORM_RADIUS, PLATFORM_RADIUS * 0.8, PLATFORM_HEIGHT, 8);
 
     textureLoader.rotateUV(this.platformGeometry, Math.PI * 0.5);
     
@@ -30,16 +31,15 @@ export class Platform {
       roughness: isKiller ? 0.4 : 0.9,
       emissive: isKiller ? new THREE.Color(0x330000) : new THREE.Color(0x000000),
     });
-  }
-  
-  create(distance) {
+
+    let distance = 0.9;
     this.group = new THREE.Group();
     this.group.position.set(distance * Math.cos(this.theta), this.y, distance * Math.sin(this.theta));
     this.group.rotation.y = -this.theta;
     
     // Создание площадки
     this.mesh = new THREE.Mesh(this.platformGeometry, this.material);
-    this.mesh.position.set(STICK_OUT, 0, 0);
+    this.mesh.position.set(0, 0, 0);
     this.mesh.castShadow = true;
     this.mesh.receiveShadow = true;
     this.group.add(this.mesh);
@@ -52,7 +52,7 @@ export class Platform {
       this.addSpikes();
     }
     
-    this.parentMesh.add(this.group);
+    this.tree.mesh.add(this.group);
   }
   
   loadTexture() {
@@ -193,5 +193,9 @@ export class Platform {
       this.group.removeFromParent();
     }
     // Материалы и геометрии удаляются автоматически сборщиком мусора
+  }
+
+  update(dt) {
+
   }
 }

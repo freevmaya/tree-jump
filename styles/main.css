@@ -47,6 +47,21 @@ body {
   width: 100dvw;
   max-width: 700px;
   margin: auto;
+  position: relative;
+}
+
+.game-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: max(150px, 20dvw);
+  background-image: url(images/game-top.png);
+  z-index: 1;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position-y: top;
+  pointer-events: none;
 }
 
 /* Верхний блок с игрой (85%) */
@@ -218,6 +233,13 @@ canvas {
   color: #aaa;
 }
 
+.btn {
+  font-size: 18px !important;
+  line-height: 1.8em;
+  text-shadow: 0 0 3px #000000ad;
+  color: #2d1904;
+}
+
 .btn-restart {
   background: linear-gradient(135deg, #ff6b6b, #ff4757);
   border: none;
@@ -316,11 +338,13 @@ canvas {
   font-weight: bold;
   text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
-.victory-message {
-  color: #ffd700;
-  font-size: 1.2rem;
-  margin-top: 15px;
+
+.status {
+  font-size: 26px;
+  text-align: center;
+  text-shadow: 2px 2px 3px #000000c4;
 }
+
 .victory-footer {
   border-top: 1px solid rgba(255, 215, 0, 0.3);
 }

@@ -1,0 +1,40 @@
+time: 07.03.26 06.49
+stack: 
+C:\OpenServer\domains\tree-jump\src\Vmaya\include\fdbg.php:73
+C:\OpenServer\domains\tree-jump\src\Vmaya\classes\Page.php:152
+params: 
+[]message: 
+Unknown database 'tree-jump'
+
+,
+time: 07.03.26 06.51
+stack: 
+C:\OpenServer\domains\tree-jump\src\Vmaya\include\fdbg.php:73
+params: 
+[]message: 
+C:\OpenServer\domains\tree-jump\src\Vmaya\classes\Page.php 30: Undefined constant "DEFAULT_LANGUAGE"
+
+,
+time: 07.03.26 06.52
+stack: 
+C:\OpenServer\domains\tree-jump\src\Vmaya\include\fdbg.php:73
+params: 
+[]message: 
+C:\OpenServer\domains\tree-jump\src\Vmaya\classes\Page.php 30: Undefined constant "DEFAULT_LANGUAGE"
+
+,
+time: 07.03.26 06.52
+stack: 
+C:\OpenServer\domains\tree-jump\src\Vmaya\include\fdbg.php:73
+params: 
+[]message: 
+C:\OpenServer\domains\tree-jump\src\Vmaya\templates\index.php 94: Undefined constant "LANGUAGES"
+
+,
+time: 07.03.26 06.54
+stack: 
+C:\OpenServer\domains\tree-jump\src\Vmaya\include\fdbg.php:73
+params: 
+[]message: 
+C:\OpenServer\domains\tree-jump\src\Vmaya\templates\index.php 94: Undefined constant "LANGUAGES"
+

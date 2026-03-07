@@ -93,7 +93,6 @@ export class KillerPlatform extends RotatePlatform {
 
   ballNearest() {
     let distance = window.game.ball.getPosition().distanceTo(this.getPosition());
-    console.log(distance);
     return distance < 2;
   }
 

@@ -2,4 +2,5 @@
 prepare/
 *.psd
 config/
+logs/
 combined.txt

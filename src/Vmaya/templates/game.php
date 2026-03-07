@@ -79,7 +79,7 @@
                 </div>
               </div>
               <div class="text-center">
-                <button type="button" class="btn" id="restartButton">Новая игра</button>
+                <button type="button" class="btn" id="restartButton">Продолжить</button>
               </div>
             </div>
           </div>

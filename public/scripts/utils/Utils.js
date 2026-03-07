@@ -63,3 +63,81 @@ export function sawToSine(x, t = 0.5) {
 export var $ = (id) => {
   return document.getElementById(id);
 }
+
+export function debounce(func, wait, start = null) {
+    var timeout;
+    return function() {
+        var context = this, args = arguments;
+        clearTimeout(timeout);
+        if (start) start();
+        timeout = setTimeout(function() {
+            func.apply(context, args);
+        }, wait);
+    };
+}
+
+export function getClassName(obj) { 
+   var funcNameRegex = /function (.{1,})\(/;
+   var results = (funcNameRegex).exec((obj).constructor.toString());
+   return (results && results.length > 1) ? results[1] : "";
+};
+
+
+export async function Ajax(params, after = null, userData = null) {
+
+    var formData;
+    if (getClassName(params) == 'FormData') 
+        formData = params
+    else {
+        formData = new FormData();
+        for (let key in params) {
+            let data = params[key];
+            formData.append(key, (typeof data == 'string') ? data : JSON.stringify(data));
+        }
+
+        if ((typeof jsdata !== 'undefined') && typeof(jsdata.ajaxRequestId) != 'undefined')
+            formData.append('ajax-request-id', jsdata.ajaxRequestId);
+    }
+
+    let headers = {};
+    let token = (typeof X_CSRF_Token === 'string') ? X_CSRF_Token : null;
+
+    if (token) {
+        headers['X-CSRF-Token'] = token;
+        formData.append('token', token);
+    }
+
+    headers['X-Requested-With'] = 'XMLHttpRequest';
+
+    const request = new Request(document.location.origin + "?page=ajax", {
+        method: "POST",
+        headers: headers,
+        body: formData
+    });
+
+    let result = null;
+    let serverTime = Date.now();
+    try {
+
+        const response = await fetch(request);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        if (response.headers.has('Server-Time'))
+            serverTime = Date.parse(response.headers.get('Server-Time'));
+
+        if (response.headers.has('X-CSRF-Token')) {
+            X_CSRF_Token = response.headers.get('X-CSRF-Token');
+        }
+
+        result = await response.json();
+
+        if (result.error && (result.message == 'The token has expired') && (token != X_CSRF_Token)) {
+        }
+    } catch (error) {
+        tracer.error(error.message);
+    }
+    if (after != null) after(result, serverTime, userData);
+    return result;
+}

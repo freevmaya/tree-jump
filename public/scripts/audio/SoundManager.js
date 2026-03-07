@@ -69,6 +69,13 @@ export class SoundManager {
       this.stop('win-music');
     });
     
+    eventBus.on('blade', (data) => {
+      this.play('blade', { 
+        volume: 0.5,
+        playbackRate: 0.9 + Math.random() * 0.2 // Случайная высота звука для разнообразия
+      });
+    });
+    
     eventBus.on('dirt', (data) => {
       this.play('dirt', { 
         volume: 0.5,
@@ -226,7 +233,8 @@ export class SoundManager {
     const sounds = [
       { id: 'bounce', url: 'sounds/bounce.mp3', options: { volume: 0.5 }},
       { id: 'fail', url: 'sounds/fail-2.mp3', options: { volume: 0.5 }},
-      { id: 'dirt', url: 'sounds/dirt.mp3', options: { volume: 0.5 }}
+      { id: 'dirt', url: 'sounds/dirt.mp3', options: { volume: 0.5 }},
+      { id: 'blade', url: 'sounds/blade.mp3', options: { volume: 0.5 }}
     ];
     
     return Promise.allSettled(

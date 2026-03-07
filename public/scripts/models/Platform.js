@@ -53,11 +53,15 @@ export class Platform {
     
     this.tree.mesh.add(this.group);
   }
+
+  texturePath() {
+    return this.tree.options.PLATFORM_TEXTURE_PATH;
+  }
   
   loadTexture() {
     
     textureLoader.loadTexture(
-      PLATFORM_TEXTURE_PATH,
+      this.texturePath(),
       (texture) => {
         // Настраиваем текстуру для платформы
         texture.repeat.set(2, 1); // Повторяем текстуру 2 раза по X
@@ -69,7 +73,7 @@ export class Platform {
         this.texture = texture;
       },
       (error) => {
-        console.warn(`Не удалось загрузить текстуру для платформы: ${texturePath}`);
+        console.warn(`Не удалось загрузить текстуру для платформы: ${this.texturePath()}`);
       },
       {
         repeat: { x: 2, y: 1 },

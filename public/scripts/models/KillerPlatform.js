@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { Platform } from './Platform.js';
 import { RotatePlatform } from './RotatePlatform.js';
 import { sawToSine } from '../utils/Utils.js';
+import { eventBus } from '../utils/EventEmitter.js';
 
 import { 
   STICK_OUT, PLATFORM_HEIGHT, PLATFORM_DISTANCE,
@@ -41,6 +42,10 @@ export class KillerPlatform extends RotatePlatform {
     
     this.tree.mesh.add(this.group);
   }
+
+  texturePath() {
+    return this.tree.options.KILLER_PLATFORM_TEXTURE_PATH;
+  }
   
   addSpikes() {
     const spikeCount = 6; // Количество шипов
@@ -56,20 +61,7 @@ export class KillerPlatform extends RotatePlatform {
     });
 
     this.spikeGroup = new THREE.Group();
-    
-    /*
-    // Загружаем текстуру для шипов
-    textureLoader.loadTexture(
-      'textures/spike.jpg',
-      (texture) => {
-        spikeMaterial.map = texture;
-        spikeMaterial.needsUpdate = true;
-      },
-      () => {
-        // Игнорируем ошибку, используем цвет
-      }
-    );*/
-    
+
     for (let i = 0; i < spikeCount; i++) {
       // Угол для размещения шипа по кругу
       const angle = (i / spikeCount) * Math.PI * 2;
@@ -94,8 +86,15 @@ export class KillerPlatform extends RotatePlatform {
     this.group.add(this.spikeGroup);
 
     this.srikesIdx = 0;
-    this.srikeSpeed = 1;
+    this.srikeSpeed = this.tree.options.KILLER_SPEED + (Math.random() - 0.5) * 0.4;
     this.srikeState = 0;
+    this.bladeState = false;
+  }
+
+  ballNearest() {
+    let distance = window.game.ball.getPosition().distanceTo(this.getPosition());
+    console.log(distance);
+    return distance < 2;
   }
 
   checkDamage() {
@@ -107,5 +106,12 @@ export class KillerPlatform extends RotatePlatform {
     this.srikesIdx -= Math.PI * this.srikeSpeed * dt;
     this.srikeState = (sawToSine(this.srikesIdx, 0.1) - 1);
     this.spikeGroup.position.set(0, Math.max(this.srikeState, -1) * this.spikeHeight, 0);
+
+    if (this.ballNearest() && this.checkDamage()) {
+      if (!this.bladeState) {
+        this.bladeState = true;
+        eventBus.emit('blade');
+      }
+    } else this.bladeState = false;
   }
 }

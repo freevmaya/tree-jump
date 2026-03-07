@@ -120,11 +120,13 @@ export const GAME_PARAMS = {
 				BARK_TEXTURE_REPEAT: {x: 4, y: 1},
 				BARK_TEXTURE_PATH: 'textures/oak-bark.jpg',
 				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
-				KILLER_PLATFORM_TEXTURE_PATH: 'textures/killer_platform.jpg',
+				PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
+				KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
 				NEEDLE_TEXTURE_PATH: 'textures/oak-leaves.png',
 				TREE_HEIGHT: 15,
 				PLATFORM_STEP: 1.6,
 				KILLER_DENSITY: 0.1,
+				KILLER_SPEED: 1,
 				PLATFORM_ROTATE_DENSITY: 0.2,
 				PLATFORM_RADIUS: { MIN: 0.5, MAX: 0.5 }
 			}
@@ -148,11 +150,13 @@ export const GAME_PARAMS = {
 				BARK_TEXTURE_REPEAT: {x: 2, y: 1},
 				BARK_TEXTURE_PATH: 'textures/pine-bark.jpg',
 				BARK_NORMAL_PATH: 'textures/bark-normal.jpg',
-				KILLER_PLATFORM_TEXTURE_PATH: 'textures/killer_platform.jpg',
+				PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
+				KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
 				NEEDLE_TEXTURE_PATH: 'textures/needle.png',
 				TREE_HEIGHT: 20,
 				PLATFORM_STEP: 1.6,
 				KILLER_DENSITY: 0.3,
+				KILLER_SPEED: 1.2,
 				PLATFORM_ROTATE_DENSITY: 0.3,
 				PLATFORM_RADIUS: { MIN: 0.38, MAX: 0.5 }
 			}
@@ -176,11 +180,13 @@ export const GAME_PARAMS = {
 				BARK_TEXTURE_REPEAT: {x: 2, y: 1},
 				BARK_TEXTURE_PATH: 'textures/birch.jfif',
 				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
-				KILLER_PLATFORM_TEXTURE_PATH: 'textures/bark-b.jpg',
+				PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
+				KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
 				NEEDLE_TEXTURE_PATH: 'textures/birch-leaves.png',
 				TREE_HEIGHT: 20,
 				PLATFORM_STEP: 1.6,
 				KILLER_DENSITY: 0.7,
+				KILLER_SPEED: 1.5,
 				PLATFORM_ROTATE_DENSITY: 0.5,
 				PLATFORM_RADIUS: { MIN: 0.3, MAX: 0.4 }
 			}

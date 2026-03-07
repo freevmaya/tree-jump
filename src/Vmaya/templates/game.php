@@ -162,6 +162,7 @@
 
   <!-- Подключаем Bootstrap JS глобально -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="text/javascript" src="<?=BASEURL?>/scripts/utils/crypto-js.min.js"></script>
   
   <!-- Import maps для Three.js -->
   <script type="importmap">
@@ -175,10 +176,10 @@
   </script>
   
   <!-- Main script -->
-  <script type="module" src="./scripts/main.js?v=<?=$v?>"></script>
+  <script type="module" src="<?=BASEURL?>/scripts/main.js?v=<?=$v?>"></script>
 
   <?if (DEV) {?>
-    <script type="module" src="./scripts/test-unit.js?v=<?=$v?>"></script>
+    <script type="module" src="<?=BASEURL?>/scripts/test-unit.js?v=<?=$v?>"></script>
     <!-- Eruda is console for mobile browsers-->
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>eruda.init();</script>

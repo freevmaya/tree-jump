@@ -13,8 +13,11 @@ import {
 import { SceneManager } from './core/SceneManager.js';
 import { RendererManager } from './core/RendererManager.js';
 import { CameraController } from './core/CameraController.js';
+import { StateManager } from './core/state-manager.js';
+
 import { Tree } from './models/Tree.js';
 import { Ball } from './models/Ball.js';
+
 import { BallPhysics } from './physics/BallPhysics.js';
 import { MouseRotationControl } from './controls/MouseRotationControl.js';
 import { JoystickControl } from './controls/JoystickControl.js';
@@ -28,7 +31,6 @@ import { Grass } from './models/Grass.js';
 import { Ground } from './models/Ground.js';
 import { enumerateTo, $ } from './utils/Utils.js';
 import { SparkEffect } from './effects/SparkEffect.js';
-
 
 // Bootstrap доступен глобально через window.bootstrap
 const bootstrap = window.bootstrap;
@@ -78,13 +80,13 @@ class Game {
     this.soundsLoaded = false;
     this.gameStarted = false; // Флаг, что игра была запущена
     this.testResult = this.quickGPUTest();
+    this.stateManager = new StateManager();
 
     console.log(this.testResult);
     
     // Создаем gameState
     this.gameState = new GameState();
     this.lights = [];
-    this.setGameIndex(START_GAME);
     
     // Инициализация Bootstrap модальных окон
     this.initModals();
@@ -100,6 +102,12 @@ class Game {
     
     // Настройка обработчика изменения размера окна
     window.addEventListener('resize', this.onResize.bind(this));
+
+    this.stateManager.loadState()
+      .then(()=>{
+        this.setGameIndex(this.stateManager.get('paramsIndex', START_GAME));
+        this.init();
+      });
   }
 
   quickGPUTest() {
@@ -176,6 +184,13 @@ class Game {
       this.hideKillerIndicator();
       this.showGameOverModal();
       this.disableControls();
+
+      let gameOverCount = this.stateManager.get('game_over_count', 0) + 1;
+      if (gameOverCount > 2) {
+        gameOverCount = 0;
+        this.prevGameIndex();
+      }
+      this.stateManager.set('game_over_count', gameOverCount);
     });
     
     this.gameState.onVictory(() => {
@@ -236,8 +251,14 @@ class Game {
     this.setGameIndex(keys[(keys.indexOf(this.paramsIndex) + 1) % keys.length]);
   }
 
+  prevGameIndex() {
+    let keys = Object.keys(GAME_PARAMS);
+    this.setGameIndex(keys[Math.max(keys.indexOf(this.paramsIndex) - 1, 0)]);
+  }
+
   setGameIndex(value) {
     this.paramsIndex = value;
+    this.stateManager.set('paramsIndex', this.paramsIndex);
     this.loadLevelTextures();
   }
 
@@ -808,5 +829,4 @@ class Game {
 // Запуск игры
 document.addEventListener('DOMContentLoaded', () => {
   window.game = new Game();
-  window.game.init();
 });

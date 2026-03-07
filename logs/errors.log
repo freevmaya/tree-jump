@@ -38,3 +38,36 @@ params:
 []message: 
 C:\OpenServer\domains\tree-jump\src\Vmaya\templates\index.php 94: Undefined constant "LANGUAGES"
 
+,
+time: 07.03.26 17.01
+stack: 
+C:\OpenServer\domains\tree-jump\src\Vmaya\include\fdbg.php:73
+params: 
+[]message: 
+C:\OpenServer\domains\tree-jump\src\Vmaya\templates\game.php 165: Undefined constant "BASE_URL"
+
+,
+time: 07.03.26 17.03
+stack: 
+C:\OpenServer\domains\tree-jump\src\Vmaya\include\fdbg.php:73
+params: 
+[]message: 
+C:\OpenServer\domains\tree-jump\src\Vmaya\templates\game.php 165: Undefined constant "BASE_URL"
+
+,
+time: 07.03.26 17.10
+stack: 
+C:\OpenServer\domains\tree-jump\src\Vmaya\include\fdbg.php:73
+C:\OpenServer\domains\tree-jump\src\Vmaya\classes\Page.php:162
+C:\OpenServer\domains\tree-jump\src\Vmaya\classes\Ajax.php:117
+C:\OpenServer\domains\tree-jump\src\Vmaya\classes\BaseAjax.php:97
+C:\OpenServer\domains\tree-jump\src\Vmaya\classes\BaseAjax.php:20
+C:\OpenServer\domains\tree-jump\src\Vmaya\classes\Page.php:148
+params: 
+{
+    "page": "ajax",
+    "action": "setUserState",
+    "data": "{\"paramsIndex\":\"DEFAULT\"}"
+}message: 
+Wrong
+

@@ -16,6 +16,8 @@
 	define("LIVETOKEN", DEV ? 20 : 60 * 10); // Врямя жизни токена 10 мин.
 	define("YANDEX_METRIKA_ID", '106450888');
 	define('DEFAULT_LANGUAGE', 'ru');
+	define('SCRIPTURL', BASEURL.'/scripts');
+	
 	
 	$lv = SCRIPTS_VERSION % 1000;
 	$mv = floor(SCRIPTS_VERSION / 1000);

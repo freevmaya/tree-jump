@@ -63,11 +63,6 @@ export class SoundManager {
             this.play('win-music')
         });
     });
-
-    this.gameState.onReset(()=>{
-      this.stop('fail-music');
-      this.stop('win-music');
-    });
     
     eventBus.on('blade', (data) => {
       this.play('blade', { 

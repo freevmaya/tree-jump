@@ -1,6 +1,7 @@
 <?php
     $v = SCRIPTS_VERSION;
     $is_developer = Page::isDev();
+    html::AddScriptFile('/scripts/main.js');
 ?>
 
   <!-- Основной контейнер игры -->
@@ -192,14 +193,14 @@
   {
     "imports": {
       "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
-      "@scripts/": "./scripts/"
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
     }
   }
   </script>
   
   <!-- Main script -->
   <script type="module" src="<?=BASEURL?>/scripts/main.js?v=<?=$v?>"></script>
+  <script type="module" src="<?=BASEURL?>/scripts/constants.js?v=<?=$v?>"></script>
 
   <?if (DEV) {?>
     <script type="module" src="<?=BASEURL?>/scripts/test-unit.js?v=<?=$v?>"></script>

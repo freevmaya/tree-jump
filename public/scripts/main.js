@@ -7,10 +7,9 @@ import {
   RIM_LIGHT_DISTANCE, TREE_HEIGHT, MAIN_RADIUS,
   GAME_OVER_Y_OFFSET, RESET_POSITION_X, RESET_POSITION_Y,
   RESET_POSITION_Z, RESET_VELOCITY_Y, CAMERA_START_Y,
-  BACKGROUND_IMAGE_PATH, GRASS_IMAGE_PATH, GAME_PARAMS, START_GAME
+  BACKGROUND_IMAGE_PATH, GRASS_IMAGE_PATH, GAME_PARAMS, START_GAME, USER_TITLES
 } from './constants.js';
 
-import { SceneManager } from './core/SceneManager.js';
 import { RendererManager } from './core/RendererManager.js';
 import { CameraController } from './core/CameraController.js';
 import { StateManager } from './core/state-manager.js';
@@ -30,6 +29,7 @@ import { SoundManager } from './audio/SoundManager.js';
 import { Grass } from './models/Grass.js';
 import { Ground } from './models/Ground.js';
 import { enumerateTo, $ } from './utils/Utils.js';
+import { MathUtils } from './utils/MathUtils.js';
 import { SparkEffect } from './effects/SparkEffect.js';
 
 // Bootstrap доступен глобально через window.bootstrap
@@ -57,11 +57,25 @@ function collectPaths(obj) {
   return paths;
 }
 
+function getUserTitle(totalScore) {
+  let accumulatedScore = 0;
+  
+  for (const [key, value] of Object.entries(USER_TITLES)) {
+    if (totalScore < accumulatedScore + value.step)
+      return key;
+    accumulatedScore += value.step;
+  }
+  
+  // Если достигнут максимум
+  const lastKey = Object.keys(USER_TITLES).pop();
+  return lastKey;
+}
+
 class Game {
   constructor() {
     this.game_container = $('game-container');
     this.container      = $('canvas-container');
-    this.sceneManager = new SceneManager();
+    this.scene          = new THREE.Scene();
     this.cameraController = null;
     this.tree = null;
     this.ball = null;
@@ -71,6 +85,11 @@ class Game {
     this.scoreIndicatorElement = $('score-indicator');
     this.currentScoreElement = $('current-score');
     this.killerIndicatorElement = $('killer-indicator');
+    this.stateView = {
+      score: $('state-score'),
+      vin: $('state-vin'),
+      title: $('state-title')
+    };
     this.lastTime = performance.now();
     this.crystal = null;
     this.background = null;
@@ -81,6 +100,7 @@ class Game {
     this.gameStarted = false; // Флаг, что игра была запущена
     this.testResult = this.quickGPUTest();
     this.stateManager = new StateManager();
+    this.gameHint = $('game-hint');
 
     console.log(this.testResult);
     
@@ -108,6 +128,26 @@ class Game {
         this.setGameIndex(this.stateManager.get('paramsIndex', START_GAME));
         this.init();
       });
+  }
+
+  setState(name, value) {
+    this.stateManager.set(name, value);
+    this.updateStateView();
+  }
+
+  updateStateView() {
+    let keys = Object.keys(this.stateView);
+    keys.forEach((name)=>{
+      let val;
+      if (name == 'title') {
+        let keys = Object.keys(USER_TITLES);
+        let key = this.stateManager.get(name, keys[0]);
+        val = USER_TITLES[key] ? USER_TITLES[key].name : USER_TITLES[keys[0]].name;
+      }
+      else val = this.stateManager.get(name, '-');
+
+      this.stateView[name].querySelector('.value').textContent = val;
+    });
   }
 
   quickGPUTest() {
@@ -239,11 +279,65 @@ class Game {
     });
   }
 
+  NextLevel() {
+      this.nextGameIndex();
+      this.resetGame();
+  }
+
+  GoToLevel(levelKey) {
+    this.setGameIndex(levelKey);
+    this.resetGame();
+  }
+
+  setUserTitle(key) {
+    this.setState('title', key);
+  }
+
+  updateUserTitle() {
+
+    let current = this.stateManager.get('title', Object.keys(USER_TITLES)[0]);
+    let totalScore = this.stateManager.get('score', this.currentScore);
+
+    let titleKey = getUserTitle(totalScore);
+    if (titleKey != current) {
+      this.setUserTitle(titleKey);
+      return titleKey;
+    }
+
+    return false;
+  }
+
+  clearUserData() {
+    this.currentScore = 0;
+    this.stateManager.delete('score');
+    this.stateManager.delete('vin');
+    this.stateManager.delete('title');
+    this.stateManager.delete('paramsIndex');
+
+    this.paramsIndex = Object.keys(GAME_PARAMS)[0];
+
+    this.updateStateView();
+  }
+
+  toVictoryScore(score) {
+
+    if (MathUtils.isNumeric(score))
+      this.currentScore = score;
+
+    let lastTotalScore = this.stateManager.get('score', 0);
+    let newTotalScore = lastTotalScore + this.currentScore;
+
+    this.setState('score', newTotalScore);
+    this.setState('vin', this.stateManager.get('vin', 0) + 1);
+
+    this.showVictoryModal(lastTotalScore, newTotalScore, this.updateUserTitle());
+    this.disableControls();
+    this.nextGameIndex();
+  }
+
   Victory() {
       this.calculateScore();
-      this.showVictoryModal();
-      this.disableControls();
-      this.nextGameIndex();
+      this.toVictoryScore(this.currentScore);
   }
 
   nextGameIndex() {
@@ -257,7 +351,7 @@ class Game {
   }
 
   setGameIndex(value) {
-    this.paramsIndex = value;
+    this.paramsIndex = GAME_PARAMS[value] ? value : Object.keys(GAME_PARAMS)[0];
     this.stateManager.set('paramsIndex', this.paramsIndex);
     this.loadLevelTextures();
   }
@@ -402,7 +496,7 @@ class Game {
     }
   }
   
-  showVictoryModal() {
+  showVictoryModal(lastScore, newScore, newTitle) {
     // Обновляем статистику в модальном окне победы
     const victoryBounceElement = $('victoryBounceCount');
     const victoryScoreElement = $('victoryScore');
@@ -417,14 +511,19 @@ class Game {
     setTimeout(()=>{
       victoryRestartBtn.disabled = false;
     }, 3000);
+
+    let newTitleElem = this.victoryModalElement.querySelectorAll('.new-title')[0];
+    if (newTitle) {
+      newTitleElem.innerHTML = 'Вам присвоено новое звание: ' + USER_TITLES[newTitle].name + 
+    `!<div class="title-image ${newTitle}"></div>`;
+      newTitleElem.style.display = 'block';
+    } else newTitleElem.style.display = 'none';
     
     // Показываем модальное окно
-    if (this.victoryModal) {
-      this.victoryModal.show();
-    }
+    this.victoryModal.show();
 
     victoryScoreElement.textContent = 0;
-    enumerateTo(0, this.currentScore, 2000, (score)=>{
+    enumerateTo(lastScore, newScore, 2000, (score)=>{
       victoryScoreElement.textContent = Math.round(score);
     }, ()=>{
 
@@ -444,6 +543,9 @@ class Game {
   
   showPauseModal() {
     if (this.pauseModal) {
+
+      this.pauseModalElement.querySelectorAll('.title-image')[0]
+        .classList.add(this.stateManager.get('title'), Object.keys(USER_TITLES)[0]);
       this.pauseModal.show();
     }
   }
@@ -512,6 +614,11 @@ class Game {
     }
 
     this.cameraController.begin();
+
+    this.gameHint.classList.add('show');
+    setTimeout(()=>{
+        this.gameHint.classList.remove('show');
+    }, 5000);
   }
   
   updateScoreIndicator() {
@@ -544,15 +651,12 @@ class Game {
   
   init() {
     // Инициализация сцены
-    const scene = this.sceneManager.init();
+    const scene = this.scene;
       
     this.rendererManager = new RendererManager(this.container);
     
     // Инициализация рендерера
     this.rendererManager.init();
-    
-    // Создание освещения
-    this.createLights(scene);
     
     // Создание игровых объектов (но не активируем физику)
     this.createGameObjects();
@@ -571,10 +675,15 @@ class Game {
     console.log('Нажмите M для отключения/включения звука');
 
     this.showStartModal();
+    this.updateStateView();
   }
   
   createGameObjects() {
-    const scene = this.sceneManager.getScene();
+    
+    // Создание освещения
+    this.createLights();
+
+    const scene = this.scene;
     let env = GAME_PARAMS[this.paramsIndex].ENV;
     
     // Создание дерева
@@ -587,13 +696,8 @@ class Game {
     // Создание шарика
     this.ball = new Ball(scene, this.tree);
 
-    this.background = new Background(scene);
-    this.background.init(env.BACKGROUND_IMAGE_PATH, {
-      size: 50,
-      opacity: 1.0,
-      rotation: 0,
-      repeat: { x: 1, y: 1 }
-    });
+    this.background = new Background(this);
+    this.background.init(env.BACKGROUND_IMAGE_PATH);
 
     this.grass = new Grass(scene, this.tree);
     this.grass.init(env.GRASS_IMAGE_PATH);
@@ -611,7 +715,7 @@ class Game {
 
   clearGameObject() {
     // Удаляем все объекты окружения из сцены
-    const scene = this.sceneManager.getScene();
+    const scene = this.scene;
 
     if (this.background) {
       this.background.dispose();
@@ -652,6 +756,8 @@ class Game {
 
     this.clearGameObject();
     this.createGameObjects();
+
+    this.newTitle = null;
     
     // Сброс камеры
     if (this.cameraController)
@@ -676,23 +782,28 @@ class Game {
     this.currentScore = 0;
     this.updateScoreIndicator();
   }
-  
-  createLights(scene) {
+
+  clearLights() {
     // Очищаем старые источники света
     this.lights.forEach(light => {
       if (light.parent) {
-        scene.remove(light);
+        this.scene.remove(light);
       }
     });
     this.lights = [];
+  }
+  
+  createLights() {
 
+    this.clearLights();
     let env = GAME_PARAMS[this.paramsIndex].ENV;
 
-    scene.background = new THREE.Color(env.BACKGROUND_COLOR);
-    scene.fog = new THREE.Fog(env.BACKGROUND_COLOR, 12, 28);
+    this.scene.background = new THREE.Color(env.BACKGROUND_COLOR);
+    let distance = 11;
+    this.scene.fog = new THREE.Fog(env.BACKGROUND_COLOR, distance, distance * 2);
     
     const ambient = new THREE.AmbientLight(env.AMBIENT_LIGHT_COLOR, env.AMBIENT_LIGHT_INTENSITY);
-    scene.add(ambient);
+    this.scene.add(ambient);
     this.lights.push(ambient);
     
     const keyLight = new THREE.DirectionalLight(env.KEY_LIGHT_COLOR, env.KEY_LIGHT_INTENSITY);
@@ -706,17 +817,17 @@ class Game {
     keyLight.shadow.camera.top = 20;
     keyLight.shadow.camera.bottom = -20;
     keyLight.shadow.bias = 0;
-    scene.add(keyLight);
+    this.scene.add(keyLight);
     this.lights.push(keyLight);
     
     const fillLight = new THREE.DirectionalLight(env.FILL_LIGHT_COLOR, env.FILL_LIGHT_INTENSITY);
     fillLight.position.set(-3, 2, 3);
-    scene.add(fillLight);
+    this.scene.add(fillLight);
     this.lights.push(fillLight);
     
     const rimLight = new THREE.PointLight(env.RIM_LIGHT_COLOR, env.RIM_LIGHT_INTENSITY, RIM_LIGHT_DISTANCE);
     rimLight.position.set(-2, -1, 4);
-    scene.add(rimLight);
+    this.scene.add(rimLight);
     this.lights.push(rimLight);
   }
   
@@ -793,8 +904,8 @@ class Game {
       }
       
       // Рендеринг (всегда, чтобы видеть сцену)
-      if (this.sceneManager.getScene() && this.cameraController) {
-        this.rendererManager.render(this.sceneManager.getScene(), this.cameraController.getCamera());
+      if (this.scene && this.cameraController) {
+        this.rendererManager.render(this.scene, this.cameraController.getCamera());
       }
 
     }
@@ -811,7 +922,7 @@ class Game {
     
     // Создаем кристалл на вершине дерева
     this.crystal = new Crystal(
-      this.sceneManager.getScene(),
+      this.scene,
       this.tree
     );
     this.crystal.init();

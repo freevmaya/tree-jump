@@ -58,18 +58,69 @@ body {
   display: none;
 }
 
-.game-top {
+.game-bottom, .game-top {
   position: absolute;
+  z-index: 1;
+  background-size: contain;
+}
+
+.s-view {
+  width: 88px;
+  height: 64px;
+  background-image: url(images/s-view.png);
+  display: flex;
+  flex-direction: column;
+}
+
+.s-view .status {
+  font-size: 18px;
+}
+
+.s-view .value {
+  font-size: 18px;
+  text-align: center;
+  text-shadow: 0 0 3px #000000ad;
+}
+
+.game-bottom > div {
+  display: flex;
+}
+
+.game-bottom {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background-image: url(images/game-bottom-center.png);
+  background-position-x: 44px;
+  pointer-events: none;
+  background-repeat: repeat-x;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+}
+
+.game-bottom .left {
+  background-image: url(images/game-bottom-left.png);
+  width: 44px;
+  height: 70px;
+}
+
+.game-bottom .right {
+  background-image: url(images/game-bottom-right.png);
+  width: 43px;
+  height: 70px;
+}
+
+.game-top {
   top: 0;
   left: 0;
   right: 0;
   height: max(150px, 10dvw);
   background-image: url(images/game-top.png);
-  z-index: 1;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position-y: top;
   pointer-events: none;
+  background-position-y: top;
+  background-repeat: no-repeat;
 }
 
 /* Верхний блок с игрой (85%) */
@@ -148,10 +199,9 @@ canvas {
   z-index: 1003;
 }
 
-/* Подсказка внизу экрана */
 .hint {
   position: fixed;
-  bottom: calc(5vh + 20px);
+  bottom: calc(5vh + 30px);
   left: 50%;
   transform: translateX(-50%);
   color: black;
@@ -166,6 +216,12 @@ canvas {
   border: 1px solid rgba(255, 255, 255, 0.3);
   white-space: nowrap;
   z-index: 100;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.show.hint {
+  opacity: 1;
 }
 
 .modal-open .hint {
@@ -354,7 +410,14 @@ canvas {
 .status {
   font-size: 26px;
   text-align: center;
-  text-shadow: 2px 2px 3px #000000c4;
+  text-shadow: 2px 2px 2px #000000c4;
+  color: #efd654;
+}
+
+@media (max-width: 420px) {
+  .status {
+    font-size: 20px;
+  }
 }
 
 .victory-footer {
@@ -443,4 +506,33 @@ canvas {
 .score-indicator i {
   color: gold;
   margin-right: 8px;
+}
+
+.title-image {
+  width: 120px;
+  height: 144px;
+  position: relative;
+  background-repeat: no-repeat;
+  background-size: contain;
+  margin: auto;
+}
+
+.Novice {
+  background-image: url(images/Novice.png);
+}
+
+.Warrior {
+  background-image: url(images/Warrior.png);
+}
+
+.Knight {
+  background-image: url(images/Knight.png);
+}
+
+.Lord {
+  background-image: url(images/Lord.png);
+}
+
+.Legend {
+  background-image: url(images/Legend.png);
 }

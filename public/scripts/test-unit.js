@@ -10,6 +10,7 @@ import {
   RESET_POSITION_Z, RESET_VELOCITY_Y, CAMERA_START_Y,
   BACKGROUND_IMAGE_PATH, GRASS_IMAGE_PATH, GAME_PARAMS, START_GAME
 } from './constants.js';
+import { MathUtils } from './utils/MathUtils.js';
 
 function VictoryTest() {
 
@@ -42,7 +43,36 @@ function MoreKiller() {
 	GAME_PARAMS[START_GAME].TREE.KILLER_DENSITY = 0.5;
 }
 
+function NextLevelSupport() {
+	document.addEventListener('keydown', (event) => {
+	  if (event.key === 'n' || event.key === 'N') {
+	    
+	    window.game.NextLevel();
+	  }
+	});
+}
+
+function DevKeySupport() {
+	document.addEventListener('keydown', (event) => {
+	  if (event.key === 'v' || event.key === 'V') {
+	    
+	    window.game.toVictoryScore(Math.round(Math.random() * 100) + 100);
+	  } else if (event.key === 'c' || event.key === 'C') {
+	    
+	    window.game.clearUserData();
+	  } else if (MathUtils.isNumeric(event.key)) {
+	  	let keys = Object.keys(GAME_PARAMS);
+
+	  	let level = (event.key - 1) % keys.length;
+	  	window.game.GoToLevel(keys[level]);
+	  }
+	});
+}
+
 //VictoryTest();
 //sparkTest();
 
 //MoreKiller();
+
+NextLevelSupport();
+DevKeySupport();

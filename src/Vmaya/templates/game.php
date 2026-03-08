@@ -10,6 +10,26 @@
       <div class="game-top">
         <div id="game-title" class="status"></div>
       </div>
+      <div class="game-bottom">
+        <div class="left">
+        </div>
+        <div>
+          <div class="s-view" id="state-score">
+            <div class="status">Счет</div>
+            <div class="value">123</div>
+          </div>
+          <div class="s-view" id="state-vin">
+            <div class="status">Поб.</div>
+            <div class="value">123</div>
+          </div>
+          <div class="s-view" id="state-title">
+            <div class="status">Зван.</div>
+            <div class="value">Рекрут</div>
+          </div>
+        </div>
+        <div class="right">
+        </div>
+      </div>
       <div class="hint" id="game-hint">
         <i class="bi bi-mouse"></i> Нажмите и тяните, чтобы вращать дерево
       </div>
@@ -106,6 +126,7 @@
               <p class="modal-subtitle status">
                 Вы достигли вершины дерева!
               </p>
+              <p class="new-title status"></p>
               <!-- Статистика игры -->
               <div class="stats-container victory-stats" id="victoryState">
                 <div class="row">
@@ -146,6 +167,8 @@
           <div class="middle">
             <div class="dialog-content">
               <p class="status">Игра приостановлена</p>
+              <p>Ваше текущее звание:</p>
+              <div class="title-image"></div>
               <div class="text-center">
                 <button type="button" class="btn" id="resumeButton">Продолжить</button>
                 <button type="button" class="btn" id="pauseRestartButton">Новая игра</button>

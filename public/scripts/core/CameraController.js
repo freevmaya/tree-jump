@@ -25,7 +25,15 @@ export class CameraController {
   }
 
   reset() {
-    this.camera.position.set(1, CAMERA_HEIGHT_OFFSET - this.game.tree.half_height, 12);
+    if (this.game.tree)
+      this.camera.position.set(0, CAMERA_HEIGHT_OFFSET - this.game.tree.half_height, 12);
+    this.camera.lookAt(0, this.camera.position.y, 0);
+  }
+
+  getLookDirection() {
+    let direction = new THREE.Vector3();
+    this.camera.getWorldDirection(direction);
+    return direction;
   }
   
   update(targetY) {
@@ -39,6 +47,10 @@ export class CameraController {
   
   setPosition(x, y, z) {
     this.camera.position.set(x, y, z);
+  }
+
+  getPosition() {
+    return this.camera.position.clone();
   }
   
   getCamera() {

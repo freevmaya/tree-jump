@@ -314,9 +314,9 @@ export class Tree {
       let platform;
 
       if (killerPlatform[i])
-        platform = new KillerPlatform(this, theta, y, false, 0.1 * (Math.random() > 0.5 ? 1 : -1));
+        platform = new KillerPlatform(this, theta, y, false, this.options.PLATFORM_SPEED * (Math.random() > 0.5 ? 1 : -1));
       else if (rotatePlatform[i])
-        platform = new RotatePlatform(this, theta, y, false, 0.3 * (Math.random() > 0.5 ? 1 : -1));
+        platform = new RotatePlatform(this, theta, y, false, this.options.PLATFORM_SPEED * (Math.random() > 0.5 ? 1 : -1));
       else {
         platform = new Platform(this, theta, y, false);
       

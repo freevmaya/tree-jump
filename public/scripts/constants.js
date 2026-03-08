@@ -40,7 +40,7 @@ export const PLATFORM_COUNT = Math.floor(TREE_HEIGHT * PLATFORM_DENSITY);
 export const PLATFORM_DISTANCE = 1.3;
 
 // Базовая платформа
-export const BASE_PLATFORM_SIZE = 20;
+export const BASE_PLATFORM_SIZE = 40;
 export const BASE_PLATFORM_TOP_Y = -CYLINDER_HALF_HEIGHT;
 
 // Шарик
@@ -97,10 +97,33 @@ export const RESET_VELOCITY_Y = BOUNCE_SPEED;
 export const PLATFORM_NORMAL_COLOR = 0xA67C52; // Используем существующий TREE_COLOR для обычных платформ
 export const PLATFORM_KILLER_COLOR = 0xFF3333; // Ярко-красный для платформ-убийц
 
-export const START_GAME = 'DEFAULT';
+export const USER_TITLES = {
+	Novice: {
+		name: 'Новичок',
+		step: 500
+	},
+	Warrior: {
+		name: 'Боец',
+		step: 500
+	},
+	Knight: {
+		name: 'Паладин',
+		step: 500
+	},
+	Lord: {
+		name: 'Лорд',
+		step: 500
+	},
+	Legend: {
+		name: 'Легенда',
+		step: 500
+	},
+}
+
+export const START_GAME = 'START';
 
 export const GAME_PARAMS = {
-	DEFAULT: 
+	START: 
 		{
 			NAME: 'Ознакомительный',
 			ENV: {
@@ -127,14 +150,15 @@ export const GAME_PARAMS = {
 				PLATFORM_STEP: 1.6,
 				KILLER_DENSITY: 0.1,
 				KILLER_SPEED: 1,
-				PLATFORM_ROTATE_DENSITY: 0.2,
+				PLATFORM_SPEED: 0.1,
+				PLATFORM_ROTATE_DENSITY: 0.1,
 				PLATFORM_RADIUS: { MIN: 0.5, MAX: 0.5 }
 			}
 		},
 	DARK: {
-			NAME: 'Начинаются сложности',
+			NAME: 'Первая ступень',
 			ENV: {
-				BACKGROUND_COLOR: 0x93b1ff,
+				BACKGROUND_COLOR: 0x7a96df,
 				KEY_LIGHT_COLOR: 0xffffff,
 				RIM_LIGHT_COLOR: 0x818cf8,
 				FILL_LIGHT_COLOR: 0x63a188,
@@ -155,14 +179,15 @@ export const GAME_PARAMS = {
 				NEEDLE_TEXTURE_PATH: 'textures/needle.png',
 				TREE_HEIGHT: 20,
 				PLATFORM_STEP: 1.6,
-				KILLER_DENSITY: 0.3,
-				KILLER_SPEED: 1.2,
-				PLATFORM_ROTATE_DENSITY: 0.3,
-				PLATFORM_RADIUS: { MIN: 0.38, MAX: 0.5 }
+				KILLER_DENSITY: 0.2,
+				KILLER_SPEED: 1,
+				PLATFORM_SPEED: 0.15,
+				PLATFORM_ROTATE_DENSITY: 0.25,
+				PLATFORM_RADIUS: { MIN: 0.45, MAX: 0.5 }
 			}
 		},
 	BIRCH: {
-			NAME: 'Придется постараться',
+			NAME: 'Небольшие сложности',
 			ENV: {
 				BACKGROUND_COLOR: 0xBBBBFF,
 				KEY_LIGHT_COLOR: 0xffffff,
@@ -185,9 +210,104 @@ export const GAME_PARAMS = {
 				NEEDLE_TEXTURE_PATH: 'textures/birch-leaves.png',
 				TREE_HEIGHT: 20,
 				PLATFORM_STEP: 1.6,
-				KILLER_DENSITY: 0.7,
+				KILLER_DENSITY: 0.3,
+				KILLER_SPEED: 1.2,
+				PLATFORM_SPEED: 0.2,
+				PLATFORM_ROTATE_DENSITY: 0.3,
+				PLATFORM_RADIUS: { MIN: 0.4, MAX: 0.45 }
+			}
+		},
+	MIDDLE: 
+		{
+			NAME: 'Покажи мастерство',
+			ENV: {
+				BACKGROUND_COLOR: 0xBBBBFF,
+				KEY_LIGHT_COLOR: 0xffffff,
+				RIM_LIGHT_COLOR: 0x818cf8,
+				FILL_LIGHT_COLOR: 0x63a188,
+				BACKGROUND_IMAGE_PATH: 'images/bk1.jpg',
+				GRASS_IMAGE_PATH: 'textures/grass-s.png',
+				GROUND_IMAGE_PATH:'textures/ground.jpg',
+				AMBIENT_LIGHT_INTENSITY: 1,
+				KEY_LIGHT_INTENSITY: 3,
+				FILL_LIGHT_INTENSITY: 2,
+				RIM_LIGHT_INTENSITY: 0.6
+			},
+			TREE: {
+				BARK_TEXTURE_REPEAT: {x: 4, y: 1},
+				BARK_TEXTURE_PATH: 'textures/oak-bark.jpg',
+				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
+				PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
+				KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
+				NEEDLE_TEXTURE_PATH: 'textures/oak-leaves.png',
+				TREE_HEIGHT: 17,
+				PLATFORM_STEP: 1.6,
+				KILLER_DENSITY: 0.35,
+				KILLER_SPEED: 1.4,
+				PLATFORM_SPEED: 0.25,
+				PLATFORM_ROTATE_DENSITY: 0.4,
+				PLATFORM_RADIUS: { MIN: 0.35, MAX: 0.45 }
+			}
+		},
+	DIFICULT: {
+			NAME: 'Стой на своем!',
+			ENV: {
+				BACKGROUND_COLOR: 0x7a96df,
+				KEY_LIGHT_COLOR: 0xffffff,
+				RIM_LIGHT_COLOR: 0x818cf8,
+				FILL_LIGHT_COLOR: 0x63a188,
+				BACKGROUND_IMAGE_PATH: 'images/dark-bg.jpg',
+				GRASS_IMAGE_PATH: 'textures/grass-s.png',
+				GROUND_IMAGE_PATH:'textures/ground.jpg',
+				AMBIENT_LIGHT_INTENSITY: 1,
+				KEY_LIGHT_INTENSITY: 3,
+				FILL_LIGHT_INTENSITY: 2,
+				RIM_LIGHT_INTENSITY: 0.6
+			},
+			TREE: {
+				BARK_TEXTURE_REPEAT: {x: 2, y: 1},
+				BARK_TEXTURE_PATH: 'textures/pine-bark.jpg',
+				BARK_NORMAL_PATH: 'textures/bark-normal.jpg',
+				PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
+				KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
+				NEEDLE_TEXTURE_PATH: 'textures/needle.png',
+				TREE_HEIGHT: 20,
+				PLATFORM_STEP: 1.6,
+				KILLER_DENSITY: 0.4,
 				KILLER_SPEED: 1.5,
+				PLATFORM_SPEED: 0.3,
 				PLATFORM_ROTATE_DENSITY: 0.5,
+				PLATFORM_RADIUS: { MIN: 0.3, MAX: 0.4 }
+			}
+		},
+	NIGHTMARE: {
+			NAME: 'Кошмар',
+			ENV: {
+				BACKGROUND_COLOR: 0xBBBBFF,
+				KEY_LIGHT_COLOR: 0xffffff,
+				RIM_LIGHT_COLOR: 0x818cf8,
+				FILL_LIGHT_COLOR: 0x63a188,
+				BACKGROUND_IMAGE_PATH: 'images/bk1.jpg',
+				GRASS_IMAGE_PATH: 'textures/grass-s.png',
+				GROUND_IMAGE_PATH:'textures/ground.jpg',
+				AMBIENT_LIGHT_INTENSITY: 0.5,
+				KEY_LIGHT_INTENSITY: 3,
+				FILL_LIGHT_INTENSITY: 2,
+				RIM_LIGHT_INTENSITY: 0.6
+			},
+			TREE: {
+				BARK_TEXTURE_REPEAT: {x: 2, y: 1},
+				BARK_TEXTURE_PATH: 'textures/birch.jfif',
+				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
+				PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
+				KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
+				NEEDLE_TEXTURE_PATH: 'textures/birch-leaves.png',
+				TREE_HEIGHT: 25,
+				PLATFORM_STEP: 1.65,
+				KILLER_DENSITY: 0.7,
+				KILLER_SPEED: 1.6,
+				PLATFORM_SPEED: 0.35,
+				PLATFORM_ROTATE_DENSITY: 0.7,
 				PLATFORM_RADIUS: { MIN: 0.3, MAX: 0.4 }
 			}
 		}

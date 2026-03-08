@@ -16,8 +16,20 @@ export class MathUtils {
   static degreesToRadians(degrees) {
     return degrees * Math.PI / 180;
   }
+
+  static isNumeric(v) {
+    if (typeof(v) == "number") return true;
+    return !isNaN(v) && !isNaN(parseFloat(v));
+  }
   
   static radiansToDegrees(radians) {
     return radians * 180 / Math.PI;
+  }
+
+  static getOffset(length, angle) {
+    return {
+      x: length * Math.cos(angle),
+      y: length * Math.sin(angle)
+    };
   }
 }

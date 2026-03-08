@@ -72,6 +72,11 @@ export class StateManager {
         this.saveState();
     }
 
+    delete(name) {
+        delete(this.state[name]);
+        this.saveState();
+    }
+
     getHash() {
         return CryptoJS.MD5(JSON.stringify(this.state)).toString();
     }

@@ -1,5 +1,5 @@
 
-import { getOffset } from '../utils/Utils.js';
+import { MathUtils } from '../utils/MathUtils.js';
 
 export class SparkEffect {
   constructor(options = {}) {
@@ -41,7 +41,7 @@ export class SparkEffect {
     const speed = this.speeds[0] + Math.random() * (this.speeds[1] - this.speeds[0]);
     
     // Начальная позиция - в центре
-    let offset = getOffset(this.baseRadius, angle);
+    let offset = MathUtils.getOffset(this.baseRadius, angle);
     const startX = this.x + offset.x;
     const startY = this.y + offset.y;
     

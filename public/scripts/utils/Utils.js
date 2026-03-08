@@ -45,13 +45,6 @@ export function enumerateTo(fromNum, toNum, totalTime, callback, finishCallBack 
   }, tik);
 }
 
-export function getOffset(length, angle) {
-  return {
-    x: length * Math.cos(angle),
-    y: length * Math.sin(angle)
-  };
-}
-
 export function sawToSine(x, t = 0.5) {
   // Нормализуем t от 0 до 1
   t = Math.max(0, Math.min(1, t));

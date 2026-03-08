@@ -38,16 +38,6 @@
 			}).bind(this));
 	</script>
 
-	<!-- Bootstrap & jQuery -->
-    <script src="scripts/jquery-3.7.0.min.js"></script>
-    <script src="scripts/bootstrap.bundle.min.js"></script>
-	<script src="scripts/crypto-js.min.js"></script>
-
-	<script src="scripts/component.js<?=$v?>"></script>
-	<script src="scripts/main.js<?=$v?>"></script>
-	<script src="scripts/user-app.js<?=$v?>" defer></script>
-	<script src="scripts/advice-modal.js<?=$v?>"></script>
-
     <?if ($vkok) {?>
 		<script src="scripts/vkapp.js<?=$v?>" defer></script>
 
@@ -58,9 +48,6 @@
 			<?}?>
 			$(window).ready(()=>{
 				vkApp = new VKApp(<?=VK_APP_ID?>, <?=$source_user_id?>, '<?=$source?>', <?=json_encode($phrases)?>);
-				<?if ($new_user) {?>
-				showAdvices();
-				<?}?>
 			});
 		</script>
     <?}?>
@@ -73,44 +60,8 @@
 	<?}?>
 	</script>
 	<?include('ya-mertika.php');?>
-    <?include('gtag.php');?>
 </head>
 <body class="theme vkok">
-	<div class="loader">
-		<div class="spinner-border" role="status">
-		</div>
-	</div>
-	<div class="page">
-		<div class="wrap-content">
-			<!-- Header -->
-			<header class="text-center mb-1">
-			    <h1 class="display-4 text-gradient app-name">
-			        <i class="bi bi-translate text-primary"></i>
-			        <?=Lang('app_name');?>
-			    </h1>
-			</header>
-			<?=$content?>
-
-			<!-- Footer -->
-			<footer class="mt-2 pt-2 border-top border-secondary text-center text-muted">
-			    <p class="small">
-			        <?=SITE_NAME?> v<?php echo APP_VERSION; ?> | <a class="link" onclick="showAdvices()"><?=Lang('help')?></a> | <a class="link" href="https://vk.com/club235452440"><?=Lang('group')?></a>
-			    </p>
-			</footer>
-		</div>
-	    <?include('message.php')?>
-	    <?include('confirm.php')?>
-		<script type="text/javascript">
-		    window.stateManager = new StateManager({
-		        use_server: <?=Page::getSession('user_id', false) ? 'true' : 'false'?>
-		    });
-		</script>
-
-		<?if ($is_developer) {?>
-		<!-- Eruda is console for mobile browsers-->
-		<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-		<script>eruda.init();</script>
-		<?}?>
-	</div>
+	<?=$content?>
 </body>
 </html>

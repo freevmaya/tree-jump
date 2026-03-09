@@ -110,7 +110,6 @@ class Vkok extends Page {
 
 	    if ($user_id) {
 			$is_developer = Page::isDev();
-			$phrases = (new UserPhrasesModel())->getPhrasesAsJsonWithDifficulty($user_id);
 			$content = $this->getContent(DEFAULTPAGE);
 			include($templatePath);
 		} else Page::Wrong();

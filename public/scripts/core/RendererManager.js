@@ -23,8 +23,9 @@ class RendererManager {
   }
   
   resize() {
-    this.width = this.container.clientWidth;
-    this.height = this.container.clientHeight;
+    let game_container = $('#game-container');
+    this.width = game_container.width();
+    this.height = game_container.height();
     this.renderer.setSize(this.width, this.height);
   }
   

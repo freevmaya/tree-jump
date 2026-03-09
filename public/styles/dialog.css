@@ -47,14 +47,6 @@
   }
 }
 
-.modal {
-  overflow: hidden;
-  background: radial-gradient(circle at top left, #7ed4e3, #223100);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
 .modal .modal-dialog {
   animation: bounce 1s ease-out;
   margin: auto;
@@ -157,17 +149,5 @@
     width: var(--bs-modal-width);
     scale: calc(100dvw / var(--bs-modal-width));
     margin-left: calc((100dvw - var(--bs-modal-width)) / 2);
-  }
-}
-
-@media (min-aspect-ratio: 1/1) {
-  .modal {
-    background-image: url(dialog/background-512.jpg);
-  }
-}
-
-@media (max-aspect-ratio: 1/1) {
-  .modal {
-    background-image: url(dialog/background-23-512.jpg);
   }
 }

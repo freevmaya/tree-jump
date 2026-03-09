@@ -150,7 +150,7 @@ class Game {
     try {
       console.log('Загрузка звуков...');
       await this.soundManager.loadAllSounds();
-      this.soundsLoaded = true;setGameIndex
+      this.soundsLoaded = true;
       console.log('Звуки успешно загружены');
     } catch (error) {
       console.warn('Ошибка загрузки звуков:', error);

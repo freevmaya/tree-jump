@@ -4,12 +4,16 @@ class CameraController {
 
   constructor(game) {
 
-    this.targetFocus = game.rendererManager.renderer.domElement.clientWidth < 500 ? 70 : 50;
+    this.targetFocus = this.calcTargetFocus();
     this.game = game;
     this.camera = new THREE.PerspectiveCamera(this.targetFocus, this.game.rendererManager.getAspectRatio(), 0.1, 100);
     this.targetY = 0;
     this.followSpeed = CAMERA_FOLLOW_SPEED;
     this.heightOffset = CAMERA_HEIGHT_OFFSET;
+  }
+
+  calcTargetFocus() {
+    return game.rendererManager.renderer.domElement.clientWidth < 500 ? 80 : 60;
   }
 
   setFocus(f) {
@@ -18,6 +22,8 @@ class CameraController {
   }
 
   begin() {
+
+    this.targetFocus = this.calcTargetFocus();
     this.camera.fov = this.targetFocus * 1.5;
   }
 

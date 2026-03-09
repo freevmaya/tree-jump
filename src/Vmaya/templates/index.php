@@ -14,12 +14,11 @@
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="./styles/main.css?v=<?=$v?>">
-  <link rel="stylesheet" href="./styles/dialog.css?v=<?=$v?>">
+  <link rel="stylesheet" href="<?=BASEURL?>/styles/main.css?v=<?=$v?>">
+  <link rel="stylesheet" href="<?=BASEURL?>/styles/dialog.css?v=<?=$v?>">
   <script type="text/javascript" src="<?=SCRIPTURL?>jquery-4.0.0.min.js"></script>
   <script type="text/javascript">
     var DEV = <?=DEV ? 'true' : 'false'?>;
-    window.SCRIPTS_VERSION = <?=SCRIPTS_VERSION?>;
   </script>
 </head>
 <body>

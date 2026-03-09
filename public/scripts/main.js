@@ -409,9 +409,11 @@ class Game {
       const victoryRestartBtn = $('#victoryRestartButton');
       if (victoryRestartBtn) {
         victoryRestartBtn.on('click', () => {
-          this.hideVictoryModal();
-          this.nextGameIndex();
-          this.resetGame();
+          this.nextGameIndex()
+            .then(()=>{
+              this.hideVictoryModal();
+              this.resetGame();
+            });
         });
       }
       
@@ -731,6 +733,7 @@ class Game {
   resetGame() {
     console.log("Сброс игры...");
 
+    this.hideScoreIndicator();
     this.clearGameObject();
     this.createGameObjects();
 

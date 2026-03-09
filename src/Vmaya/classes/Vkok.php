@@ -10,7 +10,7 @@ class Vkok extends Page {
 	}
 
 	protected function RenderIndex($templatePath) {
-		GLOBAL $dbp;
+		GLOBAL $dbp, $_SESSION;
 
 		$v 			= '?v='.SCRIPTS_VERSION;
 		$userModel 	= new UserModel();
@@ -107,6 +107,8 @@ class Vkok extends Page {
 	    	
 	    	Page::setSession('user_id', $user_id);
 	    }
+
+	    trace($_SESSION);
 
 	    if ($user_id) {
 			$is_developer = Page::isDev();

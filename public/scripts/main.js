@@ -81,7 +81,7 @@ class Game {
     // Загрузка звуков
     this.initAudio();
 
-    if (!DEV)
+    if (typeof DEV == 'undefined')
       $(window).on('blur', () => {
         if (this.gameState.isPlaying())
           this.gameState.pause();

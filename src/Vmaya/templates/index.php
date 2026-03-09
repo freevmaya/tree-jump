@@ -16,6 +16,7 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="./styles/main.css?v=<?=$v?>">
   <link rel="stylesheet" href="./styles/dialog.css?v=<?=$v?>">
+  <script type="text/javascript" src="<?=SCRIPTURL?>jquery-4.0.0.min.js"></script>
   <script type="text/javascript">
     var DEV = <?=DEV ? 'true' : 'false'?>;
     window.SCRIPTS_VERSION = <?=SCRIPTS_VERSION?>;

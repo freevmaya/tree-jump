@@ -1,12 +1,11 @@
 // scripts/core/RendererManager.js
-import * as THREE from 'three';
 
-export class RendererManager {
+class RendererManager {
   constructor(container) {
     this.container = container;
     this.renderer = null;
-    this.width = container.clientWidth;
-    this.height = container.clientHeight;
+    this.width = container.width();
+    this.height = container.height();
   }
   
   init() {
@@ -19,7 +18,7 @@ export class RendererManager {
     this.renderer.toneMappingExposure = 1.0;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     
-    this.container.appendChild(this.renderer.domElement);
+    this.container.append(this.renderer.domElement);
     return this.renderer;
   }
   

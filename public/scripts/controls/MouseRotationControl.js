@@ -1,9 +1,8 @@
 // scripts/controls/MouseRotationControl.js
-import { ROTATION_SPEED, INERTIA } from '../constants.js';
 
-export class MouseRotationControl {
-  constructor(tree, container) {
-    this.tree = tree;
+class MouseRotationControl {
+  constructor(game, container) {
+    this.game = game;
     this.container = container;
     this.isDragging = false;
     this.previousX = 0;
@@ -26,36 +25,36 @@ export class MouseRotationControl {
   
   init() {
     // События мыши
-    this.container.addEventListener('mousedown', this.onMouseDown);
+    this.container[0].addEventListener('mousedown', this.onMouseDown);
     window.addEventListener('mousemove', this.onMouseMove);
     window.addEventListener('mouseup', this.onMouseUp);
     window.addEventListener('mouseleave', this.onMouseLeave);
     
     // События тачскрина
-    this.container.addEventListener('touchstart', this.onTouchStart, { passive: false });
+    this.container[0].addEventListener('touchstart', this.onTouchStart, { passive: false });
     window.addEventListener('touchmove', this.onTouchMove, { passive: false });
     window.addEventListener('touchend', this.onTouchEnd);
     window.addEventListener('touchcancel', this.onTouchCancel);
     
     // Запрещаем скролл страницы при касании canvas
-    this.container.style.touchAction = 'none';
+    this.container.css('touchAction', 'none');
   }
   
   destroy() {
     // Удаляем события мыши
-    this.container.removeEventListener('mousedown', this.onMouseDown);
+    this.container[0].removeEventListener('mousedown', this.onMouseDown);
     window.removeEventListener('mousemove', this.onMouseMove);
     window.removeEventListener('mouseup', this.onMouseUp);
     window.removeEventListener('mouseleave', this.onMouseLeave);
     
     // Удаляем события тачскрина
-    this.container.removeEventListener('touchstart', this.onTouchStart);
+    this.container[0].removeEventListener('touchstart', this.onTouchStart);
     window.removeEventListener('touchmove', this.onTouchMove);
     window.removeEventListener('touchend', this.onTouchEnd);
     window.removeEventListener('touchcancel', this.onTouchCancel);
     
     // Возвращаем стандартное поведение
-    this.container.style.touchAction = '';
+    this.container.css('touchAction', '');
   }
   
   // Обработчики для мыши
@@ -108,7 +107,7 @@ export class MouseRotationControl {
   drag(currentX) {
     const dx = currentX - this.previousX;
     this.velocityY = dx * this.rotationSpeed;
-    this.tree.rotate(this.velocityY);
+    this.game.tree.rotate(this.velocityY);
     this.previousX = currentX;
   }
   
@@ -120,7 +119,7 @@ export class MouseRotationControl {
     if (!this.isDragging) {
       this.velocityY *= this.inertia;
       if (Math.abs(this.velocityY) > 0.0001) {
-        this.tree.rotate(this.velocityY);
+        this.game.tree.rotate(this.velocityY);
       }
     }
   }

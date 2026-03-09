@@ -1,5 +1,7 @@
 // scripts/utils/EventEmitter.js
-export class EventEmitter {
+
+
+class EventEmitter {
   constructor() {
     this.events = {};
   }
@@ -24,4 +26,4 @@ export class EventEmitter {
 }
 
 // Глобальный экземпляр шины событий
-export const eventBus = new EventEmitter();
+const eventBus = new EventEmitter();

@@ -1,12 +1,6 @@
 // scripts/models/Grass.js
-import * as THREE from 'three';
-import { textureLoader } from '../utils/TextureLoader.js';
-import {
-  MAIN_RADIUS,
-  GRASS_IMAGE_PATH
-} from '../constants.js';
 
-export class Grass {
+class Grass {
   constructor(scene, tree) {
     this.scene = scene;
     this.tree = tree;

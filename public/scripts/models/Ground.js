@@ -1,12 +1,6 @@
 // scripts/models/Ground.js
-import * as THREE from 'three';
-import { textureLoader } from '../utils/TextureLoader.js';
-import { 
-  BASE_PLATFORM_SIZE,
-  GROUND_IMAGE_PATH
-} from '../constants.js';
 
-export class Ground {
+class Ground {
   constructor(scene, tree) {
     this.scene = scene;
     this.tree = tree;

@@ -1,17 +1,3 @@
-
-import { SparkEffect } from './effects/SparkEffect.js';
-
-import { 
-  GRAVITY, BASE_PLATFORM_SIZE, AMBIENT_LIGHT_COLOR, AMBIENT_LIGHT_INTENSITY,
-  KEY_LIGHT_COLOR, KEY_LIGHT_INTENSITY, FILL_LIGHT_COLOR,
-  FILL_LIGHT_INTENSITY, RIM_LIGHT_COLOR, RIM_LIGHT_INTENSITY,
-  RIM_LIGHT_DISTANCE, TREE_HEIGHT, MAIN_RADIUS,
-  GAME_OVER_Y_OFFSET, RESET_POSITION_X, RESET_POSITION_Y,
-  RESET_POSITION_Z, RESET_VELOCITY_Y, CAMERA_START_Y,
-  BACKGROUND_IMAGE_PATH, GRASS_IMAGE_PATH, GAME_PARAMS, START_GAME
-} from './constants.js';
-import { MathUtils } from './utils/MathUtils.js';
-
 function VictoryTest() {
 
 	setTimeout(()=>{
@@ -25,7 +11,7 @@ function VictoryTest() {
 }
 
 function sparkTest() {
-	document.addEventListener('click', (e) => {
+	$(document).on('click', (e) => {
 	  new SparkEffect({
 	    x: e.clientX,
 	    y: e.clientY,
@@ -44,7 +30,7 @@ function MoreKiller() {
 }
 
 function NextLevelSupport() {
-	document.addEventListener('keydown', (event) => {
+	$(document).on('keydown', (event) => {
 	  if (event.key === 'n' || event.key === 'N') {
 	    
 	    window.game.NextLevel();
@@ -53,18 +39,26 @@ function NextLevelSupport() {
 }
 
 function DevKeySupport() {
-	document.addEventListener('keydown', (event) => {
-	  if (event.key === 'v' || event.key === 'V') {
+	$(document).on('keydown', (event) => {
+	  if (event.key === 'f' || event.key === 'F') {
+	  	
+	    window.game.gameState.set(GAME_STATE.GAME_OVER);
+
+	  } else if (event.key === 'v' || event.key === 'V') {
 	    
-	    window.game.toVictoryScore(Math.round(Math.random() * 100) + 100);
+	    window.game.ball.bounceCount = 20;
+	    window.game.gameState.set(GAME_STATE.VICTORY);
+
 	  } else if (event.key === 'c' || event.key === 'C') {
 	    
 	    window.game.clearUserData();
-	  } else if (MathUtils.isNumeric(event.key)) {
-	  	let keys = Object.keys(GAME_PARAMS);
 
+	  } else if (MathUtils.isNumeric(event.key)) {
+
+	  	let keys = Object.keys(GAME_PARAMS);
 	  	let level = (event.key - 1) % keys.length;
 	  	window.game.GoToLevel(keys[level]);
+
 	  }
 	});
 }

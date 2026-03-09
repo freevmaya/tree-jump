@@ -1,13 +1,6 @@
 // scripts/physics/BallPhysics.js
-import * as THREE from 'three';
-import { 
-  BALL_RADIUS, PLATFORM_HEIGHT, GRAVITY, BOUNCE_SPEED, MAX_VELOCITY,
-  MAIN_RADIUS, TREE_HEIGHT, CYLINDER_HALF_HEIGHT
-} from '../constants.js';
-import { GameState, GAME_STATE } from '../GameState.js';
-import { eventBus } from '../utils/EventEmitter.js';
 
-export class BallPhysics {
+class BallPhysics {
   constructor(ball, tree, gameState) {
     this.ball = ball;
     this.tree = tree;

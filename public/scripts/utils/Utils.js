@@ -1,4 +1,4 @@
-export function When(conditionFn, timeout = 5000) {
+function When(conditionFn, timeout = 5000) {
   return new Promise((resolve, reject) => {
     const startTime = Date.now();
     
@@ -14,7 +14,7 @@ export function When(conditionFn, timeout = 5000) {
   });
 }
 
-export function randomArray(length, density) {
+function randomArray(length, density) {
   const result = new Array(length).fill(0);
   const onesCount = Math.floor(length * density);
   
@@ -30,7 +30,7 @@ export function randomArray(length, density) {
   return result;
 }
 
-export function enumerateTo(fromNum, toNum, totalTime, callback, finishCallBack = null) {
+function enumerateTo(fromNum, toNum, totalTime, callback, finishCallBack = null) {
   let tik = 60;
   let tcount = Math.ceil(totalTime / tik);
   let i = 0;
@@ -45,7 +45,7 @@ export function enumerateTo(fromNum, toNum, totalTime, callback, finishCallBack 
   }, tik);
 }
 
-export function sawToSine(x, t = 0.5) {
+function sawToSine(x, t = 0.5) {
   // Нормализуем t от 0 до 1
   t = Math.max(0, Math.min(1, t));
   const saw = 2 * (x / (2 * Math.PI) - Math.floor(0.5 + x / (2 * Math.PI)));
@@ -53,11 +53,7 @@ export function sawToSine(x, t = 0.5) {
   return (1 - t) * saw + t * sine;
 }
 
-export var $ = (id) => {
-  return document.getElementById(id);
-}
-
-export function debounce(func, wait, start = null) {
+function debounce(func, wait, start = null) {
     var timeout;
     return function() {
         var context = this, args = arguments;
@@ -69,14 +65,14 @@ export function debounce(func, wait, start = null) {
     };
 }
 
-export function getClassName(obj) { 
+function getClassName(obj) { 
    var funcNameRegex = /function (.{1,})\(/;
    var results = (funcNameRegex).exec((obj).constructor.toString());
    return (results && results.length > 1) ? results[1] : "";
 };
 
 
-export async function Ajax(params, after = null, userData = null) {
+async function Ajax(params, after = null, userData = null) {
 
     var formData;
     if (getClassName(params) == 'FormData') 
@@ -133,4 +129,51 @@ export async function Ajax(params, after = null, userData = null) {
     }
     if (after != null) after(result, serverTime, userData);
     return result;
+}
+
+function onAllImagesLoaded(callback, includeCSS = true, includeImg = true) {
+  const promises = [];
+  
+  // Ждем загрузки тегов <img>
+  if (includeImg) {
+    document.querySelectorAll('img').forEach(img => {
+      if (!img.complete) {
+        promises.push(new Promise(resolve => {
+          img.onload = img.onerror = resolve;
+        }));
+      }
+    });
+  }
+  
+  // Ждем загрузки CSS фонов
+  if (includeCSS) {
+    const bgImages = new Set();
+    
+    document.querySelectorAll('*').forEach(el => {
+      const style = window.getComputedStyle(el);
+      const bgImage = style.backgroundImage;
+      
+      if (bgImage && bgImage !== 'none') {
+        const matches = bgImage.match(/url\(["']?([^"')]+)["']?\)/g);
+        if (matches) {
+          matches.forEach(match => {
+            const url = match.replace(/url\(["']?|["']?\)/g, '');
+            if (!url.startsWith('data:')) {
+              bgImages.add(url);
+            }
+          });
+        }
+      }
+    });
+    
+    bgImages.forEach(url => {
+      promises.push(new Promise(resolve => {
+        const img = new Image();
+        img.onload = img.onerror = resolve;
+        img.src = url;
+      }));
+    });
+  }
+  
+  Promise.all(promises).then(callback);
 }

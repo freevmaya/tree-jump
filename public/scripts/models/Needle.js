@@ -1,9 +1,6 @@
 // scripts/models/Needle.js
-import * as THREE from 'three';
-import { NEEDLE_SIZE, NEEDLE_COLOR_VARIATION } from '../constants.js';
-import { textureLoader } from '../utils/TextureLoader.js';
 
-export class Needle {
+class Needle {
   constructor(parentGroup, position, rotation, scale = 1.0) {
     this.parentGroup = parentGroup;
     this.position = position;

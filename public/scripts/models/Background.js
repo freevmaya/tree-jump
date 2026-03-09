@@ -1,10 +1,5 @@
 // scripts/models/Background.js
-import * as THREE from 'three';
-import { textureLoader } from '../utils/TextureLoader.js';
-import { MathUtils } from '../utils/MathUtils.js';
-import { BACKGROUND_COLOR } from '../constants.js';
-
-export class Background {
+class Background {
   constructor(game) {
     this.game = game;
     this.mesh = null;

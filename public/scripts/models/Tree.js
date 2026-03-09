@@ -1,21 +1,6 @@
 // scripts/models/Tree.js
-import * as THREE from 'three';
-import { 
-  TREE_COLOR, MAIN_RADIUS, STICK_OUT, 
-  PLATFORM_RADIUS, PLATFORM_HEIGHT, WIREFRAME_COLOR,
-  ROTATION_SMOOTH,
-  BRANCH_COUNT, BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH, BRANCH_DENSITY,
-  TRUNK_CURVE_STRENGTH, TRUNK_SEGMENTS, PLATFORM_DISTANCE
-} from '../constants.js';
 
-import { Platform } from './Platform.js';
-import { RotatePlatform } from './RotatePlatform.js';
-import { KillerPlatform } from './KillerPlatform.js';
-import { Branch } from './Branch.js';
-import { textureLoader } from '../utils/TextureLoader.js';
-import { randomArray } from '../utils/Utils.js';
-
-export class Tree {
+class Tree {
   constructor(scene) {
     this.scene = scene;
     this.mesh = null;

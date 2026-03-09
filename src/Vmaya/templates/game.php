@@ -1,8 +1,40 @@
 <?php
     $v = SCRIPTS_VERSION;
     $is_developer = Page::isDev();
-    html::AddScriptFile('/scripts/main.js');
+    $scripts =  [
+      'constants',
+      'GameState',
+      'core/RendererManager',
+      'core/CameraController',
+      'core/state-manager',
+      'models/Tree',
+      'models/Ball',
+      'models/Branch',
+      'models/Platform',
+      'models/RotatePlatform',
+      'models/KillerPlatform',
+      'models/Needle',
+      'models/Crystal',
+      'models/Background',
+      'models/Grass',
+      'models/Ground',
+      'controls/MouseRotationControl',
+      'utils/EventEmitter',
+      'utils/TextureLoader',
+      'utils/MathUtils',
+      'utils/crypto-js.min',
+      'utils/Utils',
+      'effects/SparkEffect',
+      'physics/BallPhysics',
+      'audio/SoundManager',
+      'main'
+      // ... все ваши модули
+    ];
 ?>
+  <div class="loader">
+      <div class="spinner-border" role="status">
+      </div>
+  </div>
 
   <!-- Основной контейнер игры -->
   <div id="game-container" class="start-blocking">
@@ -168,7 +200,7 @@
           <div class="middle">
             <div class="dialog-content">
               <p class="status">Игра приостановлена</p>
-              <p>Ваше текущее звание:</p>
+              <p>Ваше текущее звание: <span class="title"></span></p>
               <div class="title-image"></div>
               <div class="text-center">
                 <button type="button" class="btn" id="resumeButton">Продолжить</button>
@@ -186,21 +218,11 @@
 
   <!-- Подключаем Bootstrap JS глобально -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script type="text/javascript" src="<?=BASEURL?>/scripts/utils/crypto-js.min.js"></script>
-  
-  <!-- Import maps для Three.js -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-    }
-  }
-  </script>
-  
-  <!-- Main script -->
-  <script type="module" src="<?=BASEURL?>/scripts/main.js?v=<?=$v?>"></script>
-  <script type="module" src="<?=BASEURL?>/scripts/constants.js?v=<?=$v?>"></script>
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+
+  <?foreach ($scripts as $script) {?>
+  <script src="<?=SCRIPTURL.$script?>.js?v=<?=$v?>"></script>
+  <?}?>
 
   <?if (DEV) {?>
     <script type="module" src="<?=BASEURL?>/scripts/test-unit.js?v=<?=$v?>"></script>

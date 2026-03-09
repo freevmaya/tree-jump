@@ -1,14 +1,6 @@
 // scripts/models/Platform.js
-import * as THREE from 'three';
-import { 
-  STICK_OUT, PLATFORM_HEIGHT, 
-  PLATFORM_NORMAL_COLOR, PLATFORM_KILLER_COLOR,
-  PLATFORM_TEXTURE_PATH, KILLER_PLATFORM_TEXTURE_PATH
-} from '../constants.js';
-import { textureLoader } from '../utils/TextureLoader.js';
-import { When } from '../utils/Utils.js';
 
-export class Platform {
+class Platform {
   constructor(tree, theta, y) {
     this.tree = tree;
     this.theta = theta;

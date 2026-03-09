@@ -1,12 +1,12 @@
 // scripts/utils/TextureLoader.js
-import * as THREE from 'three';
 
-export class TextureLoaderUtil {
+class TextureLoaderUtil {
   constructor() {
     this.loader = new THREE.TextureLoader();
     this.cubeLoader = new THREE.CubeTextureLoader();
     this.cache = new Map();
     this.useCache = true;
+    this.loading = 0;
   }
 
   applyOptions(texture, options = {}) {
@@ -47,6 +47,7 @@ export class TextureLoaderUtil {
       if (onLoad) onLoad(this.applyOptions(cachedTexture.clone(), options));
       return cachedTexture;
     }
+    this.loading++;
 
     return this.loader.load(
       path,
@@ -56,11 +57,13 @@ export class TextureLoaderUtil {
         if (this.useCache)
           this.cache.set(path, texture);
 
+        this.loading--;
         if (onLoad) onLoad(this.applyOptions(texture.clone(), options));
       },
       undefined,
       (error) => {
         console.warn(`Текстура не загружена: ${path}`, error);
+        this.loading--;
         if (onError) onError(error);
       }
     );
@@ -318,4 +321,4 @@ export class TextureLoaderUtil {
 }
 
 // Создаем и экспортируем синглтон для использования во всем приложении
-export const textureLoader = new TextureLoaderUtil();
+const textureLoader = new TextureLoaderUtil();

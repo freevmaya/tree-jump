@@ -1,9 +1,6 @@
 // scripts/models/Crystal.js
-import * as THREE from 'three';
-import { textureLoader } from '../utils/TextureLoader.js';
-import { TREE_HEIGHT } from '../constants.js';
 
-export class Crystal {
+class Crystal {
   constructor(scene, tree) {
     this.scene = scene;
     this.tree = tree;

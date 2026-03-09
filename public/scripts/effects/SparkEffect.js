@@ -1,7 +1,5 @@
 
-import { MathUtils } from '../utils/MathUtils.js';
-
-export class SparkEffect {
+class SparkEffect {
   constructor(options = {}) {
     // Настройки по умолчанию
     this.container = options.container || document.body;

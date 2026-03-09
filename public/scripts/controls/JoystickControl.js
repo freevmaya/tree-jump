@@ -1,7 +1,6 @@
 // scripts/controls/JoystickControl.js
-import { ROTATION_SPEED, INERTIA } from '../constants.js';
 
-export class JoystickControl {
+class JoystickControl {
   constructor(tree, joystickPad, joystickThumb) {
     this.tree = tree;
     this.joystickPad = joystickPad;
@@ -35,35 +34,35 @@ export class JoystickControl {
     this.updateDimensions();
     
     // События мыши
-    this.joystickPad.addEventListener('mousedown', this.onMouseDown);
-    window.addEventListener('mousemove', this.onMouseMove);
-    window.addEventListener('mouseup', this.onMouseUp);
+    this.joystickPad.on('mousedown', this.onMouseDown);
+    $(window).on('mousemove', this.onMouseMove);
+    $(window).on('mouseup', this.onMouseUp);
     
     // События тачскрина
-    this.joystickPad.addEventListener('touchstart', this.onTouchStart, { passive: false });
-    window.addEventListener('touchmove', this.onTouchMove, { passive: false });
-    window.addEventListener('touchend', this.onTouchEnd);
-    window.addEventListener('touchcancel', this.onTouchEnd);
+    this.joystickPad.on('touchstart', this.onTouchStart, { passive: false });
+    $(window).on('touchmove', this.onTouchMove, { passive: false });
+    $(window).on('touchend', this.onTouchEnd);
+    $(window).on('touchcancel', this.onTouchEnd);
     
     // Обновляем размеры при изменении окна
-    window.addEventListener('resize', () => this.updateDimensions());
+    $(window).on('resize', () => this.updateDimensions());
   }
   
   destroy() {
-    this.joystickPad.removeEventListener('mousedown', this.onMouseDown);
-    window.removeEventListener('mousemove', this.onMouseMove);
-    window.removeEventListener('mouseup', this.onMouseUp);
+    this.joystickPad.off('mousedown', this.onMouseDown);
+    $(window).off('mousemove', this.onMouseMove);
+    $(window).off('mouseup', this.onMouseUp);
     
-    this.joystickPad.removeEventListener('touchstart', this.onTouchStart);
-    window.removeEventListener('touchmove', this.onTouchMove);
-    window.removeEventListener('touchend', this.onTouchEnd);
-    window.removeEventListener('touchcancel', this.onTouchEnd);
+    this.joystickPad.off('touchstart', this.onTouchStart);
+    $(window).off('touchmove', this.onTouchMove);
+    $(window).off('touchend', this.onTouchEnd);
+    $(window).off('touchcancel', this.onTouchEnd);
     
-    window.removeEventListener('resize', this.updateDimensions);
+    $(window).off('resize', this.updateDimensions);
   }
   
   updateDimensions() {
-    this.padRect = this.joystickPad.getBoundingClientRect();
+    this.padRect = this.joystickPad[0].getBoundingClientRect();
     this.maxOffset = (this.padRect.width - this.thumbWidth) / 2;
   }
   

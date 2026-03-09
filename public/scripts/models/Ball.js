@@ -1,9 +1,6 @@
 // scripts/models/Ball.js
-import * as THREE from 'three';
-import { BALL_RADIUS, BALL_COLOR, BOUNCE_SPEED, MAIN_RADIUS } from '../constants.js';
-import { eventBus } from '../utils/EventEmitter.js';
 
-export class Ball {
+class Ball {
   constructor(scene, tree) {
 
     this.tree = tree;

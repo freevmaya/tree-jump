@@ -1,15 +1,13 @@
 // scripts/audio/SoundManager.js
-import { eventBus } from '../utils/EventEmitter.js';
 
-export class SoundManager {
+class SoundManager {
   constructor(gameState) {
-    this.sounds = new Map(); // Коллекция загруженных звуков
-    this.activated = false; // Активирован ли звук пользователем
+    this.sounds = new Map();
+    this.activated = false;
     this.muted = false;
     this.masterVolume = 0.7;
-    this.gameState = gameState;
-    
-    // Настраиваем активацию по клику
+    this.gameState = gameState;    
+
     this.setupActivation();
     
     // Подписываемся на события звуков
@@ -33,15 +31,15 @@ export class SoundManager {
         silentAudio.play().catch(() => {});
         
         // Удаляем обработчики после активации
-        document.removeEventListener('click', activate);
-        document.removeEventListener('touchstart', activate);
-        document.removeEventListener('keydown', activate);
+        $(document).off('click', activate);
+        $(document).off('touchstart', activate);
+        $(document).off('keydown', activate);
       }
     };
     
-    document.addEventListener('click', activate);
-    document.addEventListener('touchstart', activate);
-    document.addEventListener('keydown', activate);
+    $(document).on('click', activate);
+    $(document).on('touchstart', activate);
+    $(document).on('keydown', activate);
   }
   
   /**
@@ -49,7 +47,7 @@ export class SoundManager {
    */
   setupEventListeners() {
 
-    this.gameState.onGameOver(() => {
+    this.gameState.on(GAME_STATE.GAME_OVER, () => {
       this.play('fail');
       this.loadSound('fail-music', 'sounds/fail-music.mp3')
         .then(()=>{
@@ -57,7 +55,7 @@ export class SoundManager {
         });
     });
 
-    this.gameState.onVictory(() => {
+    this.gameState.on(GAME_STATE.VICTORY, () => {
       this.loadSound('win-music', 'sounds/win-music.mp3')
         .then(()=>{
             this.play('win-music')
@@ -171,8 +169,7 @@ export class SoundManager {
     
     try {
       const sound = this.sounds.get(id);
-      
-      // Создаем копию для параллельного воспроизведения
+
       const audio = sound.audio;
       audio.volume = (options.volume || 1.0) * this.masterVolume;
       audio.loop = options.loop || sound.options.loop || false;
@@ -188,10 +185,12 @@ export class SoundManager {
         });
       }
       
+      /*
       // Удаляем элемент после окончания
       audio.addEventListener('ended', () => {
         audio.remove();
       });
+      */
       
       // Сообщаем о воспроизведении
       eventBus.emit('sound:played', { 

@@ -1,36 +1,4 @@
-// scripts/main.js
-import * as THREE from 'three';
-import { 
-  GRAVITY, BASE_PLATFORM_SIZE, AMBIENT_LIGHT_COLOR, AMBIENT_LIGHT_INTENSITY,
-  KEY_LIGHT_COLOR, KEY_LIGHT_INTENSITY, FILL_LIGHT_COLOR,
-  FILL_LIGHT_INTENSITY, RIM_LIGHT_COLOR, RIM_LIGHT_INTENSITY,
-  RIM_LIGHT_DISTANCE, TREE_HEIGHT, MAIN_RADIUS,
-  GAME_OVER_Y_OFFSET, RESET_POSITION_X, RESET_POSITION_Y,
-  RESET_POSITION_Z, RESET_VELOCITY_Y, CAMERA_START_Y,
-  BACKGROUND_IMAGE_PATH, GRASS_IMAGE_PATH, GAME_PARAMS, START_GAME, USER_TITLES
-} from './constants.js';
-
-import { RendererManager } from './core/RendererManager.js';
-import { CameraController } from './core/CameraController.js';
-import { StateManager } from './core/state-manager.js';
-
-import { Tree } from './models/Tree.js';
-import { Ball } from './models/Ball.js';
-
-import { BallPhysics } from './physics/BallPhysics.js';
-import { MouseRotationControl } from './controls/MouseRotationControl.js';
-import { JoystickControl } from './controls/JoystickControl.js';
-import { GameState, GAME_STATE } from './GameState.js';
-import { Crystal } from './models/Crystal.js';
-import { Background } from './models/Background.js';
-import { textureLoader } from './utils/TextureLoader.js';
-import { eventBus } from './utils/EventEmitter.js';
-import { SoundManager } from './audio/SoundManager.js';
-import { Grass } from './models/Grass.js';
-import { Ground } from './models/Ground.js';
-import { enumerateTo, $ } from './utils/Utils.js';
-import { MathUtils } from './utils/MathUtils.js';
-import { SparkEffect } from './effects/SparkEffect.js';
+//import * as THREE from 'three';
 
 // Bootstrap доступен глобально через window.bootstrap
 const bootstrap = window.bootstrap;
@@ -73,22 +41,21 @@ function getUserTitle(totalScore) {
 
 class Game {
   constructor() {
-    this.game_container = $('game-container');
-    this.container      = $('canvas-container');
+    this.game_container = $('#game-container');
+    this.container      = $('#canvas-container');
     this.scene          = new THREE.Scene();
     this.cameraController = null;
     this.tree = null;
     this.ball = null;
     this.physics = null;
     this.mouseControl = null;
-    this.joystickControl = null;
-    this.scoreIndicatorElement = $('score-indicator');
-    this.currentScoreElement = $('current-score');
-    this.killerIndicatorElement = $('killer-indicator');
+    this.scoreIndicatorElement = $('#score-indicator');
+    this.currentScoreElement = $('#current-score');
+    this.killerIndicatorElement = $('#killer-indicator');
     this.stateView = {
-      score: $('state-score'),
-      vin: $('state-vin'),
-      title: $('state-title')
+      score: $('#state-score'),
+      vin: $('#state-vin'),
+      title: $('#state-title')
     };
     this.lastTime = performance.now();
     this.crystal = null;
@@ -100,7 +67,7 @@ class Game {
     this.gameStarted = false; // Флаг, что игра была запущена
     this.testResult = this.quickGPUTest();
     this.stateManager = new StateManager();
-    this.gameHint = $('game-hint');
+    this.gameHint = $('#game-hint');
 
     console.log(this.testResult);
     
@@ -115,18 +82,20 @@ class Game {
     this.initAudio();
 
     if (!DEV)
-      window.addEventListener('blur', () => {
+      $(window).on('blur', () => {
         if (this.gameState.isPlaying())
           this.gameState.pause();
       });
     
     // Настройка обработчика изменения размера окна
-    window.addEventListener('resize', this.onResize.bind(this));
+    $(window).on('resize', this.onResize.bind(this));
 
     this.stateManager.loadState()
       .then(()=>{
-        this.setGameIndex(this.stateManager.get('paramsIndex', START_GAME));
-        this.init();
+        this.setGameIndex(this.stateManager.get('paramsIndex', START_GAME))
+          .then(()=>{
+            this.init();
+          });
       });
   }
 
@@ -146,7 +115,7 @@ class Game {
       }
       else val = this.stateManager.get(name, '-');
 
-      this.stateView[name].querySelector('.value').textContent = val;
+      this.stateView[name].find('.value').text(val);
     });
   }
 
@@ -181,7 +150,7 @@ class Game {
     try {
       console.log('Загрузка звуков...');
       await this.soundManager.loadAllSounds();
-      this.soundsLoaded = true;
+      this.soundsLoaded = true;setGameIndex
       console.log('Звуки успешно загружены');
     } catch (error) {
       console.warn('Ошибка загрузки звуков:', error);
@@ -195,7 +164,7 @@ class Game {
     this.initPauseModal();
     
     // Настройка обработчика нажатия клавиш
-    window.addEventListener('keydown', (e) => {
+    $(window).on('keydown', (e) => {
       // Перезапуск по клавише R (в любом состоянии, кроме IDLE)
       if ((e.key === 'r' || e.key === 'R') && !this.gameState.isIdle()) {
         this.resetGame();
@@ -218,7 +187,7 @@ class Game {
     });
     
     // Подписка на события состояния игры
-    this.gameState.onGameOver(() => {
+    this.gameState.on(GAME_STATE.GAME_OVER, () => {
       console.log("Game Over callback вызван");
       this.hideScoreIndicator();
       this.hideKillerIndicator();
@@ -233,24 +202,29 @@ class Game {
       this.stateManager.set('game_over_count', gameOverCount);
     });
     
-    this.gameState.onVictory(() => {
+    this.gameState.on(GAME_STATE.VICTORY, () => {
       console.log("Victory callback вызван");
       this.Victory();
     });
     
-    this.gameState.onPause(() => {
+    this.gameState.on(GAME_STATE.PLAYING, () => {
+      console.log("PLAYING callback вызван");
+      this.enableControls();
+    });
+    
+    this.gameState.on(GAME_STATE.PAUSED, () => {
       console.log("Pause callback вызван");
       this.showPauseModal();
       this.disableControls();
     });
     
-    this.gameState.onResume(() => {
+    this.gameState.on(GAME_STATE.RESUME, () => {
       console.log("Resume callback вызван");
       this.hidePauseModal();
-      this.enableControls();
+      this.gameState.set(GAME_STATE.PLAYING);
     });
     
-    this.gameState.onReset(() => {
+    this.gameState.on(GAME_STATE.RESET, () => {
       console.log("Reset callback вызван");
       if (this.gameOverModal) {
         this.gameOverModal.hide();
@@ -264,29 +238,32 @@ class Game {
       this.hideScoreIndicator();
       this.updateGameDisplay();
       this.showKillerIndicator();
-      this.enableControls();
     });
 
     // Подписка на старт игры
-    this.gameState.onStart(() => {
+    this.gameState.on(GAME_STATE.START, () => {
       console.log("Start callback вызван");
-      this.game_container.classList.remove('start-blocking');
+      this.game_container.removeClass('start-blocking');
       this.hideStartModal();
       this.updateGameDisplay();
       this.showKillerIndicator();
-      this.enableControls();
       this.gameStarted = true;
+      this.gameState.set(GAME_STATE.PLAYING);
     });
   }
 
   NextLevel() {
-      this.nextGameIndex();
-      this.resetGame();
+      this.nextGameIndex()
+          .then(()=>{
+            this.resetGame();
+          });
   }
 
   GoToLevel(levelKey) {
-    this.setGameIndex(levelKey);
-    this.resetGame();
+    this.setGameIndex(levelKey)
+          .then(()=>{
+            this.resetGame();
+          });
   }
 
   setUserTitle(key) {
@@ -319,10 +296,8 @@ class Game {
     this.updateStateView();
   }
 
-  toVictoryScore(score) {
-
-    if (MathUtils.isNumeric(score))
-      this.currentScore = score;
+  Victory() {
+    this.calculateScore();
 
     let lastTotalScore = this.stateManager.get('score', 0);
     let newTotalScore = lastTotalScore + this.currentScore;
@@ -332,41 +307,46 @@ class Game {
 
     this.showVictoryModal(lastTotalScore, newTotalScore, this.updateUserTitle());
     this.disableControls();
-    this.nextGameIndex();
-  }
-
-  Victory() {
-      this.calculateScore();
-      this.toVictoryScore(this.currentScore);
   }
 
   nextGameIndex() {
     let keys = Object.keys(GAME_PARAMS);
-    this.setGameIndex(keys[(keys.indexOf(this.paramsIndex) + 1) % keys.length]);
+    return this.setGameIndex(keys[(keys.indexOf(this.paramsIndex) + 1) % keys.length]);
   }
 
   prevGameIndex() {
     let keys = Object.keys(GAME_PARAMS);
-    this.setGameIndex(keys[Math.max(keys.indexOf(this.paramsIndex) - 1, 0)]);
+    return this.setGameIndex(keys[Math.max(keys.indexOf(this.paramsIndex) - 1, 0)]);
   }
 
   setGameIndex(value) {
     this.paramsIndex = GAME_PARAMS[value] ? value : Object.keys(GAME_PARAMS)[0];
     this.stateManager.set('paramsIndex', this.paramsIndex);
-    this.loadLevelTextures();
+    return this.loadLevelTextures();
   }
 
-  loadLevelTextures(onComplete) {
+  loadLevelTextures() {
+    return new Promise((resolve, reject)=>{
+      let textures = collectPaths(GAME_PARAMS[this.paramsIndex]);
+      this.visibleLoader(true);
+      textureLoader.loadTexturesParallel(textures, (result)=>{
+        this.visibleLoader(false);
+        if (result)
+          resolve(result);
+        else reject();
+      });
+    })
+  }
 
-    let textures = collectPaths(GAME_PARAMS[this.paramsIndex]);
-    textureLoader.loadTexturesParallel(textures, onComplete);
+  visibleLoader(visible = true) {
+    $('body').toggleClass('page-loaded', !visible);
   }
   
   initStartModal() {
     // Получаем элемент модального окна Start
-    this.startModalElement = $('startModal');
+    this.startModalElement = $('#startModal');
 
-    $('testResult').textContent = Math.round(this.testResult);
+    $('#testResult').text(Math.round(this.testResult));
     
     if (this.startModalElement && bootstrap) {
       // Создаем экземпляр Bootstrap модального окна
@@ -376,9 +356,9 @@ class Game {
       });
       
       // Обработчик для кнопки старта
-      const startBtn = $('startGameButton');
+      const startBtn = $('#startGameButton');
       if (startBtn) {
-        startBtn.addEventListener('click', () => {
+        startBtn.on('click', () => {
           this.gameState.start();
         });
       }
@@ -387,7 +367,7 @@ class Game {
   
   initGameOverModal() {
     // Получаем элемент модального окна Game Over
-    this.gameOverModalElement = $('gameOverModal');
+    this.gameOverModalElement = $('#gameOverModal');
     
     if (this.gameOverModalElement && bootstrap) {
       // Создаем экземпляр Bootstrap модального окна
@@ -397,15 +377,16 @@ class Game {
       });
       
       // Обработчик для кнопки рестарта в Game Over
-      const restartBtn = $('restartButton');
+      const restartBtn = $('#restartButton');
       if (restartBtn) {
-        restartBtn.addEventListener('click', () => {
+        restartBtn.on('click', () => {
+          this.gameOverModal.hide();
           this.resetGame();
         });
       }
       
       // Обработчик для закрытия модального окна
-      this.gameOverModalElement.addEventListener('hidden.bs.modal', () => {
+      this.gameOverModalElement.on('hidden.bs.modal', () => {
         if (this.gameState.isGameOver()) {
           this.resetGame();
         }
@@ -415,7 +396,7 @@ class Game {
   
   initVictoryModal() {
     // Получаем элемент модального окна Victory
-    this.victoryModalElement = $('victoryModal');
+    this.victoryModalElement = $('#victoryModal');
     
     if (this.victoryModalElement && bootstrap) {
       // Создаем экземпляр Bootstrap модального окна
@@ -425,15 +406,17 @@ class Game {
       });
       
       // Обработчик для кнопки рестарта в Victory
-      const victoryRestartBtn = $('victoryRestartButton');
+      const victoryRestartBtn = $('#victoryRestartButton');
       if (victoryRestartBtn) {
-        victoryRestartBtn.addEventListener('click', () => {
+        victoryRestartBtn.on('click', () => {
+          this.hideVictoryModal();
+          this.nextGameIndex();
           this.resetGame();
         });
       }
       
       // Обработчик для закрытия модального окна
-      this.victoryModalElement.addEventListener('hidden.bs.modal', () => {
+      this.victoryModalElement.on('hidden.bs.modal', () => {
         if (this.gameState.isVictory()) {
           this.resetGame();
         }
@@ -443,7 +426,7 @@ class Game {
   
   initPauseModal() {
     // Получаем элемент модального окна Pause
-    this.pauseModalElement = $('pauseModal');
+    this.pauseModalElement = $('#pauseModal');
     
     if (this.pauseModalElement && bootstrap) {
       // Создаем экземпляр Bootstrap модального окна
@@ -453,17 +436,18 @@ class Game {
       });
       
       // Обработчик для кнопки продолжения
-      const resumeBtn = $('resumeButton');
+      const resumeBtn = $('#resumeButton');
       if (resumeBtn) {
-        resumeBtn.addEventListener('click', () => {
+        resumeBtn.on('click', () => {
           this.gameState.resume();
         });
       }
       
       // Обработчик для кнопки рестарта в паузе
-      const pauseRestartBtn = $('pauseRestartButton');
+      const pauseRestartBtn = $('#pauseRestartButton');
       if (pauseRestartBtn) {
-        pauseRestartBtn.addEventListener('click', () => {
+        pauseRestartBtn.on('click', () => {
+          this.hidePauseModal();
           this.resetGame();
         });
       }
@@ -484,50 +468,60 @@ class Game {
   
   showGameOverModal() {
     // Обновляем статистику в модальном окне
-    const finalBounceElement = $('finalBounceCount');
+    const finalBounceElement = $('#finalBounceCount');
     
     if (finalBounceElement && this.ball) {
-      finalBounceElement.textContent = this.ball.getBounceCount();
+      finalBounceElement.text(this.ball.getBounceCount());
     }
     
     // Показываем модальное окно
-    if (this.gameOverModal) {
-      this.gameOverModal.show();
-    }
+
+    let restartButton = $('#restartButton')[0];
+
+    restartButton.disabled = true;
+    setTimeout(()=>{
+      restartButton.disabled = false;
+    }, 3000);
+
+    this.gameOverModal.show();
+  }
+
+  hideVictoryModal() {
+    this.victoryModal.hide();
   }
   
   showVictoryModal(lastScore, newScore, newTitle) {
     // Обновляем статистику в модальном окне победы
-    const victoryBounceElement = $('victoryBounceCount');
-    const victoryScoreElement = $('victoryScore');
+    const victoryBounceElement = $('#victoryBounceCount');
+    const victoryScoreElement = $('#victoryScore');
     
     if (victoryBounceElement && this.ball) {
-      victoryBounceElement.textContent = this.ball.getBounceCount();
+      victoryBounceElement.text(this.ball.getBounceCount());
     }
 
-    const victoryRestartBtn = $('victoryRestartButton');
+    const victoryRestartBtn = $('#victoryRestartButton')[0];
 
     victoryRestartBtn.disabled = true;
     setTimeout(()=>{
       victoryRestartBtn.disabled = false;
-    }, 3000);
+    }, 4000);
 
-    let newTitleElem = this.victoryModalElement.querySelectorAll('.new-title')[0];
+    let newTitleElem = this.victoryModalElement.find('.new-title');
     if (newTitle) {
-      newTitleElem.innerHTML = 'Вам присвоено новое звание: ' + USER_TITLES[newTitle].name + 
-    `!<div class="title-image ${newTitle}"></div>`;
-      newTitleElem.style.display = 'block';
-    } else newTitleElem.style.display = 'none';
+      newTitleElem.html('Вам присвоено новое звание: ' + USER_TITLES[newTitle].name + 
+    `!<div class="title-image ${newTitle}"></div>`);
+      newTitleElem.css('display', 'block');
+    } else newTitleElem.css('display', 'none');
     
     // Показываем модальное окно
     this.victoryModal.show();
 
-    victoryScoreElement.textContent = 0;
+    victoryScoreElement.text(0);
     enumerateTo(lastScore, newScore, 2000, (score)=>{
-      victoryScoreElement.textContent = Math.round(score);
+      victoryScoreElement.text(Math.round(score));
     }, ()=>{
 
-      let coord = $('victoryState').getBoundingClientRect();
+      let coord = $('#victoryState')[0].getBoundingClientRect();
       new SparkEffect({
         x: coord.x + coord.width / 2,
         y: coord.y + coord.height / 2,
@@ -544,54 +538,41 @@ class Game {
   showPauseModal() {
     if (this.pauseModal) {
 
-      this.pauseModalElement.querySelectorAll('.title-image')[0]
-        .classList.add(this.stateManager.get('title'), Object.keys(USER_TITLES)[0]);
+      let title = this.stateManager.get('title') || Object.keys(USER_TITLES)[0];
+      this.pauseModalElement.find('.title-image').toggleClass(title, true);
+      this.pauseModalElement.find('.title').text(USER_TITLES[title].name);
       this.pauseModal.show();
     }
   }
   
   hidePauseModal() {
-    if (this.pauseModal) {
-      this.pauseModal.hide();
-    }
+    this.pauseModal.hide();
   }
   
   showScoreIndicator() {
-    if (this.scoreIndicatorElement) {
-      this.scoreIndicatorElement.style.display = 'block';
-    }
+    this.scoreIndicatorElement.css('display', 'block');
   }
   
   hideScoreIndicator() {
-    if (this.scoreIndicatorElement) {
-      this.scoreIndicatorElement.style.display = 'none';
-    }
+    this.scoreIndicatorElement.css('display', 'none');
   }
   
   updateGameDisplay() {
-    $('game-title').textContent = GAME_PARAMS[this.paramsIndex].NAME;
+    $('#game-title').text(GAME_PARAMS[this.paramsIndex].NAME);
   }
   
   showKillerIndicator() {
-    if (this.killerIndicatorElement) {
-      this.killerIndicatorElement.style.display = 'block';
-    }
+    this.killerIndicatorElement.css('display', 'block');
   }
   
   hideKillerIndicator() {
-    if (this.killerIndicatorElement) {
-      this.killerIndicatorElement.style.display = 'none';
-    }
+    this.killerIndicatorElement.css('display', 'none');
   }
   
   disableControls() {
     if (this.mouseControl) {
       this.mouseControl.destroy();
       this.mouseControl = null;
-    }
-    if (this.joystickControl) {
-      this.joystickControl.destroy();
-      this.joystickControl = null;
     }
   }
   
@@ -600,30 +581,22 @@ class Game {
     if (this.mouseControl) {
       this.mouseControl.destroy();
     }
-    this.mouseControl = new MouseRotationControl(this.tree, this.container);
+    this.mouseControl = new MouseRotationControl(this, this.container);
     this.mouseControl.init();
-    
-    // Инициализация управления джойстиком (для нижнего блока)
-    if (this.joystickControl) {
-      this.joystickControl.destroy();
-    }
-    const joystickPad = $('joystick-pad');
-    const joystickThumb = $('joystick-thumb');
-    if (joystickPad && joystickThumb) {
-      this.joystickControl = new JoystickControl(this.tree, joystickPad, joystickThumb);
-    }
 
     this.cameraController.begin();
 
-    this.gameHint.classList.add('show');
+    this.gameHint.toggleClass('show', true);
     setTimeout(()=>{
-        this.gameHint.classList.remove('show');
+        this.gameHint.toggleClass('show', false);
     }, 5000);
+
+    $('body').addClass('page-loaded');
   }
   
   updateScoreIndicator() {
     if (this.currentScoreElement) {
-      this.currentScoreElement.textContent = this.currentScore;
+      this.currentScoreElement.text(this.currentScore);
     }
   }
   
@@ -658,11 +631,11 @@ class Game {
     // Инициализация рендерера
     this.rendererManager.init();
     
-    // Создание игровых объектов (но не активируем физику)
-    this.createGameObjects();
-    
     // Инициализация камеры
     this.cameraController = new CameraController(this);
+    
+    // Создание игровых объектов (но не активируем физику)
+    this.createGameObjects();
     
     // Запуск анимации
     this.animate();
@@ -676,6 +649,7 @@ class Game {
 
     this.showStartModal();
     this.updateStateView();
+    this.visibleLoader(false);
   }
   
   createGameObjects() {
@@ -707,6 +681,9 @@ class Game {
     
     // Инициализация физики с передачей gameState
     this.physics = new BallPhysics(this.ball, this.tree, this.gameState);
+    
+    // Сброс камеры
+    this.cameraController.reset();
     
     // Сброс счета
     this.currentScore = 0;
@@ -759,28 +736,19 @@ class Game {
 
     this.newTitle = null;
     
-    // Сброс камеры
-    if (this.cameraController)
-      this.cameraController.reset();
-    
     // Сброс счетчика отскоков
     if (this.ball) {
       this.ball.resetBounceCount();
     }
     
+    // Сброс счета
+    this.currentScore = 0;
+    this.updateScoreIndicator();
+    
     // Сброс состояния игры (это вызовет onReset колбэки)
     if (this.gameState) {
       this.gameState.reset();
     }
-    
-    // Сброс джойстика
-    if (this.joystickControl) {
-      this.joystickControl.reset();
-    }
-    
-    // Сброс счета
-    this.currentScore = 0;
-    this.updateScoreIndicator();
   }
 
   clearLights() {
@@ -857,7 +825,7 @@ class Game {
     this.lastTime = time;
     
     // Обновление физики только если игра активна (не на паузе, не закончена и не в IDLE)
-    if (this.gameState.isPlaying() && this.ball && this.physics) {
+    if (this.gameState.isPlaying() && this.ball && this.physics && (textureLoader.loading <= 0)) {
       this.tree.update(dt);
       this.physics.update(dt);
     
@@ -879,11 +847,6 @@ class Game {
       // Обновление вращения мыши
       if (this.mouseControl) {
         this.mouseControl.update();
-      }
-      
-      // Обновление джойстика
-      if (this.joystickControl) {
-        this.joystickControl.update();
       }
       
       // Проверка конца игры
@@ -938,6 +901,6 @@ class Game {
 }
 
 // Запуск игры
-document.addEventListener('DOMContentLoaded', () => {
+onAllImagesLoaded(() => {
   window.game = new Game();
 });

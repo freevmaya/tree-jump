@@ -135,6 +135,14 @@
   border: none !important;
 }
 
+.dialog-1 .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none;
+  transform: none;
+}
+
 .dialog-1 .btn:hover {
   filter: drop-shadow(3px 3px 4px black);
 }

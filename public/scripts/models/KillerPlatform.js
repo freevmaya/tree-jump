@@ -1,17 +1,6 @@
 // scripts/models/RotatePlatform.js
-import * as THREE from 'three';
-import { Platform } from './Platform.js';
-import { RotatePlatform } from './RotatePlatform.js';
-import { sawToSine } from '../utils/Utils.js';
-import { eventBus } from '../utils/EventEmitter.js';
 
-import { 
-  STICK_OUT, PLATFORM_HEIGHT, PLATFORM_DISTANCE,
-  PLATFORM_NORMAL_COLOR, PLATFORM_KILLER_COLOR,
-  PLATFORM_TEXTURE_PATH, KILLER_PLATFORM_TEXTURE_PATH
-} from '../constants.js';
-
-export class KillerPlatform extends RotatePlatform {
+class KillerPlatform extends RotatePlatform {
 
   createMesh() {
     // Выбираем цвет в зависимости от типа платформы

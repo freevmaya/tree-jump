@@ -1,6 +1,5 @@
-import { debounce, Ajax } from '../utils/Utils.js';
 
-export class StateManager {
+class StateManager {
     constructor(config) {
         this.isPlaying;
         this.isPaused;
@@ -22,28 +21,28 @@ export class StateManager {
             this.lastHash = this.getHash();
         });
 
-        window.addEventListener('beforeunload', (e)=>{
+        $(window).on('beforeunload', (e)=>{
             this.saveImmediately();
         });
 
-        window.addEventListener('unload', (e)=>{
+        $(window).on('unload', (e)=>{
             this.saveImmediately();
         });
 
-        window.addEventListener('pagehide', (e)=>{
+        $(window).on('pagehide', (e)=>{
             this.saveImmediately();
         });
 
-        window.addEventListener('freeze', (e)=>{
+        $(window).on('freeze', (e)=>{
             this.saveImmediately();
         });
 
-        window.addEventListener('visibilitychange', (e)=>{
+        $(window).on('visibilitychange', (e)=>{
             if (document.visibilityState != 'visible')
                 this.saveImmediately();
         });
 
-        window.addEventListener('blur', (e)=>{
+        $(window).on('blur', (e)=>{
             this.saveImmediately();
         });
     }

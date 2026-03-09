@@ -1,8 +1,6 @@
 // scripts/models/Skybox.js
-import * as THREE from 'three';
-import { textureLoader } from '../utils/TextureLoader.js';
 
-export class Skybox {
+class Skybox {
   constructor(scene) {
     this.scene = scene;
     this.skybox = null;

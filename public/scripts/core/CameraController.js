@@ -1,8 +1,6 @@
 // scripts/core/CameraController.js
-import * as THREE from 'three';
-import { CAMERA_FOLLOW_SPEED, CAMERA_HEIGHT_OFFSET, CAMERA_START_Y } from '../constants.js';
 
-export class CameraController {
+class CameraController {
 
   constructor(game) {
 
@@ -12,7 +10,6 @@ export class CameraController {
     this.targetY = 0;
     this.followSpeed = CAMERA_FOLLOW_SPEED;
     this.heightOffset = CAMERA_HEIGHT_OFFSET;
-    this.reset();
   }
 
   setFocus(f) {
@@ -25,8 +22,7 @@ export class CameraController {
   }
 
   reset() {
-    if (this.game.tree)
-      this.camera.position.set(0, CAMERA_HEIGHT_OFFSET - this.game.tree.half_height, 12);
+    this.camera.position.set(0, CAMERA_HEIGHT_OFFSET - this.game.tree.half_height, 12);
     this.camera.lookAt(0, this.camera.position.y, 0);
   }
 

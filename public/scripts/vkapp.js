@@ -14,9 +14,24 @@ class VKApp {
 
 		vkBridge.send('VKWebAppGetUserInfo', {})
 			.then(((user) => { 
-				
-				tracer.log(user);
+				if (user) {
+					Ajax({
+						action: 'initUser',
+						data: {
+							source_id: source_id,
+							source: source,
+							user_data:  user
+						}
+					}).then((data)=>{
+						if (data) {
+							this.user_id = data.user_id;
+							localStorage.setItem('user_id', data.user_id);
 
+							if (data.redirect)
+								document.location.href = data.redirect;
+						} else localStorage.setItem('user_id', null);
+					});
+				}
 			}).bind(this));
 
 		vkBridge.send('VKWebAppCheckNativeAds', {

@@ -95,9 +95,7 @@ class VKSessionHandler {
             
             ini_set('session.cookie_samesite', 'None');
             ini_set('session.cookie_secure', '1');
-        } 
-
-        trace($session_params);
+        }
 
         session_set_cookie_params($session_params);
     }

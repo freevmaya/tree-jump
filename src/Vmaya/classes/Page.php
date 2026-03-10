@@ -16,6 +16,7 @@ class Page {
 	public function __construct($userModel = null) {
 		GLOBAL $lang, $dbp, $_GET, $user;
 
+		$this->session_start();
 		$this->userModel = $userModel ? $userModel : new UserModel();
 
 		Page::$current = $this;
@@ -55,6 +56,10 @@ class Page {
 				$this->model->Update(Page::$request);
 			}
 		}
+	}
+
+	protected function session_start() {
+		session_start();
 	}
 
 	public function Route($params) {

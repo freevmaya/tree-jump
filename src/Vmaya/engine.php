@@ -30,7 +30,7 @@
 	define('DEVUSER', 49);
 	define("JSON_FLAGS", JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT);
 
-	include(INCLUDE_PATH.DS."SessionManager.php");
+	//include(INCLUDE_PATH.DS."SessionManager.php");
 	include(INCLUDE_PATH.DS."_edbu2.php");
 	include(INCLUDE_PATH.DS."fdbg.php");
 	include(INCLUDE_PATH.DS."utils.php");

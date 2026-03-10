@@ -7,8 +7,6 @@ class VKSessionHandler {
     public static function startForVK(): string {
         // Получаем параметры из VK
         $initData = $_GET['tgWebAppInitData'] ?? '';
-
-        trace($initData);
         
         if ($initData) {
             // Используем данные VK для создания стабильного session_id
@@ -73,7 +71,7 @@ class VKSessionHandler {
     /**
      * Настройка кук для VK WebView
      */
-    private static function configureVKCookies(): void {
+    public static function configureVKCookies(): void {
         $session_params = [
             'lifetime' => 86400 * 7,
             'path' => '/',
@@ -98,6 +96,8 @@ class VKSessionHandler {
             ini_set('session.cookie_samesite', 'None');
             ini_set('session.cookie_secure', '1');
         } 
+
+        trace($session_params);
 
         session_set_cookie_params($session_params);
     }
@@ -131,4 +131,4 @@ class VKSessionHandler {
 }
 
 // Использование
-$sessionId = VKSessionHandler::startForVK();
+// $sessionId = VKSessionHandler::startForVK();

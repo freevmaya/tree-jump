@@ -1,6 +1,11 @@
 <?
 class Vkok extends Page {
 
+	protected function session_start() {
+		VKSessionHandler::configureVKCookies();
+		parent::session_start();
+	}
+
 	public function Render($page) {
 		header("Content-Type: text/html; charset=".CHARSET);
 		$filename = TEMPLATES_PATH."/vkok.php";
@@ -107,8 +112,6 @@ class Vkok extends Page {
 	    	
 	    	Page::setSession('user_id', $user_id);
 	    }
-
-	    trace($_SESSION);
 
 	    if ($user_id) {
 			$is_developer = Page::isDev();

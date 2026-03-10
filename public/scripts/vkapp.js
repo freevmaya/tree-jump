@@ -65,7 +65,7 @@ class VKApp {
 									resolve(result);
 								}, 1000);
 							});
-					} else resolve(result);
+					} else resolve(true);
 		      });
 		    }
 		});

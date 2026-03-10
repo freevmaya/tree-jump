@@ -50,15 +50,20 @@ class VKApp {
 	}
 
 	initListeners() {
+		When(()=>{
+			return window.game;
+		})
+		.then(()=>{
 
-		window.game.advProvider = () => {
-	      return new Promise((resolve, reject)=>{
-			this.showAd()
-				.then((result) => { 
-					resolve(result);
-				});
-	      });
-	    }
+			window.game.advProvider = () => {
+		      return new Promise((resolve, reject)=>{
+				this.showAd()
+					.then((result) => { 
+						resolve(result);
+					});
+		      });
+		    }
+		});
 	}
 
 

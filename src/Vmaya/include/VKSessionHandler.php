@@ -7,6 +7,8 @@ class VKSessionHandler {
     public static function startForVK(): string {
         // Получаем параметры из VK
         $initData = $_GET['tgWebAppInitData'] ?? '';
+
+        trace($initData);
         
         if ($initData) {
             // Используем данные VK для создания стабильного session_id
@@ -96,8 +98,6 @@ class VKSessionHandler {
             ini_set('session.cookie_samesite', 'None');
             ini_set('session.cookie_secure', '1');
         } 
-
-        trace($session_params);
 
         session_set_cookie_params($session_params);
     }

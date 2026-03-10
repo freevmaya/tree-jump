@@ -58,7 +58,9 @@ class VKApp {
 		      return new Promise((resolve, reject)=>{
 				this.showAd()
 					.then((result) => { 
-						resolve(result);
+						setTimeout(()=>{
+							resolve(result);
+						}, 2000);
 					});
 		      });
 		    }

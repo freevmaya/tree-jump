@@ -3,6 +3,7 @@ class VKApp {
 	requireShareCount = 3;
 	constructor(app_id, source_user_id, source) {
 
+		this.last_show_adv = performance.now();
 		this.app_id = app_id;
 		this.source = source;
 		this.source_user_id = source_user_id;
@@ -55,13 +56,16 @@ class VKApp {
 		})
 		.then(()=>{
 			window.game.advProvider = () => {
-		      return new Promise((resolve, reject)=>{
-				this.showAd()
-					.then((result) => { 
-						setTimeout(()=>{
-							resolve(result);
-						}, 2000);
-					});
+				return new Promise((resolve, reject)=>{
+					let dt = (performance.now() - this.last_show_adv) / 1000;
+					if (dt > 60) {
+						this.showAd()
+							.then((result) => {
+								setTimeout(()=>{
+									resolve(result);
+								}, 1000);
+							});
+					} else resolve(result);
 		      });
 		    }
 		});

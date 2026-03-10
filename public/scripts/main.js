@@ -88,6 +88,7 @@ class Game {
     this.initAudio();
 
     if ((typeof DEV == 'undefined') || !DEV) {
+      /*
       $(window).on('blur', () => {
         this.allow_playing = false;
       });
@@ -95,6 +96,7 @@ class Game {
       $(window).on('focus', () => {
         this.allow_playing = true;
       });
+      */
     }
     
     // Настройка обработчика изменения размера окна

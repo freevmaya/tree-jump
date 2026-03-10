@@ -137,11 +137,12 @@
 
 .btn:hover {
   filter: drop-shadow(3px 3px 4px black);
+  color: #5d0000;
 }
 
 .btn:active {
   filter: brightness(0.8) drop-shadow(1px 1px 2px black);
-  color: white;
+  color: red;
 }
 
 @media (max-width: 576px) {

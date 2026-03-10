@@ -22,7 +22,6 @@ class CameraController {
   }
 
   begin() {
-
     this.targetFocus = this.calcTargetFocus();
     this.camera.fov = this.targetFocus * 1.5;
   }

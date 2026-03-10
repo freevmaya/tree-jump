@@ -18,8 +18,8 @@ class VKApp {
 					Ajax({
 						action: 'initUser',
 						data: {
-							source_id: source_id,
-							source: source,
+							source_id: this.source_user_id,
+							source: this.source,
 							user_data:  user
 						}
 					}).then((data)=>{

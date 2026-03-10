@@ -282,8 +282,7 @@ class Tree {
           (Math.random() <= this.options.RADIAL_PLATFORM_STEP[0])) {
 
         theta = previousTheta + (Math.PI * this.options.RADIAL_PLATFORM_STEP[1] * direct);   
-        direct_steps++;     
-
+        direct_steps++;
       } else {
         
         direct_steps = 0;
@@ -293,8 +292,7 @@ class Tree {
           do {
             theta = (Math.random() - 0.5) * Math.PI * 2;
           } while ((theta > 0.7) && (theta < 2.2));
-
-          console.log(theta);
+          
         } else {
           let attempts = 0;
           const maxAttempts = 100;
@@ -304,8 +302,9 @@ class Tree {
             attempts++;
             
             if (attempts > maxAttempts) {
-              const direction = Math.random() > 0.5 ? 1 : -1;
-              theta = previousTheta + direction * MIN_ANGLE_DIFF;
+
+              theta = previousTheta + (Math.random() > 0.5 ? 1 : -1) * MIN_ANGLE_DIFF;
+
               while (theta > Math.PI) theta -= Math.PI * 2;
               while (theta < -Math.PI) theta += Math.PI * 2;
               break;

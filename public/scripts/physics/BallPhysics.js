@@ -13,6 +13,15 @@ class BallPhysics {
     this.dirt = false;
   }
   
+  nextBallPosition(dt) {
+    let angle = this.tree.mesh.rotation.y;
+    let a_v = this.ball.getPosition().add(this.ball.velocity.clone().multiplyScalar(dt));
+    let v = this.tree.getPointOnTrunk(a_v.y, this.ball.k_distance, angle + Math.PI / 2);
+
+    v.applyMatrix4(new THREE.Matrix4().makeRotationY(angle));
+    return new THREE.Vector3(a_v.x, v.y, v.z);
+  }
+  
   update(dt) {
     // Не обновляем физику, если игра в IDLE
     if (this.gameState.isIdle()) return;
@@ -21,16 +30,20 @@ class BallPhysics {
       // Применение гравитации
       this.ball.applyGravity(dt, this.gravity);
       this.ball.limitVelocity(this.maxVelocity);
-      this.ball.updatePosition(dt);
+      let np = this.nextBallPosition(dt);
       
       // Проверка достижения вершины дерева (победа)
-      this.checkVictory();
+      if (!this.checkVictory()) {
       
-      // Проверка столкновения с базовой платформой
-      this.checkBasePlatformCollision();
-      
-      // Проверка столкновения с платформами на дереве
-      this.checkTreePlatformsCollision();
+        // Проверка столкновения с базовой платформой
+        if (this.checkBasePlatformCollision(np))
+          this.ball.setPosition(np.x, np.y, np.z);
+        
+        // Проверка столкновения с платформами на дереве
+        if (!this.checkTreePlatformsCollision(np)) 
+          this.ball.setPosition(np.x, np.y, np.z);
+      }
+
     } else {
       let pos = this.dirt.object.getPosition().add(this.dirt.offset);
       this.ball.setPosition(pos.x, pos.y, pos.z);
@@ -44,19 +57,26 @@ class BallPhysics {
     if (ballPos.y + BALL_RADIUS >= this.victoryY) {
       console.log("ПОБЕДА! Шарик достиг вершины дерева!");
       this.gameState.victory();
+      return true;
     }
+    return false;
   }
   
-  checkBasePlatformCollision() {
+  checkBasePlatformCollision(newBallPos) {
     const ballPos = this.ball.getPosition();
-    if (ballPos.y - BALL_RADIUS <= this.baseBounceY) {
+    const direct  = newBallPos.y - ballPos.y;
+    if (ballPos.y - BALL_RADIUS + direct <= this.baseBounceY) {
       this.ball.bounce(this.baseBounceY, this.bounceSpeed);
+      return true;
     }
+    return false;
   }
   
-  checkTreePlatformsCollision() {
-    const ballPos = this.ball.getPosition();
+  checkTreePlatformsCollision(newBallPos) {
+
+    const ballPos   = this.ball.getPosition();
     const platforms = this.tree.getPlatforms();
+    const direct    = newBallPos.y - ballPos.y;
     
     // Обновление мировой матрицы дерева
     this.tree.mesh.updateMatrixWorld(true);
@@ -64,22 +84,23 @@ class BallPhysics {
     for (const platformData of platforms) {
       const worldPos = new THREE.Vector3();
       platformData.mesh.getWorldPosition(worldPos);
-      const platformWorldY = worldPos.y;
-      const platformTop = platformWorldY + PLATFORM_HEIGHT / 2;
-      const platformBottom = platformWorldY - PLATFORM_HEIGHT / 2;
+      const platformWorldY  = worldPos.y;
+      const platformTop     = platformWorldY + PLATFORM_HEIGHT / 2;
+      const platformBottom  = platformWorldY - PLATFORM_HEIGHT / 2;
       
       const dx = ballPos.x - worldPos.x;
       const dz = ballPos.z - worldPos.z;
       const distance2D = Math.sqrt(dx * dx + dz * dz);
+      const ballTop = ballPos.y + BALL_RADIUS;
+      const ballBtm = ballPos.y - BALL_RADIUS;
       
       // Проверка горизонтального расстояния
       if (distance2D < platformData.radius + BALL_RADIUS) {
         
         // Проверка столкновения с ВЕРХНЕЙ поверхностью платформы
-        if (ballPos.y - BALL_RADIUS <= platformTop && 
-            ballPos.y + BALL_RADIUS >= platformTop &&
-            ballPos.y > platformTop &&
-            this.ball.velocity.y < 0) {
+        if (ballBtm + direct <= platformTop &&
+            ballBtm > platformTop &&
+            direct < 0) {
           
           // Если это платформа-убийца - заканчиваем игру (ТОЛЬКО ПРИ УДАРЕ СВЕРХУ)
           if (platformData.checkDamage()) {
@@ -92,34 +113,26 @@ class BallPhysics {
             setTimeout(()=>{
               this.gameState.gameOver();
             }, 1000);
-            return; // Прерываем проверку
+            return true;
           }
           
           // Обычный отскок от верхней поверхности (летим вверх)
           this.ball.bounce(platformTop, this.bounceSpeed);
-          break;
+          return true;
         }
         
         // Проверка столкновения с НИЖНЕЙ поверхностью платформы
-        if (ballPos.y + BALL_RADIUS >= platformBottom && 
-            ballPos.y - BALL_RADIUS <= platformBottom &&
-            ballPos.y < platformBottom &&
-            this.ball.velocity.y > 0) {
-          
-          // Если это платформа-убийца - НЕ заканчиваем игру при ударе снизу
-          if (platformData.isKiller) {
-            console.log("Платформа-убийца: удар снизу - безопасно");
-            // Обычный отскок от нижней поверхности для платформы-убийцы
-            this.ball.bounce(platformBottom, -this.bounceSpeed);
-            break;
-          }
+        if (ballTop + direct >= platformBottom && 
+            ballTop < platformBottom &&
+            direct > 0) {
           
           // Обычный отскок от нижней поверхности - летим ВНИЗ (отрицательная скорость)
           this.ball.bounce(platformBottom, -this.bounceSpeed);
-          break;
+          return true;
         }
       }
     }
+    return false;
   }
   
   setGravity(gravity) {

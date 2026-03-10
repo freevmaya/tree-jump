@@ -56,15 +56,6 @@ class Ball {
     this.velocity.y = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocity.y));
   }
   
-  updatePosition(dt) {
-    let angle = this.tree.mesh.rotation.y;
-    let a_v = this.getPosition().add(this.velocity.clone().multiplyScalar(dt));
-    let v = this.tree.getPointOnTrunk(a_v.y, this.k_distance, angle + Math.PI / 2);
-
-    v.applyMatrix4(new THREE.Matrix4().makeRotationY(angle));
-    this.setPosition(a_v.x, v.y, v.z);
-  }
-  
   bounce(bounceY, bounceSpeed) {
     this.mesh.position.y = bounceY + BALL_RADIUS * Math.sign(bounceSpeed);
     this.velocity.y = bounceSpeed;

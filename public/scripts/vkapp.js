@@ -54,7 +54,6 @@ class VKApp {
 			return window.game;
 		})
 		.then(()=>{
-
 			window.game.advProvider = () => {
 		      return new Promise((resolve, reject)=>{
 				this.showAd()

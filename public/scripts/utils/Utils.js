@@ -178,15 +178,29 @@ function onAllImagesLoaded(callback, includeCSS = true, includeImg = true) {
   Promise.all(promises).then(callback);
 }
 
-function btnOnClick(selector, onClick) {
+function btnOnClick(selector, onClick, wait = 5000) {
   const btn = $(selector);
   if (btn.length > 0) {
     btn.on('click', () => {
       btn[0].disabled = true;
       setTimeout(()=>{
         btn[0].disabled = false;
-      }, 2000);
+      }, wait);
       onClick();
     });
   }
+}
+
+function delayAnimation(ms, callback) {
+  const start = performance.now();
+  
+  function check(time) {
+    if (time - start >= ms) {
+      callback();
+    } else {
+      requestAnimationFrame(check);
+    }
+  }
+  
+  requestAnimationFrame(check);
 }

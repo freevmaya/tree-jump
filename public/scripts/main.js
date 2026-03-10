@@ -241,6 +241,7 @@ class Game {
     
     this.gameState.on(GAME_STATE.PLAYING, () => {
       console.log("PLAYING callback вызван");
+      this.updateGameDisplay();
       this.enableControls();
     });
     
@@ -825,9 +826,8 @@ class Game {
       this.gameState.gameOver();
     }
   }
-  
-  animate() {
-    requestAnimationFrame(this.animate.bind(this));
+
+  _update() {
     
     const time = performance.now();
     const dt = (time - this.lastTime) / 1000;
@@ -869,7 +869,7 @@ class Game {
     
       // Обновление кристалла
       this.updateCrystal(dt);
-      
+
       if (this.ball) {
         this.cameraController.update(dt, this.ball.getLastBounceY());
       }
@@ -880,6 +880,14 @@ class Game {
       }
 
     }
+  }
+  
+  animate() {
+    //if (typeof DEV == 'undefined')
+      requestAnimationFrame(this.animate.bind(this));
+    //else delayAnimation(100, this.animate.bind(this));
+
+    this._update();
   }
 
   createCrystal() {

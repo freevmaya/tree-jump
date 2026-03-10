@@ -57,8 +57,10 @@ class VKApp {
 		.then(()=>{
 			window.game.advProvider = () => {
 				return new Promise((resolve, reject)=>{
-					let dt = (performance.now() - this.last_show_adv) / 1000;
-					if (dt > 60) {
+					let current = performance.now();
+					let dt = (current - this.last_show_adv) / 1000;
+					if (dt > 30) {
+						this.last_show_adv = current;
 						this.showAd()
 							.then((result) => {
 								setTimeout(()=>{

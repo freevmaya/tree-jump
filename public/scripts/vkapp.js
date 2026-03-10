@@ -3,7 +3,7 @@ class VKApp {
 	requireShareCount = 3;
 	constructor(app_id, source_user_id, source) {
 
-		this.last_show_adv = performance.now();
+		this.last_show_adv = 0;
 		this.app_id = app_id;
 		this.source = source;
 		this.source_user_id = source_user_id;

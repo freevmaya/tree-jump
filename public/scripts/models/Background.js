@@ -37,10 +37,10 @@ class Background {
    */
   createBackground() {
 
-    let size = this.game.tree.half_height * 4.5;
+    this.size = 50 + this.game.tree.half_height;
 
     // Создаем геометрию плоскости
-    const geometry = new THREE.PlaneGeometry(size, size);
+    const geometry = new THREE.PlaneGeometry(this.size, this.size);
     
     // Создаем материал с текстурой
     const material = new THREE.MeshBasicMaterial({
@@ -75,7 +75,7 @@ class Background {
     let angle = Math.atan2(dir.x, dir.z);
     
     // Позиционируем фон позади сцены
-    this.mesh.position.set(dir.x * distance, this.game.tree.half_height, dir.z * distance);
+    this.mesh.position.set(dir.x * distance, this.game.tree.options.TREE_HEIGHT, dir.z * distance);
     
     // Поворачиваем чтобы смотрела на камеру
     this.mesh.rotation.y = angle;

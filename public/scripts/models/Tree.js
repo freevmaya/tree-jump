@@ -85,8 +85,8 @@ class Tree {
     const trunkGeometry = this.createVariableRadiusTube(
       curve, 
       radiusFunction, 
-      64, // tubularSegments
-      12  // radialSegments
+      Math.floor(this.options.TREE_HEIGHT * 6), // Вертикальных сегментов
+      window.game.testResult < 25 ? 8 : 16  // Радиальных сегментов
     );
     
     // Создаем материал
@@ -262,39 +262,58 @@ class Tree {
     // Создаем массив для хранения углов обычных платформ, чтобы разместить напротив них убийц
     const normalPlatformAngles = [];
     const rotatePlatform = randomArray(this.platform_count, this.options.PLATFORM_ROTATE_DENSITY);
-    const killerPlatform = randomArray(this.platform_count, this.options.KILLER_DENSITY);
+    const killerPlatform = randomArray(this.platform_count - 2, this.options.KILLER_DENSITY);
+
+    killerPlatform.unshift(false, false); // Самые две первых платформа не убийца
     
     let base_y = this.half_height / this.platform_count;
     let previousTheta = null;
     const MIN_ANGLE_DIFF = Math.PI / 3;
-    
-    // Сначала создаем все обычные платформы (isKiller = false)
+    let direct = Math.random() > 0.5 ? 1 : -1;
+    let direct_steps = 0;
+
     for (let i = 0; i < this.platform_count; i++) {
       const y = base_y + (i / this.platform_count * 2 - 1) * (this.half_height - base_y);
       
       let theta;
-      
-      if (previousTheta === null) {
-        theta = (Math.random() - 0.5) * Math.PI * 2;
+
+      if (this.options.RADIAL_PLATFORM_STEP && (previousTheta != null) && 
+         (direct_steps < this.options.RADIAL_PLATFORM_STEP[2]) &&
+          (Math.random() <= this.options.RADIAL_PLATFORM_STEP[0])) {
+
+        theta = previousTheta + (Math.PI * this.options.RADIAL_PLATFORM_STEP[1] * direct);   
+        direct_steps++;     
+
       } else {
-        let attempts = 0;
-        const maxAttempts = 100;
         
-        do {
-          theta = (Math.random() - 0.5) * Math.PI * 2;
-          attempts++;
+        direct_steps = 0;
+        direct = -direct;
+
+        if (previousTheta == null) {
+          do {
+            theta = (Math.random() - 0.5) * Math.PI * 2;
+          } while ((theta > 0.7) && (theta < 2.2));
+
+          console.log(theta);
+        } else {
+          let attempts = 0;
+          const maxAttempts = 100;
           
-          if (attempts > maxAttempts) {
-            const direction = Math.random() > 0.5 ? 1 : -1;
-            theta = previousTheta + direction * MIN_ANGLE_DIFF;
-            while (theta > Math.PI) theta -= Math.PI * 2;
-            while (theta < -Math.PI) theta += Math.PI * 2;
-            break;
-          }
-        } while (Math.abs(theta - previousTheta) < MIN_ANGLE_DIFF);
+          do {
+            theta = (Math.random() - 0.5) * Math.PI * 2;
+            attempts++;
+            
+            if (attempts > maxAttempts) {
+              const direction = Math.random() > 0.5 ? 1 : -1;
+              theta = previousTheta + direction * MIN_ANGLE_DIFF;
+              while (theta > Math.PI) theta -= Math.PI * 2;
+              while (theta < -Math.PI) theta += Math.PI * 2;
+              break;
+            }
+          } while (Math.abs(theta - previousTheta) < MIN_ANGLE_DIFF);
+        }
       }
-      
-      // Создаем обычную платформу
+
 
       let platform;
 
@@ -325,8 +344,8 @@ class Tree {
     if (this.platforms.length === 0) return;
     
     // Рассчитываем количество веток на основе плотности
-    const targetBranchCount = Math.floor(this.platform_count * BRANCH_DENSITY);
-    console.log(`Создание веток под платформами: ${targetBranchCount} шт. (плотность ${BRANCH_DENSITY})`);
+    const targetBranchCount = Math.floor(this.platform_count * this.options.BRANCH_DENSITY);
+    console.log(`Создание веток под платформами: ${targetBranchCount} шт. (плотность ${this.options.BRANCH_DENSITY})`);
     
     // Сортируем платформы по высоте
     const sortedPlatforms = [...this.platforms].sort((a, b) => a.y - b.y);
@@ -357,14 +376,14 @@ class Tree {
             break;
           }
         }
-        
+        /*
         // Также проверяем расстояние до других платформ (чтобы ветка не мешала)
         for (const otherPlatform of sortedPlatforms) {
           if (otherPlatform !== platform && Math.abs(otherPlatform.y - platformY) < 0.6) {
             tooClose = true;
             break;
           }
-        }
+        }*/
         
         if (!tooClose) {
           // Добавляем платформу в выбранные

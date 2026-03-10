@@ -608,9 +608,9 @@ class Game {
     const bounceCount = this.ball.getBounceCount();
     // Формула: чем меньше отскоков, тем больше очков
     // Максимум 1000 очков при 0 отскоков, минимум 100 при максимальном количестве
-    const MAX_BOUNCES = 30; // Ожидаемое максимальное количество отскоков
-    const MAX_SCORE = 1000;
-    const MIN_SCORE = 100;
+    const MAX_BOUNCES = 100; // Ожидаемое максимальное количество отскоков
+    const MAX_SCORE = 200;
+    const MIN_SCORE = 20;
     
     if (bounceCount >= MAX_BOUNCES) {
       this.currentScore = MIN_SCORE;

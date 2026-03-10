@@ -72,33 +72,34 @@ class VKSessionHandler {
      * Настройка кук для VK WebView
      */
     private static function configureVKCookies(): void {
+        $session_params = [
+            'lifetime' => 86400 * 7,
+            'path' => '/',
+            'domain' => $_SERVER['HTTP_HOST'],
+            'secure' => isset($_SERVER['HTTPS']),
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ];
+
         // Важно: для VK Mini Apps нужны особые настройки
-        $isVK = self::isVKEnvironment();
-        
-        if ($isVK) {
+        if (self::isVKEnvironment()) {
             // Для VK
-            session_set_cookie_params([
+            $session_params = [
                 'lifetime' => 86400 * 30, // 30 дней
                 'path' => '/',
                 'domain' => '', // Пустой domain для VK
                 'secure' => true, // VK всегда использует HTTPS
                 'httponly' => true,
                 'samesite' => 'None' // Для кросс-сайтовых запросов
-            ]);
+            ];
             
             ini_set('session.cookie_samesite', 'None');
             ini_set('session.cookie_secure', '1');
-        } else {
-            // Для обычных браузеров
-            session_set_cookie_params([
-                'lifetime' => 86400 * 7,
-                'path' => '/',
-                'domain' => $_SERVER['HTTP_HOST'],
-                'secure' => isset($_SERVER['HTTPS']),
-                'httponly' => true,
-                'samesite' => 'Lax'
-            ]);
-        }
+        } 
+
+        trace($session_params);
+
+        session_set_cookie_params($session_params);
     }
     
     /**

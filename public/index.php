@@ -1,5 +1,4 @@
 <?
 	require dirname(__FILE__, 2).'/src/Vmaya/engine.php';
-	//VKSessionHandler::startForVK();
-	session_start();
+	VKSessionHandler::startForVK();
 	Page::Run(null, array_merge($_POST, $_GET));

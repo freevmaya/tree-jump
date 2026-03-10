@@ -37,7 +37,7 @@ class Background {
    */
   createBackground() {
 
-    this.size = 50 + this.game.tree.half_height;
+    this.size = 70 + this.game.tree.half_height;
 
     // Создаем геометрию плоскости
     const geometry = new THREE.PlaneGeometry(this.size, this.size);

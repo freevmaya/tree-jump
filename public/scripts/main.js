@@ -68,6 +68,12 @@ class Game {
     this.testResult = this.quickGPUTest();
     this.stateManager = new StateManager();
     this.gameHint = $('#game-hint');
+    this.allow_playing = true;
+    this.advProvider = () => {
+      return new Promise((resolve, reject)=>{
+        resolve(true);
+      });
+    }
 
     console.log(this.testResult);
     
@@ -156,6 +162,32 @@ class Game {
       console.warn('Ошибка загрузки звуков:', error);
     }
   }
+
+  doAfterGameOver() {
+    this.advProvider()
+      .then((result)=>{
+          this.gameOverModal.hide();
+          this.resetGame();
+      });
+  }
+
+  doNextLevel() {
+    this.advProvider()
+      .then((result)=>{
+        this.nextGameIndex()
+          .then(()=>{
+            this.hideVictoryModal();
+            this.resetGame();
+          });
+      });
+  }
+
+  doResume() {
+    this.advProvider()
+      .then((result)=>{
+        this.gameState.resume();
+      });
+  }
   
   initModals() {
     this.initStartModal();
@@ -175,7 +207,7 @@ class Game {
         if (this.gameState.isPlaying()) {
           this.gameState.pause();
         } else if (this.gameState.isPaused()) {
-          this.gameState.resume();
+          this.doResume();
         }
       }
       
@@ -356,12 +388,7 @@ class Game {
       });
       
       // Обработчик для кнопки старта
-      const startBtn = $('#startGameButton');
-      if (startBtn) {
-        startBtn.on('click', () => {
-          this.gameState.start();
-        });
-      }
+      btnOnClick('#startGameButton', this.gameState.start.bind(this.gameState));
     }
   }
   
@@ -377,13 +404,9 @@ class Game {
       });
       
       // Обработчик для кнопки рестарта в Game Over
-      const restartBtn = $('#restartButton');
-      if (restartBtn) {
-        restartBtn.on('click', () => {
-          this.gameOverModal.hide();
-          this.resetGame();
-        });
-      }
+      btnOnClick('#restartButton', ()=>{
+        this.doAfterGameOver();
+      });
       
       // Обработчик для закрытия модального окна
       this.gameOverModalElement.on('hidden.bs.modal', () => {
@@ -406,16 +429,7 @@ class Game {
       });
       
       // Обработчик для кнопки рестарта в Victory
-      const victoryRestartBtn = $('#victoryRestartButton');
-      if (victoryRestartBtn) {
-        victoryRestartBtn.on('click', () => {
-          this.nextGameIndex()
-            .then(()=>{
-              this.hideVictoryModal();
-              this.resetGame();
-            });
-        });
-      }
+      btnOnClick('#victoryRestartButton', this.doNextLevel.bind(this));
       
       // Обработчик для закрытия модального окна
       this.victoryModalElement.on('hidden.bs.modal', () => {
@@ -438,21 +452,13 @@ class Game {
       });
       
       // Обработчик для кнопки продолжения
-      const resumeBtn = $('#resumeButton');
-      if (resumeBtn) {
-        resumeBtn.on('click', () => {
-          this.gameState.resume();
-        });
-      }
+      btnOnClick('#resumeButton', this.doResume.bind(this));
       
       // Обработчик для кнопки рестарта в паузе
-      const pauseRestartBtn = $('#pauseRestartButton');
-      if (pauseRestartBtn) {
-        pauseRestartBtn.on('click', () => {
-          this.hidePauseModal();
-          this.resetGame();
-        });
-      }
+      btnOnClick('#pauseRestartButton', () => {
+        this.hidePauseModal();
+        this.resetGame();
+      });
     }
   }
   
@@ -828,7 +834,7 @@ class Game {
     this.lastTime = time;
     
     // Обновление физики только если игра активна (не на паузе, не закончена и не в IDLE)
-    if (this.gameState.isPlaying() && this.ball && this.physics && (textureLoader.loading <= 0)) {
+    if (this.allow_playing && this.gameState.isPlaying() && this.ball && this.physics && (textureLoader.loading <= 0)) {
       this.tree.update(dt);
       this.physics.update(dt);
     
@@ -864,9 +870,8 @@ class Game {
       // Обновление кристалла
       this.updateCrystal(dt);
       
-      // Обновление камеры (всегда, чтобы камера не улетала)
       if (this.ball) {
-        this.cameraController.update(this.ball.getLastBounceY());
+        this.cameraController.update(dt, this.ball.getLastBounceY());
       }
       
       // Рендеринг (всегда, чтобы видеть сцену)

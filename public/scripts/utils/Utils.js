@@ -177,3 +177,16 @@ function onAllImagesLoaded(callback, includeCSS = true, includeImg = true) {
   
   Promise.all(promises).then(callback);
 }
+
+function btnOnClick(selector, onClick) {
+  const btn = $(selector);
+  if (btn.length > 0) {
+    btn.on('click', () => {
+      btn[0].disabled = true;
+      setTimeout(()=>{
+        btn[0].disabled = false;
+      }, 2000);
+      onClick();
+    });
+  }
+}

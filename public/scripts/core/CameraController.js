@@ -38,13 +38,13 @@ class CameraController {
     return direction;
   }
   
-  update(targetY) {
+  update(dt, targetY) {
     this.targetY = targetY + this.heightOffset;
     this.camera.position.y += (this.targetY - this.camera.position.y) * this.followSpeed;
     this.camera.lookAt(0, this.camera.position.y, 0);
     let diff = this.targetFocus - this.camera.fov;
     if (Math.abs(diff) > 0.1)
-      this.setFocus(this.camera.fov + diff * 0.05);
+      this.setFocus(this.camera.fov + diff * dt);
   }
   
   setPosition(x, y, z) {

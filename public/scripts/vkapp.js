@@ -1,13 +1,11 @@
 
 class VKApp {
 	requireShareCount = 3;
-	_haveAd = false;
 	constructor(app_id, source_user_id, source) {
 
 		this.app_id = app_id;
 		this.source = source;
 		this.source_user_id = source_user_id;
-		this.count_phrases = 0;
 		this.sharedSession = false;
 
 		$('body').addClass('vk_layout');
@@ -34,16 +32,6 @@ class VKApp {
 				}
 			}).bind(this));
 
-		vkBridge.send('VKWebAppCheckNativeAds', {
-			ad_format: 'reward' /* Тип рекламы */ 
-		})
-		.then((data) => { 
-			if (data.result) { 
-				this._haveAd = true;
-			}   
-	  	})
-	  	.catch((error) => { tracer.log(error); });
-
 	  	this.initListeners();
 	}
 
@@ -62,7 +50,18 @@ class VKApp {
 	}
 
 	initListeners() {
+
+		window.game.advProvider = () => {
+	      return new Promise((resolve, reject)=>{
+			this.showAd()
+				.then((result) => { 
+					resolve(result);
+				});
+	      });
+	    }
 	}
+
+
 
 	shareApp(message) {
 		return new Promise((resolve, reject)=>{
@@ -82,6 +81,33 @@ class VKApp {
 				tracer.error(e);
 				reject(e);
 			});
+		});
+	}
+
+	showAd() {
+		return new Promise((resolve, reject) => {
+			vkBridge.send('VKWebAppCheckNativeAds', {
+				ad_format: 'reward' /* Тип рекламы */ 
+			})
+			.then((data) => { 
+				if (data.result) { 
+					vkBridge.send('VKWebAppShowNativeAds', {
+						ad_format: 'interstitial' /* Тип рекламы */
+					})
+					.then((data) => { 
+						// Реклама была показана
+						resolve(data.result)
+					})
+					.catch((error) => { 
+						tracer.log(error);
+						resolve(false);
+					});
+				} else resolve(false);
+		  	})
+		  	.catch((error) => { 
+		  		tracer.log(error);
+		  		resolve(false);
+		  	});
 		});
 	}
 }

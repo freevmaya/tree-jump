@@ -12,6 +12,4 @@
 	        'check-audio'
 	    ]
 	});
-
-	var X_CSRF_Token = '<?=Page::LastToken();?>';
 </script>

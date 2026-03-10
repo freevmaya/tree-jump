@@ -13,7 +13,7 @@
 	<!-- Custom CSS -->
 	<link rel="stylesheet" href="<?=BASEURL?>/styles/main.css?v=<?=$v?>">
 	<link rel="stylesheet" href="<?=BASEURL?>/styles/dialog.css?v=<?=$v?>">
-    <?if ($is_developer) {?><script>var DEV = true</script><?}?>
+    <script>var DEV = <?=$is_developer ? 'true' : 'false'?></script>
 	<?include('tracker.php')?>
 
 	<script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>

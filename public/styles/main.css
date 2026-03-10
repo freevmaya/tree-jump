@@ -487,11 +487,8 @@ canvas {
   gap: 10px;
 }
 
-/* Стили для отображения очков */
 .score-indicator {
   position: absolute;
-  top: 120px;
-  right: 20px;    
   background-image: url(dialog/button.png);
   background-position: center;
   background-repeat: no-repeat;
@@ -506,6 +503,15 @@ canvas {
   width: 129px;
   height: 50px;
   line-height: 37px;
+  top: 120px;
+  right: 20px;
+}
+
+#pause-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1;
 }
 
 .title-image {

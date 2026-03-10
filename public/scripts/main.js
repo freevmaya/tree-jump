@@ -87,11 +87,15 @@ class Game {
     // Загрузка звуков
     this.initAudio();
 
-    if (typeof DEV == 'undefined')
+    if ((typeof DEV == 'undefined') || !DEV) {
       $(window).on('blur', () => {
-        if (this.gameState.isPlaying())
-          this.gameState.pause();
+        this.allow_playing = false;
       });
+
+      $(window).on('focus', () => {
+        this.allow_playing = true;
+      });
+    }
     
     // Настройка обработчика изменения размера окна
     $(window).on('resize', this.onResize.bind(this));
@@ -652,13 +656,14 @@ class Game {
     // Скрываем подсказки до старта игры
     this.hideKillerIndicator();
     this.hideScoreIndicator();
-    
-    // Добавляем подсказку по управлению звуком
-    console.log('Нажмите M для отключения/включения звука');
 
     this.showStartModal();
     this.updateStateView();
     this.visibleLoader(false);
+
+    btnOnClick('#pause-btn', ()=>{
+      this.gameState.pause();
+    });
   }
   
   createGameObjects() {

@@ -840,7 +840,7 @@ class Game {
     
     // Если шарик упал ниже камеры на заданное смещение
     if (ballPos.y < cameraY + GAME_OVER_Y_OFFSET) {
-      console.log("Game Over по падению");
+      console.log(`Game Over по падению ${ballPos.y} < ${cameraY} + ${GAME_OVER_Y_OFFSET}`);
       this.gameState.gameOver();
     }
   }

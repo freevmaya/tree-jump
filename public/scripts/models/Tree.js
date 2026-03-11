@@ -266,7 +266,7 @@ class Tree {
 
     killerPlatform.unshift(false, false); // Самые две первых платформа не убийца
     
-    let base_y = this.half_height / this.platform_count;
+    let base_y = this.half_height / (this.platform_count + 1);
     let previousTheta = null;
     const MIN_ANGLE_DIFF = Math.PI / 3;
     let direct = Math.random() > 0.5 ? 1 : -1;

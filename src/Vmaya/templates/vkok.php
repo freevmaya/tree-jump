@@ -17,7 +17,7 @@
 	<?include('tracker.php')?>
 
 	<script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
-	<script type="text/javascript" src="<?=SCRIPTURL?>jquery-4.0.0.min.js"></script>
+	<script src="<?=SCRIPTURL?>jquery-4.0.0.min.js"></script>
 	<script src="<?=SCRIPTURL?>vkapp.js<?=$v?>" defer></script>
 
 	<?include('lang_script.php')?>

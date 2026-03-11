@@ -258,9 +258,7 @@ class Tree {
   createPlatforms() {
     // Очищаем массив платформ перед созданием новых
     this.platforms = [];
-    
-    // Создаем массив для хранения углов обычных платформ, чтобы разместить напротив них убийц
-    const normalPlatformAngles = [];
+
     const rotatePlatform = randomArray(this.platform_count, this.options.PLATFORM_ROTATE_DENSITY);
     const killerPlatform = randomArray(this.platform_count - 2, this.options.KILLER_DENSITY);
 
@@ -321,10 +319,11 @@ class Tree {
       else if (rotatePlatform[i])
         platform = new RotatePlatform(this, theta, y, false, this.options.PLATFORM_SPEED * (Math.random() > 0.5 ? 1 : -1));
       else {
-        platform = new Platform(this, theta, y, false);
-      
-        // Сохраняем угол для возможного создания платформы-убийцы напротив
-        normalPlatformAngles.push(platform);
+        /*
+        if (Math.random() > 0.5)
+          platform = new MagicPlatform(this, theta, y, false, 0);
+        else*/
+          platform = new Platform(this, theta, y, false);
       }
       platform.group.position.copy(this.getPointOnTrunk(y, PLATFORM_DISTANCE, theta));
       
@@ -332,8 +331,6 @@ class Tree {
       
       previousTheta = theta;
     }
-    
-    console.log(`Создано платформ: ${normalPlatformAngles.length}`);
   }
   
   createBranchesUnderPlatforms() {

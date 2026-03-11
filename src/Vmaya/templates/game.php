@@ -13,6 +13,7 @@
       'models/Platform',
       'models/RotatePlatform',
       'models/KillerPlatform',
+      'models/MagicPlatform',
       'models/Needle',
       'models/Crystal',
       'models/Background',
@@ -25,6 +26,7 @@
       'utils/crypto-js.min',
       'utils/Utils',
       'effects/SparkEffect',
+      //'effects/BounceEffect',
       'physics/BallPhysics',
       'audio/SoundManager',
       'main'
@@ -68,7 +70,13 @@
         <i class="bi bi-mouse"></i> Нажмите и тяните, чтобы вращать дерево
       </div>
 
-      <button type="button" class="btn" id="pause-btn">Пауза</button>
+      <div id="tools">
+        <span id="pause-btn">Пауза</span>
+        <span id="volume" class="on">
+          <i class="bi bi-volume-down"></i>
+          <i class="bi bi-volume-mute"></i>
+        </span>
+      </div>
 
       <!-- Индикатор очков (только при победе) -->
       <div class="score-indicator" id="score-indicator">

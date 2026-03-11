@@ -11,10 +11,13 @@ class Platform {
 
     this.radius = this.tree.options.PLATFORM_RADIUS.MIN + Math.random() * (this.tree.options.PLATFORM_RADIUS.MAX - this.tree.options.PLATFORM_RADIUS.MIN);
 
-    this.platformGeometry = new THREE.CylinderGeometry(this.radius, this.radius * 0.8, PLATFORM_HEIGHT, 8);
-
-    textureLoader.rotateUV(this.platformGeometry, Math.PI * 0.5);
+    this.createGeometry();
     this.createMesh();
+  }
+
+  createGeometry() {
+    this.platformGeometry = new THREE.CylinderGeometry(this.radius, this.radius * 0.8, PLATFORM_HEIGHT, 8);
+    textureLoader.rotateUV(this.platformGeometry, Math.PI * 0.5);
   }
 
   createMesh() {

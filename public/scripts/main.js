@@ -665,6 +665,26 @@ class Game {
     btnOnClick('#pause-btn', ()=>{
       this.gameState.pause();
     });
+
+    this.soundControl();
+  }
+
+  soundControl() {
+
+    this.volume = $('#volume');
+    this.volume.toggleClass('on', this.stateManager.get('sound_on', true));
+    this.updateSound();
+
+    this.volume.click(()=>{
+      this.volume.toggleClass('on');
+      this.updateSound();
+    });
+  }
+
+  updateSound() {
+    let on = this.volume.hasClass('on');
+    this.stateManager.set('sound_on', on);
+    this.soundManager.setMuted(!on);
   }
   
   createGameObjects() {

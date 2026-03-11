@@ -75,8 +75,6 @@ class Game {
         resolve(true);
       });
     }
-
-    console.log(this.testResult);
     
     // Создаем gameState
     this.gameState = new GameState();
@@ -666,24 +664,6 @@ class Game {
     btnOnClick('#pause-btn', ()=>{
       this.gameState.pause();
     });
-
-    let btn = $('#pause-btn')[0];
-
-    btn.addEventListener('click touchstart', function(e) {
-
-      // Проверить перекрытие
-      //console.log(document.elementsFromPoint(x, y)); // какие элементы под координатами
-      console.log(e);
-    });
-
-    // Проверить стили
-    console.log(window.getComputedStyle(btn).pointerEvents);
-    console.log(window.getComputedStyle(btn).display);
-    console.log(window.getComputedStyle(btn).visibility);
-    console.log(window.getComputedStyle(btn).opacity);
-
-    // Проверить обработчики событий
-    //console.log(getEventListeners(btn)); // В Chrome DevTools
   }
   
   createGameObjects() {

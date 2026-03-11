@@ -26,7 +26,7 @@
 	define('SITE_NAME', 'English Phrases Trainer');
 
 	define('DEVUSERS', [49, 14]);
-	define('DEVUSER', 50);
+	define('DEVUSER', 51);
 	define("JSON_FLAGS", JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT);
 
 	//include(INCLUDE_PATH.DS."SessionManager.php");

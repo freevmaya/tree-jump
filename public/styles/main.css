@@ -47,7 +47,13 @@ body {
 }
 
 #game-title {
-  margin-top: 7%;
+  width: 60dvw;
+  margin: 8% auto 0px auto;
+  padding-left: 10dvw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: min(24px, 4dvw);
 }
 
 .modal-open #game-container {

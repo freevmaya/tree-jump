@@ -243,6 +243,7 @@ class Game {
       console.log("PLAYING callback вызван");
       this.updateGameDisplay();
       this.enableControls();
+      this.updateDeltaTime();
     });
     
     this.gameState.on(GAME_STATE.PAUSED, () => {
@@ -828,11 +829,15 @@ class Game {
     }
   }
 
-  _update() {
-    
+  updateDeltaTime() {
     const time = performance.now();
     const dt = (time - this.lastTime) / 1000;
     this.lastTime = time;
+    return dt;
+  }
+
+  _update() {
+    const dt = this.updateDeltaTime();
     
     // Обновление физики только если игра активна (не на паузе, не закончена и не в IDLE)
     if (this.allow_playing && this.gameState.isPlaying() && this.ball && this.physics && (textureLoader.loading <= 0)) {

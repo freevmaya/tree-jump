@@ -17,13 +17,13 @@ class CameraController {
   }
 
   setFocus(f) {
-    this.camera.fov = f; // меньше значение = больше приближение
+    this.camera.fov = f;
     this.camera.updateProjectionMatrix();
   }
 
   begin() {
     this.targetFocus = this.calcTargetFocus();
-    this.camera.fov = this.targetFocus * 1.5;
+    this.camera.fov = this.targetFocus;// * 1.5;
   }
 
   reset() {
@@ -41,9 +41,11 @@ class CameraController {
     this.targetY = targetY + this.heightOffset;
     this.camera.position.y += (this.targetY - this.camera.position.y) * this.followSpeed;
     this.camera.lookAt(0, this.camera.position.y, 0);
+    /*
     let diff = this.targetFocus - this.camera.fov;
     if (Math.abs(diff) > 0.1)
       this.setFocus(this.camera.fov + diff * dt);
+      */
   }
   
   setPosition(x, y, z) {

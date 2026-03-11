@@ -63,9 +63,12 @@
         <div class="right">
         </div>
       </div>
+
       <div class="hint" id="game-hint">
         <i class="bi bi-mouse"></i> Нажмите и тяните, чтобы вращать дерево
       </div>
+
+      <button type="button" class="btn" id="pause-btn">Пауза</button>
 
       <!-- Индикатор очков (только при победе) -->
       <div class="score-indicator" id="score-indicator">
@@ -79,7 +82,7 @@
   </div>
 
   <!-- Bootstrap модальное окно для Start Game -->
-  <div class="modal fade" id="startModal" tabindex="-1" aria-labelledby="startModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal fade" id="startModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
       <div class="dialog-1 modal-content">
         <div class="background">
@@ -111,7 +114,7 @@
   </div>
 
   <!-- Bootstrap модальное окно для Game Over -->
-  <div class="modal fade" id="gameOverModal" tabindex="-1" aria-labelledby="startModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal fade" id="gameOverModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
       <div class="dialog-1 modal-content">
         <div class="background">
@@ -145,7 +148,7 @@
   </div>
 
   <!-- Bootstrap модальное окно для Victory (Победа) -->
-  <div class="modal fade" id="victoryModal" tabindex="-1" aria-labelledby="startModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal fade" id="victoryModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
       <div class="dialog-1 modal-content">
         <div class="background">
@@ -188,7 +191,7 @@
   </div>
 
   <!-- Bootstrap модальное окно для Pause (Пауза) -->
-  <div class="modal fade" id="pauseModal" tabindex="-1" aria-labelledby="startModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal fade" id="pauseModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
       <div class="dialog-1 modal-content">
         <div class="background">

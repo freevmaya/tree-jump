@@ -259,6 +259,7 @@ class Game {
     
     this.gameState.on(GAME_STATE.RESUME, () => {
       console.log("Resume callback вызван");
+      console.log(`Ball position: ${this.ball.getPosition().y}`);
       this.hidePauseModal();
       this.gameState.set(GAME_STATE.PLAYING);
     });

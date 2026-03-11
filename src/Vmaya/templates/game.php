@@ -99,7 +99,7 @@
               <p>
                 <i class="bi bi-exclamation-triangle-fill"></i> Красные платформы смертельны при ударе сверху!
               </p>
-              <p <?=DEV ? '' : 'style="display:none"'?>>GPU speed: <span id="testResult"></span></p>
+              <p <?=Page::isDev() ? '' : 'style="display:none"'?>>GPU speed: <span id="testResult"></span>. Version: <span><?=APP_VERSION?></span></p>
               <div class="text-center">
                 <button type="button" class="btn" id="startGameButton">Начать</button>
               </div>

@@ -164,6 +164,14 @@ class Game {
     }
   }
 
+  doPlaying() {
+    this.frame_num = 0;
+    this.cameraController.begin();
+    this.updateGameDisplay();
+    this.enableControls();
+    this.updateDeltaTime();
+  }
+
   doAfterGameOver() {
     this.advProvider()
       .then((result)=>{
@@ -242,10 +250,7 @@ class Game {
     
     this.gameState.on(GAME_STATE.PLAYING, () => {
       console.log("PLAYING callback вызван");
-      this.frame_num = 0;
-      this.updateGameDisplay();
-      this.enableControls();
-      this.updateDeltaTime();
+      this.doPlaying();
     });
     
     this.gameState.on(GAME_STATE.PAUSED, () => {
@@ -590,20 +595,18 @@ class Game {
   
   enableControls() {
     // Инициализация управления мышью (для верхнего блока)
-    if (this.mouseControl) {
+    if (this.mouseControl)
       this.mouseControl.destroy();
-    }
-    this.mouseControl = new MouseRotationControl(this, this.container);
-    this.mouseControl.init();
 
-    this.cameraController.begin();
+    this.mouseControl = new MouseRotationControl(this, this.container);
+    this.mouseControl.init();    
 
     this.gameHint.toggleClass('show', true);
     setTimeout(()=>{
         this.gameHint.toggleClass('show', false);
     }, 5000);
 
-    $('body').addClass('page-loaded');
+    this.visibleLoader(false);
   }
   
   updateScoreIndicator() {
@@ -663,6 +666,24 @@ class Game {
     btnOnClick('#pause-btn', ()=>{
       this.gameState.pause();
     });
+
+    let btn = $('#pause-btn')[0];
+
+    btn.addEventListener('click touchstart', function(e) {
+
+      // Проверить перекрытие
+      //console.log(document.elementsFromPoint(x, y)); // какие элементы под координатами
+      console.log(e);
+    });
+
+    // Проверить стили
+    console.log(window.getComputedStyle(btn).pointerEvents);
+    console.log(window.getComputedStyle(btn).display);
+    console.log(window.getComputedStyle(btn).visibility);
+    console.log(window.getComputedStyle(btn).opacity);
+
+    // Проверить обработчики событий
+    //console.log(getEventListeners(btn)); // В Chrome DevTools
   }
   
   createGameObjects() {
@@ -750,19 +771,12 @@ class Game {
 
     this.newTitle = null;
     
-    // Сброс счетчика отскоков
-    if (this.ball) {
-      this.ball.resetBounceCount();
-    }
-    
     // Сброс счета
     this.currentScore = 0;
     this.updateScoreIndicator();
     
     // Сброс состояния игры (это вызовет onReset колбэки)
-    if (this.gameState) {
-      this.gameState.reset();
-    }
+    this.gameState.reset();
   }
 
   clearLights() {

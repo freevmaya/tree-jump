@@ -178,7 +178,7 @@ function onAllImagesLoaded(callback, includeCSS = true, includeImg = true) {
   Promise.all(promises).then(callback);
 }
 
-function btnOnClick(selector, onClick, wait = 5000) {
+function btnOnClick(selector, onClick, wait = 3000) {
   const btn = $(selector);
   if (btn.length > 0) {
     btn.on('click', () => {

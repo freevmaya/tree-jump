@@ -25,16 +25,17 @@ class MouseRotationControl {
   
   init() {
     // События мыши
-    this.container[0].addEventListener('mousedown', this.onMouseDown);
-    window.addEventListener('mousemove', this.onMouseMove);
-    window.addEventListener('mouseup', this.onMouseUp);
-    window.addEventListener('mouseleave', this.onMouseLeave);
+    let layer = this.container[0];
+    layer.addEventListener('mousedown', this.onMouseDown);
+    layer.addEventListener('mousemove', this.onMouseMove);
+    layer.addEventListener('mouseup', this.onMouseUp);
+    layer.addEventListener('mouseleave', this.onMouseLeave);
     
     // События тачскрина
-    this.container[0].addEventListener('touchstart', this.onTouchStart, { passive: false });
-    window.addEventListener('touchmove', this.onTouchMove, { passive: false });
-    window.addEventListener('touchend', this.onTouchEnd);
-    window.addEventListener('touchcancel', this.onTouchCancel);
+    layer.addEventListener('touchstart', this.onTouchStart, { passive: false });
+    layer.addEventListener('touchmove', this.onTouchMove, { passive: false });
+    layer.addEventListener('touchend', this.onTouchEnd);
+    layer.addEventListener('touchcancel', this.onTouchCancel);
     
     // Запрещаем скролл страницы при касании canvas
     this.container.css('touchAction', 'none');

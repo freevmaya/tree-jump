@@ -23,8 +23,6 @@ class BallPhysics {
   }
   
   update(dt) {
-    // Не обновляем физику, если игра в IDLE
-    if (this.gameState.isIdle()) return;
     
     if (!this.dirt) {
       // Применение гравитации

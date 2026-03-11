@@ -58,6 +58,7 @@ class Game {
       title: $('#state-title')
     };
     this.lastTime = performance.now();
+    this.frame_num = 0; 
     this.crystal = null;
     this.background = null;
     this.grass = null;
@@ -241,6 +242,7 @@ class Game {
     
     this.gameState.on(GAME_STATE.PLAYING, () => {
       console.log("PLAYING callback вызван");
+      this.frame_num = 0;
       this.updateGameDisplay();
       this.enableControls();
       this.updateDeltaTime();
@@ -841,6 +843,8 @@ class Game {
     
     // Обновление физики только если игра активна (не на паузе, не закончена и не в IDLE)
     if (this.allow_playing && this.gameState.isPlaying() && this.ball && this.physics && (textureLoader.loading <= 0)) {
+
+      this.frame_num++;
       this.tree.update(dt);
       this.physics.update(dt);
     
@@ -864,8 +868,9 @@ class Game {
         this.mouseControl.update();
       }
       
-      // Проверка конца игры
-      this.checkGameOver();
+      // Проверка конца игры, только после 30 кадров игры
+      if (this.frame_num > 30)
+        this.checkGameOver();
       
       // Показываем индикатор очков при приближении к вершине
       if (this.ball && this.ball.getPosition().y > this.tree.half_height - 2) {

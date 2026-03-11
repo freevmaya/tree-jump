@@ -227,7 +227,7 @@
   <script src="<?=SCRIPTURL.$script?>.js?v=<?=$v?>"></script>
   <?}?>
 
-  <?if (DEV) {?>
+  <?if (Page::isDev()) {?>
     <script type="module" src="<?=BASEURL?>/scripts/test-unit.js?v=<?=$v?>"></script>
     <!-- Eruda is console for mobile browsers-->
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>

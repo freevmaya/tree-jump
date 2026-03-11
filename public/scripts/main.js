@@ -849,7 +849,11 @@ class Game {
     const time = performance.now();
     const dt = (time - this.lastTime) / 1000;
     this.lastTime = time;
-    return dt;
+
+    if (dt > 0.1)
+      console.log(dt);
+
+    return Math.min(dt, 0.1);
   }
 
   _update() {

@@ -65,7 +65,7 @@ class VKApp {
 							.then((result) => {
 								setTimeout(()=>{
 									resolve(result);
-								}, 1000);
+								}, 200);
 							});
 					} else resolve(true);
 		      });

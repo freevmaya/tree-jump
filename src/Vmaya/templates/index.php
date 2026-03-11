@@ -16,8 +16,8 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="<?=BASEURL?>/styles/main.css?v=<?=$v?>">
   <link rel="stylesheet" href="<?=BASEURL?>/styles/dialog.css?v=<?=$v?>">
-  <script type="text/javascript" src="<?=SCRIPTURL?>jquery-4.0.0.min.js"></script>
-  <script type="text/javascript">
+  <script src="<?=SCRIPTURL?>jquery-4.0.0.min.js"></script>
+  <script>
     var DEV = <?=DEV ? 'true' : 'false'?>;
   </script>
 </head>

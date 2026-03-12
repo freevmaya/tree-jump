@@ -47,9 +47,9 @@ body {
 }
 
 #game-title {
-  width: 60dvw;
+  width: 60%;
   margin: 8% auto 0px auto;
-  padding-left: 10dvw;
+  padding-left: 10%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

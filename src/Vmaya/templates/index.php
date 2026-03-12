@@ -20,6 +20,7 @@
   <script>
     var DEV = <?=DEV ? 'true' : 'false'?>;
   </script>
+  <?include('ya-mertika.php');?>
 </head>
 <body>
     <?=$content?>

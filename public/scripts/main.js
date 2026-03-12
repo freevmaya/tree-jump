@@ -91,9 +91,6 @@ class Game {
         this.gameState.pause();
       });
     }
-    
-    // Настройка обработчика изменения размера окна
-    $(window).on('resize', this.onResize.bind(this));
 
     this.stateManager.loadState()
       .then(()=>{
@@ -667,6 +664,8 @@ class Game {
     });
 
     this.soundControl();
+    
+    $(window).on('resize', this.onResize.bind(this));
   }
 
   soundControl() {

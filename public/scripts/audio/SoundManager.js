@@ -48,7 +48,6 @@ class SoundManager {
   setupEventListeners() {
 
     this.gameState.on(GAME_STATE.GAME_OVER, () => {
-      this.play('fail');
       this.loadSound('fail-music', 'sounds/fail-music.mp3')
         .then(()=>{
             this.play('fail-music')
@@ -65,21 +64,20 @@ class SoundManager {
     eventBus.on('blade', (data) => {
       this.play('blade', { 
         volume: 0.5,
-        playbackRate: 0.9 + Math.random() * 0.2 // Случайная высота звука для разнообразия
+        playbackRate: 0.9 + Math.random() * 0.2
       });
     });
     
     eventBus.on('dirt', (data) => {
       this.play('dirt', { 
-        volume: 0.5,
-        playbackRate: 0.9 + Math.random() * 0.2 // Случайная высота звука для разнообразия
+        playbackRate: 0.9 + Math.random() * 0.2
       });
     });
     
     eventBus.on('bounce', (data) => {
       this.play('bounce', { 
         volume: 0.5,
-        playbackRate: 0.9 + Math.random() * 0.2 // Случайная высота звука для разнообразия
+        playbackRate: 0.9 + Math.random() * 0.2
       });
     });
 
@@ -170,6 +168,8 @@ class SoundManager {
     try {
       const sound = this.sounds.get(id);
 
+      options = {...sound.options, ...options};
+
       const audio = sound.audio;
       audio.volume = (options.volume || 1.0) * this.masterVolume;
       audio.loop = options.loop || sound.options.loop || false;
@@ -226,7 +226,6 @@ class SoundManager {
   loadAllSounds() {
     const sounds = [
       { id: 'bounce', url: 'sounds/bounce.mp3', options: { volume: 0.5 }},
-      { id: 'fail', url: 'sounds/fail-2.mp3', options: { volume: 0.5 }},
       { id: 'dirt', url: 'sounds/dirt.mp3', options: { volume: 0.5 }},
       { id: 'blade', url: 'sounds/blade.mp3', options: { volume: 0.5 }}
     ];

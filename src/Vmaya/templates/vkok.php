@@ -46,7 +46,6 @@
 			vkApp = new VKApp(<?=VK_APP_ID?>, <?=$source_user_id?>, '<?=$source?>');
 		});
 	</script>
-	<?include('ya-mertika.php');?>
 </head>
 <body class="theme vkok">
 	<?=$content?>

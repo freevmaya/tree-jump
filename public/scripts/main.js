@@ -305,6 +305,7 @@ class Game {
 
   setUserTitle(key) {
     this.setState('title', key);
+    eventBus.emit('set_user_title', key);
   }
 
   updateUserTitle() {

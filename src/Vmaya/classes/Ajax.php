@@ -134,40 +134,46 @@ class Ajax extends BaseAjax {
 
 	protected function vk_apiCall($data) {
 
-		$url = "https://api.vk.com/method/".$data['method'];
-		unset($data['method']);
+		if ($user_id = Page::getSession('user_id', 0)) {
 
-		$params = array_merge($data, [
-		    'access_token' => VK_APP_SERVER_SECRET,
-		    'user_id' => intval($data['user_id']),
-		    'v' => '5.199'
-		]);
+			$url = "https://api.vk.com/method/".$data['method'];
+			unset($data['method']);
 
-		// Инициализируем cURL
-		$ch = curl_init();
+			if ($user = (new UserModel())->getItem($user_id)) {
 
-		// Настройки cURL
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Для локальной разработки, на продакшене лучше true
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); // Для локальной разработки
+				$params = array_merge($data, [
+				    'access_token' => VK_APP_SERVER_SECRET,
+				    'user_id' => $user['source_id'],
+				    'v' => '5.199'
+				]);
 
-		// Выполняем запрос
-		$response = curl_exec($ch);
+				// Инициализируем cURL
+				$ch = curl_init();
 
-		// Проверяем на ошибки
-		if (curl_error($ch)) {
-		    echo 'Ошибка cURL: ' . curl_error($ch);
-		} else {
-		    $result = json_decode($response, true);
-		    
-		    if (isset($result['error'])) {
-		        echo 'Ошибка API: ' . $result['error']['error_msg'] . ' (Код: ' . $result['error']['error_code'] . ')';
-		    } else {
-		        return $result;
-		    }
+				// Настройки cURL
+				curl_setopt($ch, CURLOPT_URL, $url);
+				curl_setopt($ch, CURLOPT_POST, 1);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Для локальной разработки, на продакшене лучше true
+				curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); // Для локальной разработки
+
+				// Выполняем запрос
+				$response = curl_exec($ch);
+
+				// Проверяем на ошибки
+				if (curl_error($ch)) {
+				    trace_error('Ошибка cURL: ' . curl_error($ch)."\nParams: ".json_encode($params));
+				} else {
+				    $result = json_decode($response, true);
+				    
+				    if (isset($result['error'])) {
+				        trace_error('Ошибка API: ' . $result['error']['error_msg'] . ' (Код: ' . $result['error']['error_code'] . ')'."\nParams: ".json_encode($params));
+				    } else {
+				        return $result;
+				    }
+				}
+			}
 		}
 
 		Page::Wrong();

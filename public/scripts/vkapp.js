@@ -1,3 +1,10 @@
+const TITLE_MISSION_IDS = {
+	Novice: 0,
+	Warrior: 3,
+	Knight: 4,
+	Lord: 5,
+	Legend: 6
+}
 
 class VKApp {
 	requireShareCount = 3;
@@ -36,10 +43,28 @@ class VKApp {
 	  	this.initListeners();
 	}
 
+	getToken(scope, callback) {
+		vkBridge.send('VKWebAppGetAuthToken', { 
+				app_id: this.app_id, 
+				scope: scope,
+				append_local: this.source == 'ok'
+			})
+			.then( (data) => { 
+				if (data.access_token)
+					callback(data.access_token);
+				else if (data.local_access_token)
+					callback(data.local_access_token);
+			})
+			.catch( (error) => {
+				// Ошибка
+				tracer.log(error);
+			});
+	}
+
 	callApi(method, params, callback) {
 		vkBridge.send('VKWebAppCallAPIMethod', {
 			method: method,
-			params: params
+			params: {...{v: '5.199'}, ...params}
 		})
 		.then((data) => { 
 			if (data.response)
@@ -71,9 +96,25 @@ class VKApp {
 		      });
 		    }
 		});
+
+
+    	eventBus.on('set_user_title', this.onNewTitle.bind(this));
 	}
 
-
+	onNewTitle(key) {
+		/*
+		if (TITLE_MISSION_IDS[key]) {
+			Ajax({
+				action: 'vk_apiCall',
+				data: {
+					method: 'secure.addAppEvent',
+					activity_id: TITLE_MISSION_IDS[key]
+				}
+			}, (data)=>{
+				tracer.log(data);
+			});
+		}*/
+	}
 
 	shareApp(message) {
 		return new Promise((resolve, reject)=>{

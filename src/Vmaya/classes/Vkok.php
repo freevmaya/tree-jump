@@ -17,6 +17,7 @@ class Vkok extends Page {
 	protected function RenderIndex($templatePath) {
 		GLOBAL $dbp, $_SESSION;
 
+		/*
 		if (DEV) { // Проверка по входным параметрам
 			$request = json_decode('{
 			    "page": "vkok",
@@ -34,7 +35,7 @@ class Vkok extends Page {
 			}', true);
 
 			Page::$request = $request;
-		}
+		}*/
 
 		$v 			= '?v='.SCRIPTS_VERSION;
 		$userModel 	= new UserModel();

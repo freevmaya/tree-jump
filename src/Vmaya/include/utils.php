@@ -898,10 +898,12 @@ function encodeTelegramParams(array $params, bool $forceEncode = false): array
     return $params;
 }
 
-function vkVerifyParams($secretKey)
+function vkVerifyParams($secretKey, $params = null)
 {
-    $params = [];
-    parse_str($_SERVER['QUERY_STRING'] ?? '', $params);
+    if (!$params) {
+        $params = [];
+        parse_str($_SERVER['QUERY_STRING'] ?? '', $params);
+    }
     
     // Проверяем обязательные поля
     if (empty($params['sign']) || empty($params['vk_user_id'])) {

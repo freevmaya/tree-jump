@@ -116,6 +116,7 @@ abstract class BaseModel {
 			$fieldNames = array_keys($options);
 
 		$where = $fieldNames ? ('WHERE '.implode(" {$operator} ", BaseModel::GetConditions($options, $fieldNames))) : '';
+		
 		return $this->getItemsWhere($where);
 	}
 

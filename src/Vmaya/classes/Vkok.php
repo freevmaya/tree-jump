@@ -17,6 +17,25 @@ class Vkok extends Page {
 	protected function RenderIndex($templatePath) {
 		GLOBAL $dbp, $_SESSION;
 
+		if (DEV) { // Проверка по входным параметрам
+			$request = json_decode('{
+			    "page": "vkok",
+			    "vk_access_token_settings": "",
+			    "vk_app_id": "54476025",
+			    "vk_are_notifications_enabled": "0",
+			    "vk_is_app_user": "0",
+			    "vk_is_favorite": "0",
+			    "vk_language": "ru",
+			    "vk_platform": "mobile_android",
+			    "vk_ref": "apps_games_genre",
+			    "vk_ts": "1773341564",
+			    "vk_user_id": "285120287",
+			    "sign": "ZH_gbTYebdOg3stsW3g6I3jv3fVK5sGRX72vMGe0Am4"
+			}', true);
+
+			Page::$request = $request;
+		}
+
 		$v 			= '?v='.SCRIPTS_VERSION;
 		$userModel 	= new UserModel();
 		$user_id 	= 0;
@@ -25,7 +44,7 @@ class Vkok extends Page {
 
 		if ($vkok) {
 
-			if (!vkVerifyParams(VK_APP_CLIENT_SECRET))
+			if (!vkVerifyParams(VK_APP_CLIENT_SECRET, Page::$request))
 				Page::Wrong();
 
 	    	if (isset(Page::$request['vk_client']) && (Page::$request['vk_client'] == 'ok')) {

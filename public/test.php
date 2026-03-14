@@ -1,6 +1,6 @@
 <head>
     <title>Test</title>
-    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+    <script src="scripts/browser.min.js?v=123122"></script>
 </head>
 <body>
     <h1 style="color:green">Test Page</h1>

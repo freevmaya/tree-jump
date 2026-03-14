@@ -3,7 +3,7 @@
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 </head>
 <body>
-    <h1>Test Page</h1>
+    <h1 style="color:green">Test Page</h1>
     <script>
         vkBridge.send("VKWebAppInit", {})
             .then((response)=>{

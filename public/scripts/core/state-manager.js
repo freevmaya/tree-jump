@@ -25,9 +25,10 @@ class StateManager {
             this.saveImmediately();
         });
 
+        /*
         $(window).on('unload', (e)=>{
             this.saveImmediately();
-        });
+        });*/
 
         $(window).on('pagehide', (e)=>{
             this.saveImmediately();

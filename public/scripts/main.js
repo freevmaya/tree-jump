@@ -342,6 +342,7 @@ class Game {
 
     this.setState('score', newTotalScore);
     this.setState('vin', this.stateManager.get('vin', 0) + 1);
+    eventBus.emit('new_score', newTotalScore);
 
     this.showVictoryModal(lastTotalScore, newTotalScore, this.updateUserTitle());
     this.disableControls();
@@ -358,8 +359,16 @@ class Game {
   }
 
   setGameIndex(value) {
-    this.paramsIndex = GAME_PARAMS[value] ? value : Object.keys(GAME_PARAMS)[0];
+    let keys = Object.keys(GAME_PARAMS);
+    this.paramsIndex = GAME_PARAMS[value] ? value : keys[0];
     this.stateManager.set('paramsIndex', this.paramsIndex);
+
+    let index = keys.indexOf(this.paramsIndex);
+    
+    if (this.stateManager.get('level', 0) < index) {
+      this.stateManager.set('level', index);
+      eventBus.emit('new_level', index);
+    }
     return this.loadLevelTextures();
   }
 

@@ -45,8 +45,8 @@ class Vkok extends Page {
 
 		if ($vkok) {
 
-			if (!vkVerifyParams(VK_APP_CLIENT_SECRET, Page::$request))
-				Page::Wrong();
+			//if (!vkVerifyParams(VK_APP_CLIENT_SECRET, Page::$request))
+				//Page::Wrong();
 
 	    	if (isset(Page::$request['vk_client']) && (Page::$request['vk_client'] == 'ok')) {
 	    		$source = 'ok';

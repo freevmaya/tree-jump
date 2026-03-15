@@ -40,7 +40,7 @@ class Vkok extends Page {
 		$v 			= '?v='.SCRIPTS_VERSION;
 		$userModel 	= new UserModel();
 		$user_id 	= 0;
-		$vkok		= isset(Page::$request['vk_app_id']);
+		$vkok		= Page::getRequest('vk_app_id') ?? Page::getRequest('api_id');
 	    $new_user 	= false;
 
 		if ($vkok) {
@@ -48,12 +48,12 @@ class Vkok extends Page {
 			//if (!vkVerifyParams(VK_APP_CLIENT_SECRET, Page::$request))
 				//Page::Wrong();
 
-	    	if (isset(Page::$request['vk_client']) && (Page::$request['vk_client'] == 'ok')) {
+	    	if (Page::getRequest('vk_client')  == 'ok') {
 	    		$source = 'ok';
-	    		$source_user_id = intval(Page::$request['vk_ok_user_id']);
+	    		$source_user_id = intval(Page::getRequest('vk_ok_user_id'));
 	    	} else {
 	    		$source = 'vk';
-	    		$source_user_id = intval(Page::$request['vk_user_id']);
+	    		$source_user_id = intval(Page::getRequest('vk_user_id') ?? Page::getRequest('viewer_id'));
 	    	}
 	    	
 	    	$items = null;

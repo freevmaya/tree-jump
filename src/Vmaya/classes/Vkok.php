@@ -60,16 +60,20 @@ class Vkok extends Page {
 
 	    	try {
 
-				$items = $userModel->getItems(['source_id' => $source_user_id, 'source'=>$source]);
+	    		$item = $dbp->line("SELECT * FROM users WHERE source_id={$source_user_id} AND source ='{$source}'");
 
-		    	if (count($items) == 0) {
+				//$items = $userModel->getItems(['source_id' => $source_user_id, 'source'=>$source]);
+
+		    	if ($item) 
+		    		$user_id = $item['id'];
+		    	else {
 		    		$new_user = $user_id = $userModel->Update([
 		    			'source_id'=>$source_user_id,
 		    			'source'=>$source,
 		    			'language_code'=>DEFAULT_LANGUAGE,
 		    			'last_time'=>date('Y-m-d H:i:s')
 		    		]);
-		    	} else $user_id = $items[0]['id'];
+		    	}
 
 	    	} catch (Exception $e) {
 

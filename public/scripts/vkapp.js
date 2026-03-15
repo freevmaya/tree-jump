@@ -15,6 +15,7 @@ class VKApp {
 		this.source = source;
 		this.source_user_id = source_user_id;
 		this.sharedSession = false;
+		this.haveAdv = false;
 
 		$('body').addClass('vk_layout');
 
@@ -39,6 +40,17 @@ class VKApp {
 					});
 				}
 			}).bind(this));
+
+		vkBridge.send('VKWebAppCheckNativeAds', {
+				ad_format: 'reward' /* Тип рекламы */ 
+			})
+			.then((data) => { 
+				this.haveAdv = data.result;
+		  	})
+		  	.catch((error) => { 
+		  		tracer.log(error);
+		  		resolve(false);
+		  	});
 
 	  	this.initListeners();
 	}
@@ -139,28 +151,19 @@ class VKApp {
 
 	showAd() {
 		return new Promise((resolve, reject) => {
-			vkBridge.send('VKWebAppCheckNativeAds', {
-				ad_format: 'reward' /* Тип рекламы */ 
-			})
-			.then((data) => { 
-				if (data.result) { 
-					vkBridge.send('VKWebAppShowNativeAds', {
-						ad_format: 'interstitial' /* Тип рекламы */
-					})
-					.then((data) => { 
-						// Реклама была показана
-						resolve(data.result)
-					})
-					.catch((error) => { 
-						tracer.log(error);
-						resolve(false);
-					});
-				} else resolve(false);
-		  	})
-		  	.catch((error) => { 
-		  		tracer.log(error);
-		  		resolve(false);
-		  	});
+			if (this.haveAdv) { 
+				vkBridge.send('VKWebAppShowNativeAds', {
+					ad_format: 'interstitial' /* Тип рекламы */
+				})
+				.then((data) => { 
+					// Реклама была показана
+					resolve(data.result)
+				})
+				.catch((error) => { 
+					tracer.log(error);
+					resolve(false);
+				});
+			} else resolve(false);
 		});
 	}
 }

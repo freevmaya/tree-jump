@@ -692,6 +692,7 @@ class Game {
     this.soundControl();
     
     $(window).on('resize', this.onResize.bind(this));
+    $(window).trigger('game-ready');
   }
 
   soundControl() {

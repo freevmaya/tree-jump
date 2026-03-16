@@ -2,6 +2,9 @@
     $v = SCRIPTS_VERSION;
     $is_developer = Page::isDev();
     $scripts =  [
+      'languages/Lang',
+      'languages/ru',
+      'languages/en',
       'constants',
       'GameState',
       'core/RendererManager',
@@ -30,7 +33,6 @@
       'physics/BallPhysics',
       'audio/SoundManager',
       'main'
-      // ... все ваши модули
     ];
 ?>
   <div class="loader">
@@ -50,15 +52,15 @@
         </div>
         <div>
           <div class="s-view" id="state-score">
-            <div class="status">Счет</div>
+            <div class="status" data-lang="score_label">Счет</div>
             <div class="value">123</div>
           </div>
           <div class="s-view" id="state-vin">
-            <div class="status">Поб.</div>
+            <div class="status" data-lang="wins_label">Поб.</div>
             <div class="value">123</div>
           </div>
           <div class="s-view" id="state-title">
-            <div class="status">Зван.</div>
+            <div class="status" data-lang="title_label">Зван.</div>
             <div class="value">Рекрут</div>
           </div>
         </div>
@@ -67,11 +69,11 @@
       </div>
 
       <div class="hint" id="game-hint">
-        <i class="bi bi-mouse"></i> Нажмите и тяните, чтобы вращать дерево
+        <i class="bi bi-mouse"></i> <span data-lang="game_hint_mouse">Нажмите и тяните, чтобы вращать дерево</span>
       </div>
 
       <div id="tools">
-        <span id="pause-btn">Пауза</span>
+        <span id="pause-btn" data-lang="pause">Пауза</span>
         <span id="volume" class="on">
           <i class="bi bi-volume-down"></i>
           <i class="bi bi-volume-mute"></i>
@@ -80,7 +82,7 @@
 
       <!-- Индикатор очков (только при победе) -->
       <div class="score-indicator" id="score-indicator">
-        <i class="bi bi-trophy-fill"></i> Счет: <span id="current-score">0</span>
+        <i class="bi bi-trophy-fill"></i> <span data-lang="score_indicator">Счет:</span> <span id="current-score">0</span>
       </div>
     </div>
     
@@ -102,14 +104,17 @@
           <div class="middle">
             <div class="dialog-content">
               <p>
-                <i class="bi bi-info-circle"></i> Управляйте вращением дерева, чтобы шарик отскакивал от платформ
+                <i class="bi bi-info-circle"></i> <span data-lang="start_info_1">Управляйте вращением дерева, чтобы шарик отскакивал от платформ</span>
               </p>
               <p>
-                <i class="bi bi-exclamation-triangle-fill"></i> Красные платформы смертельны при ударе сверху!
+                <i class="bi bi-exclamation-triangle-fill"></i> <span data-lang="start_info_2">Красные платформы смертельны при ударе сверху!</span>
               </p>
-              <p <?=Page::isDev() ? '' : 'style="display:none"'?>>GPU speed: <span id="testResult"></span>. Version: <span><?=APP_VERSION?></span></p>
+              <p <?=Page::isDev() ? '' : 'style="display:none"'?>>
+                <span data-lang="gpu_speed">GPU speed:</span> <span id="testResult"></span>. 
+                <span data-lang="version">Version:</span> <span><?=APP_VERSION?></span>
+              </p>
               <div class="text-center">
-                <button type="button" class="btn" id="startGameButton">Начать</button>
+                <button type="button" class="btn" id="startGameButton" data-lang="start_button">Начать</button>
               </div>
             </div>
           </div>
@@ -133,17 +138,17 @@
           </div>
           <div class="middle">
             <div class="dialog-content">
-              <p class="status">Неудача!</p>
+              <p class="status" data-lang="game_over_title">Неудача!</p>
               <div class="stats-container">
                 <div class="row">
                   <div class="col-12">
                     <div class="stat-value" id="finalBounceCount">0</div>
-                    <div class="stat-label">Отскоков</div>
+                    <div class="stat-label" data-lang="game_over_bounces">Отскоков</div>
                   </div>
                 </div>
               </div>
               <div class="text-center">
-                <button type="button" class="btn" id="restartButton">Продолжить</button>
+                <button type="button" class="btn" id="restartButton" data-lang="game_over_button">Продолжить</button>
               </div>
             </div>
           </div>
@@ -167,26 +172,24 @@
           </div>
           <div class="middle">
             <div class="dialog-content">
-              <p class="modal-subtitle status">
-                Вы достигли вершины дерева!
-              </p>
-              <p class="new-title status"></p>
+              <p class="modal-subtitle status" data-lang="victory_title">Вы достигли вершины дерева!</p>
+              <p class="new-title status" data-lang="new_rank"></p>
               <!-- Статистика игры -->
               <div class="stats-container victory-stats" id="victoryState">
                 <div class="row">
                   <div class="col-6">
                     <div class="stat-value" id="victoryBounceCount">0</div>
-                    <div class="stat-label">Отскоков</div>
+                    <div class="stat-label" data-lang="victory_bounces">Отскоков</div>
                   </div>
                   <div class="col-6">
                     <div class="stat-value" id="victoryScore">0</div>
-                    <div class="stat-label">Очки</div>
+                    <div class="stat-label" data-lang="victory_score">Очки</div>
                   </div>
                 </div>
               </div>
 
               <div class="text-center">
-                <button type="button" class="btn" id="victoryRestartButton">Продолжить</button>
+                <button type="button" class="btn" id="victoryRestartButton" data-lang="victory_button">Продолжить</button>
               </div>
             </div>
           </div>
@@ -210,12 +213,12 @@
           </div>
           <div class="middle">
             <div class="dialog-content">
-              <p class="status">Игра приостановлена</p>
-              <p>Ваше текущее звание: <span class="title"></span></p>
+              <p class="status" data-lang="pause_title">Игра приостановлена</p>
+              <p><span data-lang="current_rank">Ваше текущее звание:</span> <span class="title"></span></p>
               <div class="title-image"></div>
               <div class="text-center">
-                <button type="button" class="btn" id="resumeButton">Продолжить</button>
-                <button type="button" class="btn" id="pauseRestartButton">Новая игра</button>
+                <button type="button" class="btn" id="resumeButton" data-lang="pause_resume">Продолжить</button>
+                <button type="button" class="btn" id="pauseRestartButton" data-lang="pause_restart">Новая игра</button>
               </div>
             </div>
           </div>
@@ -230,12 +233,17 @@
   <!-- Подключаем Bootstrap JS глобально -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="<?=SCRIPTURL?>jquery-4.0.0.min.js"></script>
 
   <?foreach ($scripts as $script) {?>
-  <script src="<?=SCRIPTURL.$script?>.js?v=<?=$v?>"></script>
+  <script src="<?=SCRIPTURL . $script?>.js?v=<?=$v?>"></script>
   <?}?>
 
-  <?if (Page::isDev()) {?>
+  <?if ($is_developer) {?>
+  <script src="<?=SCRIPTURL?>language-switcher.js?v=<?=$v?>"></script>
+  <?}?>
+
+  <?if ($is_developer) {?>
     <script type="module" src="<?=BASEURL?>/scripts/test-unit.js?v=<?=$v?>"></script>
     <!-- Eruda is console for mobile browsers-->
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>

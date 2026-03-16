@@ -95,261 +95,255 @@ const RESET_VELOCITY_Y = BOUNCE_SPEED;
 const PLATFORM_NORMAL_COLOR = 0xA67C52; // Используем существующий TREE_COLOR для обычных платформ
 const PLATFORM_KILLER_COLOR = 0xFF3333; // Ярко-красный для платформ-убийц
 
+// Звания пользователей - ИНДЕКСЫ для локализации
 const USER_TITLES = {
-	Novice: {
-		name: 'Новичок',
-		step: 500
-	},
-	Warrior: {
-		name: 'Боец',
-		step: 800
-	},
-	Knight: {
-		name: 'Паладин',
-		step: 1000
-	},
-	Lord: {
-		name: 'Лорд',
-		step: 1200
-	},
-	Legend: {
-		name: 'Легенда',
-		step: 1500
-	},
+    Novice: {
+        step: 500
+    },
+    Warrior: {
+        step: 800
+    },
+    Knight: {
+        step: 1000
+    },
+    Lord: {
+        step: 1200
+    },
+    Legend: {
+        step: 1500
+    },
 }
 
 const START_GAME = 'TEST';
 
+// Параметры игры - ИНДЕКСЫ для локализации названий уровней
 const GAME_PARAMS = {
-	TEST: 
-		{
-			NAME: 'Ознакомительный',
-			ENV: {
-				BACKGROUND_COLOR: 0xBBBBFF,
-				KEY_LIGHT_COLOR: 0xffffff,
-				RIM_LIGHT_COLOR: 0x818cf8,
-				FILL_LIGHT_COLOR: 0x63a188,
-				BACKGROUND_IMAGE_PATH: 'images/bk1.jpg',
-				GRASS_IMAGE_PATH: 'textures/grass-s.png',
-				GROUND_IMAGE_PATH:'textures/ground.jpg',
-				AMBIENT_LIGHT_INTENSITY: 1,
-				KEY_LIGHT_INTENSITY: 3,
-				FILL_LIGHT_INTENSITY: 2,
-				RIM_LIGHT_INTENSITY: 0.6
-			},
-			TREE: {
-				BARK_TEXTURE_REPEAT: {x: 4, y: 1},
-				BARK_TEXTURE_PATH: 'textures/oak-bark.jpg',
-				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
-				PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
-				KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
-				NEEDLE_TEXTURE_PATH: 'textures/oak-leaves.png',
-				BRANCH_DENSITY: 0.4,
-				TREE_HEIGHT: 10,
-				PLATFORM_STEP: 1,
-				KILLER_DENSITY: 0,
-				KILLER_SPEED: 0,
-				PLATFORM_SPEED: 0,
-				PLATFORM_ROTATE_DENSITY: 0,
-				PLATFORM_RADIUS: { MIN: 0.5, MAX: 0.5 },
-				RADIAL_PLATFORM_STEP: [1, 0.4, 4] 
-				// 0-1 Случаность, шаг ступени в рад., минимальное кол-во последовательных ступеней 
-			}
-		},
-	START: 
-		{
-			NAME: 'Начальный',
-			ENV: {
-				BACKGROUND_COLOR: 0xBBBBFF,
-				KEY_LIGHT_COLOR: 0xffffff,
-				RIM_LIGHT_COLOR: 0x818cf8,
-				FILL_LIGHT_COLOR: 0x63a188,
-				BACKGROUND_IMAGE_PATH: 'images/bk1.jpg',
-				GRASS_IMAGE_PATH: 'textures/grass-s.png',
-				GROUND_IMAGE_PATH:'textures/ground.jpg',
-				AMBIENT_LIGHT_INTENSITY: 1,
-				KEY_LIGHT_INTENSITY: 3,
-				FILL_LIGHT_INTENSITY: 2,
-				RIM_LIGHT_INTENSITY: 0.6
-			},
-			TREE: {
-				BARK_TEXTURE_REPEAT: {x: 4, y: 1},
-				BARK_TEXTURE_PATH: 'textures/oak-bark.jpg',
-				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
-				PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
-				KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
-				NEEDLE_TEXTURE_PATH: 'textures/oak-leaves.png',
-				BRANCH_DENSITY: 0.8,
-				TREE_HEIGHT: 12,
-				PLATFORM_STEP: 1.4,
-				KILLER_DENSITY: 0.1,
-				KILLER_SPEED: 1,
-				PLATFORM_SPEED: 0.1,
-				PLATFORM_ROTATE_DENSITY: 0.1,
-				PLATFORM_RADIUS: { MIN: 0.5, MAX: 0.5 },
-				RADIAL_PLATFORM_STEP: [0.8, 0.4, 3] 
-			}
-		},
-	DARK: {
-			NAME: 'Первая ступень',
-			ENV: {
-				BACKGROUND_COLOR: 0x7a96df,
-				KEY_LIGHT_COLOR: 0xffffff,
-				RIM_LIGHT_COLOR: 0x818cf8,
-				FILL_LIGHT_COLOR: 0x63a188,
-				BACKGROUND_IMAGE_PATH: 'images/dark-bg.jpg',
-				GRASS_IMAGE_PATH: 'textures/grass-s.png',
-				GROUND_IMAGE_PATH:'textures/ground.jpg',
-				AMBIENT_LIGHT_INTENSITY: 1,
-				KEY_LIGHT_INTENSITY: 3,
-				FILL_LIGHT_INTENSITY: 2,
-				RIM_LIGHT_INTENSITY: 0.6
-			},
-			TREE: {
-				BARK_TEXTURE_REPEAT: {x: 2, y: 1},
-				BARK_TEXTURE_PATH: 'textures/pine-bark.jpg',
-				BARK_NORMAL_PATH: 'textures/bark-normal.jpg',
-				PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
-				KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
-				NEEDLE_TEXTURE_PATH: 'textures/needle.png',
-				BRANCH_DENSITY: 0.8,
-				TREE_HEIGHT: 15,
-				PLATFORM_STEP: 1.6,
-				KILLER_DENSITY: 0.2,
-				KILLER_SPEED: 1,
-				PLATFORM_SPEED: 0.15,
-				PLATFORM_ROTATE_DENSITY: 0.25,
-				PLATFORM_RADIUS: { MIN: 0.45, MAX: 0.5 },
-				RADIAL_PLATFORM_STEP: [0.5, 0.4, 3] 
-			}
-		},
-	BIRCH: {
-			NAME: 'Небольшие сложности',
-			ENV: {
-				BACKGROUND_COLOR: 0xBBBBFF,
-				KEY_LIGHT_COLOR: 0xffffff,
-				RIM_LIGHT_COLOR: 0x818cf8,
-				FILL_LIGHT_COLOR: 0x63a188,
-				BACKGROUND_IMAGE_PATH: 'images/bk1.jpg',
-				GRASS_IMAGE_PATH: 'textures/grass-s.png',
-				GROUND_IMAGE_PATH:'textures/ground.jpg',
-				AMBIENT_LIGHT_INTENSITY: 0.5,
-				KEY_LIGHT_INTENSITY: 3,
-				FILL_LIGHT_INTENSITY: 2,
-				RIM_LIGHT_INTENSITY: 0.6
-			},
-			TREE: {
-				BARK_TEXTURE_REPEAT: {x: 2, y: 1},
-				BARK_TEXTURE_PATH: 'textures/birch.jfif',
-				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
-				PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
-				KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
-				NEEDLE_TEXTURE_PATH: 'textures/birch-leaves.png',
-				BRANCH_DENSITY: 1,
-				TREE_HEIGHT: 20,
-				PLATFORM_STEP: 1.6,
-				KILLER_DENSITY: 0.3,
-				KILLER_SPEED: 1.2,
-				PLATFORM_SPEED: 0.2,
-				PLATFORM_ROTATE_DENSITY: 0.3,
-				PLATFORM_RADIUS: { MIN: 0.4, MAX: 0.45 }
-			}
-		},
-	MIDDLE: 
-		{
-			NAME: 'Покажи мастерство',
-			ENV: {
-				BACKGROUND_COLOR: 0xBBBBFF,
-				KEY_LIGHT_COLOR: 0xffffff,
-				RIM_LIGHT_COLOR: 0x818cf8,
-				FILL_LIGHT_COLOR: 0x63a188,
-				BACKGROUND_IMAGE_PATH: 'images/bk1.jpg',
-				GRASS_IMAGE_PATH: 'textures/grass-s.png',
-				GROUND_IMAGE_PATH:'textures/ground.jpg',
-				AMBIENT_LIGHT_INTENSITY: 1,
-				KEY_LIGHT_INTENSITY: 3,
-				FILL_LIGHT_INTENSITY: 2,
-				RIM_LIGHT_INTENSITY: 0.6
-			},
-			TREE: {
-				BARK_TEXTURE_REPEAT: {x: 4, y: 1},
-				BARK_TEXTURE_PATH: 'textures/oak-bark.jpg',
-				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
-				PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
-				KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
-				NEEDLE_TEXTURE_PATH: 'textures/oak-leaves.png',
-				BRANCH_DENSITY: 1,
-				TREE_HEIGHT: 17,
-				PLATFORM_STEP: 1.6,
-				KILLER_DENSITY: 0.35,
-				KILLER_SPEED: 1.4,
-				PLATFORM_SPEED: 0.25,
-				PLATFORM_ROTATE_DENSITY: 0.4,
-				PLATFORM_RADIUS: { MIN: 0.35, MAX: 0.45 }
-			}
-		},
-	DIFICULT: {
-			NAME: 'Стой на своем!',
-			ENV: {
-				BACKGROUND_COLOR: 0x7a96df,
-				KEY_LIGHT_COLOR: 0xffffff,
-				RIM_LIGHT_COLOR: 0x818cf8,
-				FILL_LIGHT_COLOR: 0x63a188,
-				BACKGROUND_IMAGE_PATH: 'images/dark-bg.jpg',
-				GRASS_IMAGE_PATH: 'textures/grass-s.png',
-				GROUND_IMAGE_PATH:'textures/ground.jpg',
-				AMBIENT_LIGHT_INTENSITY: 1,
-				KEY_LIGHT_INTENSITY: 3,
-				FILL_LIGHT_INTENSITY: 2,
-				RIM_LIGHT_INTENSITY: 0.6
-			},
-			TREE: {
-				BARK_TEXTURE_REPEAT: {x: 2, y: 1},
-				BARK_TEXTURE_PATH: 'textures/pine-bark.jpg',
-				BARK_NORMAL_PATH: 'textures/bark-normal.jpg',
-				PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
-				KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
-				NEEDLE_TEXTURE_PATH: 'textures/needle.png',
-				BRANCH_DENSITY: 1,
-				TREE_HEIGHT: 20,
-				PLATFORM_STEP: 1.6,
-				KILLER_DENSITY: 0.4,
-				KILLER_SPEED: 1.5,
-				PLATFORM_SPEED: 0.3,
-				PLATFORM_ROTATE_DENSITY: 0.5,
-				PLATFORM_RADIUS: { MIN: 0.3, MAX: 0.4 }
-			}
-		},
-	NIGHTMARE: {
-			NAME: 'Кошмар',
-			ENV: {
-				BACKGROUND_COLOR: 0xBBBBFF,
-				KEY_LIGHT_COLOR: 0xffffff,
-				RIM_LIGHT_COLOR: 0x818cf8,
-				FILL_LIGHT_COLOR: 0x63a188,
-				BACKGROUND_IMAGE_PATH: 'images/bk1.jpg',
-				GRASS_IMAGE_PATH: 'textures/grass-s.png',
-				GROUND_IMAGE_PATH:'textures/ground.jpg',
-				AMBIENT_LIGHT_INTENSITY: 0.5,
-				KEY_LIGHT_INTENSITY: 3,
-				FILL_LIGHT_INTENSITY: 2,
-				RIM_LIGHT_INTENSITY: 0.6
-			},
-			TREE: {
-				BARK_TEXTURE_REPEAT: {x: 2, y: 1},
-				BARK_TEXTURE_PATH: 'textures/birch.jfif',
-				BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
-				PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
-				KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
-				NEEDLE_TEXTURE_PATH: 'textures/birch-leaves.png',
-				BRANCH_DENSITY: 1,
-				TREE_HEIGHT: 25,
-				PLATFORM_STEP: 1.65,
-				KILLER_DENSITY: 0.7,
-				KILLER_SPEED: 1.6,
-				PLATFORM_SPEED: 0.35,
-				PLATFORM_ROTATE_DENSITY: 0.7,
-				PLATFORM_RADIUS: { MIN: 0.3, MAX: 0.4 }
-			}
-		}
+    TEST: {
+        NAME: 'difficulty_test', // Индекс для локализации
+        ENV: {
+            BACKGROUND_COLOR: 0xBBBBFF,
+            KEY_LIGHT_COLOR: 0xffffff,
+            RIM_LIGHT_COLOR: 0x818cf8,
+            FILL_LIGHT_COLOR: 0x63a188,
+            BACKGROUND_IMAGE_PATH: 'images/bk1.jpg',
+            GRASS_IMAGE_PATH: 'textures/grass-s.png',
+            GROUND_IMAGE_PATH:'textures/ground.jpg',
+            AMBIENT_LIGHT_INTENSITY: 1,
+            KEY_LIGHT_INTENSITY: 3,
+            FILL_LIGHT_INTENSITY: 2,
+            RIM_LIGHT_INTENSITY: 0.6
+        },
+        TREE: {
+            BARK_TEXTURE_REPEAT: {x: 4, y: 1},
+            BARK_TEXTURE_PATH: 'textures/oak-bark.jpg',
+            BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
+            PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
+            KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
+            NEEDLE_TEXTURE_PATH: 'textures/oak-leaves.png',
+            BRANCH_DENSITY: 0.4,
+            TREE_HEIGHT: 10,
+            PLATFORM_STEP: 1,
+            KILLER_DENSITY: 0,
+            KILLER_SPEED: 0,
+            PLATFORM_SPEED: 0,
+            PLATFORM_ROTATE_DENSITY: 0,
+            PLATFORM_RADIUS: { MIN: 0.5, MAX: 0.5 },
+            RADIAL_PLATFORM_STEP: [1, 0.4, 4] 
+            // 0-1 Случаность, шаг ступени в рад., минимальное кол-во последовательных ступеней 
+        }
+    },
+    START: {
+        NAME: 'difficulty_start', // Индекс для локализации
+        ENV: {
+            BACKGROUND_COLOR: 0xBBBBFF,
+            KEY_LIGHT_COLOR: 0xffffff,
+            RIM_LIGHT_COLOR: 0x818cf8,
+            FILL_LIGHT_COLOR: 0x63a188,
+            BACKGROUND_IMAGE_PATH: 'images/bk1.jpg',
+            GRASS_IMAGE_PATH: 'textures/grass-s.png',
+            GROUND_IMAGE_PATH:'textures/ground.jpg',
+            AMBIENT_LIGHT_INTENSITY: 1,
+            KEY_LIGHT_INTENSITY: 3,
+            FILL_LIGHT_INTENSITY: 2,
+            RIM_LIGHT_INTENSITY: 0.6
+        },
+        TREE: {
+            BARK_TEXTURE_REPEAT: {x: 4, y: 1},
+            BARK_TEXTURE_PATH: 'textures/oak-bark.jpg',
+            BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
+            PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
+            KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
+            NEEDLE_TEXTURE_PATH: 'textures/oak-leaves.png',
+            BRANCH_DENSITY: 0.8,
+            TREE_HEIGHT: 12,
+            PLATFORM_STEP: 1.4,
+            KILLER_DENSITY: 0.1,
+            KILLER_SPEED: 1,
+            PLATFORM_SPEED: 0.1,
+            PLATFORM_ROTATE_DENSITY: 0.1,
+            PLATFORM_RADIUS: { MIN: 0.5, MAX: 0.5 },
+            RADIAL_PLATFORM_STEP: [0.8, 0.4, 3] 
+        }
+    },
+    DARK: {
+        NAME: 'difficulty_dark', // Индекс для локализации
+        ENV: {
+            BACKGROUND_COLOR: 0x7a96df,
+            KEY_LIGHT_COLOR: 0xffffff,
+            RIM_LIGHT_COLOR: 0x818cf8,
+            FILL_LIGHT_COLOR: 0x63a188,
+            BACKGROUND_IMAGE_PATH: 'images/dark-bg.jpg',
+            GRASS_IMAGE_PATH: 'textures/grass-s.png',
+            GROUND_IMAGE_PATH:'textures/ground.jpg',
+            AMBIENT_LIGHT_INTENSITY: 1,
+            KEY_LIGHT_INTENSITY: 3,
+            FILL_LIGHT_INTENSITY: 2,
+            RIM_LIGHT_INTENSITY: 0.6
+        },
+        TREE: {
+            BARK_TEXTURE_REPEAT: {x: 2, y: 1},
+            BARK_TEXTURE_PATH: 'textures/pine-bark.jpg',
+            BARK_NORMAL_PATH: 'textures/bark-normal.jpg',
+            PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
+            KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
+            NEEDLE_TEXTURE_PATH: 'textures/needle.png',
+            BRANCH_DENSITY: 0.8,
+            TREE_HEIGHT: 15,
+            PLATFORM_STEP: 1.6,
+            KILLER_DENSITY: 0.2,
+            KILLER_SPEED: 1,
+            PLATFORM_SPEED: 0.15,
+            PLATFORM_ROTATE_DENSITY: 0.25,
+            PLATFORM_RADIUS: { MIN: 0.45, MAX: 0.5 },
+            RADIAL_PLATFORM_STEP: [0.5, 0.4, 3] 
+        }
+    },
+    BIRCH: {
+        NAME: 'difficulty_birch', // Индекс для локализации
+        ENV: {
+            BACKGROUND_COLOR: 0xBBBBFF,
+            KEY_LIGHT_COLOR: 0xffffff,
+            RIM_LIGHT_COLOR: 0x818cf8,
+            FILL_LIGHT_COLOR: 0x63a188,
+            BACKGROUND_IMAGE_PATH: 'images/bk1.jpg',
+            GRASS_IMAGE_PATH: 'textures/grass-s.png',
+            GROUND_IMAGE_PATH:'textures/ground.jpg',
+            AMBIENT_LIGHT_INTENSITY: 0.5,
+            KEY_LIGHT_INTENSITY: 3,
+            FILL_LIGHT_INTENSITY: 2,
+            RIM_LIGHT_INTENSITY: 0.6
+        },
+        TREE: {
+            BARK_TEXTURE_REPEAT: {x: 2, y: 1},
+            BARK_TEXTURE_PATH: 'textures/birch.jfif',
+            BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
+            PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
+            KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
+            NEEDLE_TEXTURE_PATH: 'textures/birch-leaves.png',
+            BRANCH_DENSITY: 1,
+            TREE_HEIGHT: 20,
+            PLATFORM_STEP: 1.6,
+            KILLER_DENSITY: 0.3,
+            KILLER_SPEED: 1.2,
+            PLATFORM_SPEED: 0.2,
+            PLATFORM_ROTATE_DENSITY: 0.3,
+            PLATFORM_RADIUS: { MIN: 0.4, MAX: 0.45 }
+        }
+    },
+    MIDDLE: {
+        NAME: 'difficulty_middle', // Индекс для локализации
+        ENV: {
+            BACKGROUND_COLOR: 0xBBBBFF,
+            KEY_LIGHT_COLOR: 0xffffff,
+            RIM_LIGHT_COLOR: 0x818cf8,
+            FILL_LIGHT_COLOR: 0x63a188,
+            BACKGROUND_IMAGE_PATH: 'images/bk1.jpg',
+            GRASS_IMAGE_PATH: 'textures/grass-s.png',
+            GROUND_IMAGE_PATH:'textures/ground.jpg',
+            AMBIENT_LIGHT_INTENSITY: 1,
+            KEY_LIGHT_INTENSITY: 3,
+            FILL_LIGHT_INTENSITY: 2,
+            RIM_LIGHT_INTENSITY: 0.6
+        },
+        TREE: {
+            BARK_TEXTURE_REPEAT: {x: 4, y: 1},
+            BARK_TEXTURE_PATH: 'textures/oak-bark.jpg',
+            BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
+            PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
+            KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
+            NEEDLE_TEXTURE_PATH: 'textures/oak-leaves.png',
+            BRANCH_DENSITY: 1,
+            TREE_HEIGHT: 17,
+            PLATFORM_STEP: 1.6,
+            KILLER_DENSITY: 0.35,
+            KILLER_SPEED: 1.4,
+            PLATFORM_SPEED: 0.25,
+            PLATFORM_ROTATE_DENSITY: 0.4,
+            PLATFORM_RADIUS: { MIN: 0.35, MAX: 0.45 }
+        }
+    },
+    DIFICULT: {
+        NAME: 'difficulty_hard', // Индекс для локализации
+        ENV: {
+            BACKGROUND_COLOR: 0x7a96df,
+            KEY_LIGHT_COLOR: 0xffffff,
+            RIM_LIGHT_COLOR: 0x818cf8,
+            FILL_LIGHT_COLOR: 0x63a188,
+            BACKGROUND_IMAGE_PATH: 'images/dark-bg.jpg',
+            GRASS_IMAGE_PATH: 'textures/grass-s.png',
+            GROUND_IMAGE_PATH:'textures/ground.jpg',
+            AMBIENT_LIGHT_INTENSITY: 1,
+            KEY_LIGHT_INTENSITY: 3,
+            FILL_LIGHT_INTENSITY: 2,
+            RIM_LIGHT_INTENSITY: 0.6
+        },
+        TREE: {
+            BARK_TEXTURE_REPEAT: {x: 2, y: 1},
+            BARK_TEXTURE_PATH: 'textures/pine-bark.jpg',
+            BARK_NORMAL_PATH: 'textures/bark-normal.jpg',
+            PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
+            KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
+            NEEDLE_TEXTURE_PATH: 'textures/needle.png',
+            BRANCH_DENSITY: 1,
+            TREE_HEIGHT: 20,
+            PLATFORM_STEP: 1.6,
+            KILLER_DENSITY: 0.4,
+            KILLER_SPEED: 1.5,
+            PLATFORM_SPEED: 0.3,
+            PLATFORM_ROTATE_DENSITY: 0.5,
+            PLATFORM_RADIUS: { MIN: 0.3, MAX: 0.4 }
+        }
+    },
+    NIGHTMARE: {
+        NAME: 'difficulty_nightmare', // Индекс для локализации
+        ENV: {
+            BACKGROUND_COLOR: 0xBBBBFF,
+            KEY_LIGHT_COLOR: 0xffffff,
+            RIM_LIGHT_COLOR: 0x818cf8,
+            FILL_LIGHT_COLOR: 0x63a188,
+            BACKGROUND_IMAGE_PATH: 'images/bk1.jpg',
+            GRASS_IMAGE_PATH: 'textures/grass-s.png',
+            GROUND_IMAGE_PATH:'textures/ground.jpg',
+            AMBIENT_LIGHT_INTENSITY: 0.5,
+            KEY_LIGHT_INTENSITY: 3,
+            FILL_LIGHT_INTENSITY: 2,
+            RIM_LIGHT_INTENSITY: 0.6
+        },
+        TREE: {
+            BARK_TEXTURE_REPEAT: {x: 2, y: 1},
+            BARK_TEXTURE_PATH: 'textures/birch.jfif',
+            BARK_NORMAL_PATH: 'textures/bark-d-normal.jpg',
+            PLATFORM_TEXTURE_PATH: 'textures/platform.jpg',
+            KILLER_PLATFORM_TEXTURE_PATH: 'textures/lava.jpg',
+            NEEDLE_TEXTURE_PATH: 'textures/birch-leaves.png',
+            BRANCH_DENSITY: 1,
+            TREE_HEIGHT: 25,
+            PLATFORM_STEP: 1.65,
+            KILLER_DENSITY: 0.7,
+            KILLER_SPEED: 1.6,
+            PLATFORM_SPEED: 0.35,
+            PLATFORM_ROTATE_DENSITY: 0.7,
+            PLATFORM_RADIUS: { MIN: 0.3, MAX: 0.4 }
+        }
+    }
 }

@@ -112,9 +112,8 @@ class Game {
     keys.forEach((name)=>{
       let val;
       if (name == 'title') {
-        let keys = Object.keys(USER_TITLES);
-        let key = this.stateManager.get(name, keys[0]);
-        val = USER_TITLES[key] ? USER_TITLES[key].name : USER_TITLES[keys[0]].name;
+        let key = this.stateManager.get(name, Object.keys(USER_TITLES)[0]);
+        val = lang.get('title_' + key);
       }
       else val = this.stateManager.get(name, '-');
 
@@ -365,6 +364,8 @@ class Game {
     this.stateManager.set('paramsIndex', this.paramsIndex);
 
     let index = keys.indexOf(this.paramsIndex);
+
+    this.updateGameDisplay();
     
     if (this.stateManager.get('level', 0) < index) {
       this.stateManager.set('level', index);
@@ -532,8 +533,8 @@ class Game {
 
     let newTitleElem = this.victoryModalElement.find('.new-title');
     if (newTitle) {
-      newTitleElem.html('Вам присвоено новое звание: ' + USER_TITLES[newTitle].name + 
-    `!<div class="title-image ${newTitle}"></div>`);
+      let titleText = lang.get('new_rank') + ' ' + lang.get('title_' + newTitle) + '!';
+      newTitleElem.html(titleText + '<div class="title-image ' + newTitle + '"></div>');
       newTitleElem.css('display', 'block');
     } else newTitleElem.css('display', 'none');
     
@@ -561,11 +562,10 @@ class Game {
   
   showPauseModal() {
     if (this.pauseModal) {
-
-      let title = this.stateManager.get('title') || Object.keys(USER_TITLES)[0];
-      this.pauseModalElement.find('.title-image').toggleClass(title, true);
-      this.pauseModalElement.find('.title').text(USER_TITLES[title].name);
-      this.pauseModal.show();
+        let title = this.stateManager.get('title') || Object.keys(USER_TITLES)[0];
+        this.pauseModalElement.find('.title-image').toggleClass(title, true);
+        this.pauseModalElement.find('.title').text(lang.get('title_' + title));
+        this.pauseModal.show();
     }
   }
   
@@ -582,7 +582,7 @@ class Game {
   }
   
   updateGameDisplay() {
-    $('#game-title').text(GAME_PARAMS[this.paramsIndex].NAME);
+    $('#game-title').text(lang.get(GAME_PARAMS[this.paramsIndex].NAME));
   }
   
   showKillerIndicator() {

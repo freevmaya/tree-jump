@@ -174,7 +174,9 @@ class Lang {
 
 // Глобальный экземпляр
 window.lang = new Lang();
+lang.init('ru');
 
+/*
 // Автоматическая инициализация при загрузке DOM
 $(document).ready(() => {
     // Определяем язык из URL, localStorage или браузера
@@ -200,4 +202,4 @@ $(document).ready(() => {
     } catch (e) {}
 
     lang.init(preferredLanguage);
-});
+});*/

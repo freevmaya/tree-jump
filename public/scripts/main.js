@@ -63,6 +63,7 @@ class Game {
     this.background = null;
     this.grass = null;
     this.ground = null;
+    this.bounceEffect = null;
     this.currentScore = 0;
     this.soundsLoaded = false;
     this.gameStarted = false; // Флаг, что игра была запущена
@@ -644,8 +645,6 @@ class Game {
   }
   
   init() {
-    // Инициализация сцены
-    const scene = this.scene;
       
     this.rendererManager = new RendererManager(this.container);
     
@@ -654,6 +653,23 @@ class Game {
     
     // Инициализация камеры
     this.cameraController = new CameraController(this);
+    this.bounceEffect = new BounceEffect(this.scene, {
+      spread: 1.0,
+      gravity: -1.0
+    });
+
+    eventBus.on('bounce', (data) => {
+      if (this.bounceEffect && this.ball) {
+
+        let r = Math.abs(this.tree.getDelta()) * 50;
+        console.log(r);
+        if (r > 1) {
+          this.bounceEffect.createBounceEffect(this.ball.getPosition(), {
+            particleCount: Math.floor(Math.random() * r + 10)
+          });
+        }
+      }
+    });
     
     // Создание игровых объектов (но не активируем физику)
     this.createGameObjects();
@@ -916,6 +932,10 @@ class Game {
       // Рендеринг (всегда, чтобы видеть сцену)
       if (this.scene && this.cameraController) {
         this.rendererManager.render(this.scene, this.cameraController.getCamera());
+      }
+  
+      if (this.bounceEffect) {
+        this.bounceEffect.update(dt);
       }
 
     }

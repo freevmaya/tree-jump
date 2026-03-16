@@ -26,7 +26,7 @@
       'utils/crypto-js.min',
       'utils/Utils',
       'effects/SparkEffect',
-      //'effects/BounceEffect',
+      'effects/BounceEffect',
       'physics/BallPhysics',
       'audio/SoundManager',
       'main'

@@ -438,8 +438,12 @@ class Tree {
     return this.mesh ? this.mesh.rotation.y : 0;
   }
 
+  getDelta() {
+    return this.targetRotation - this.mesh.rotation.y;
+  }
+
   update(dt) {
-    this.setRotation(this.mesh.rotation.y + (this.targetRotation - this.mesh.rotation.y) * ROTATION_SMOOTH);
+    this.setRotation(this.mesh.rotation.y + this.getDelta() * ROTATION_SMOOTH);
     this.branches.forEach(branch => branch.update(dt));
     this.platforms.forEach(platform => platform.update(dt));
   }

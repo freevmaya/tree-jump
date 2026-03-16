@@ -7,7 +7,7 @@ def combine_project_files():
     
     output_file = "combined.txt"
     exclude_files = ["combine_run.py", output_file]
-    exclude_paths = ["vendor", "dev"]
+    exclude_paths = ["vendor", "dev", "prepare"]
     
     # Определяем расширения файлов для обработки
     target_extensions = [".js", ".html", ".css", ".php"]

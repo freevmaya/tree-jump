@@ -162,6 +162,7 @@ class Game {
   doPlaying() {
     this.frame_num = 0;
     this.cameraController.begin();
+    this.updateStateView();
     this.updateGameDisplay();
     this.enableControls();
     this.updateDeltaTime();

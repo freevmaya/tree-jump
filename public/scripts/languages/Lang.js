@@ -1,11 +1,12 @@
 // scripts/languages/Lang.js
 
 class Lang {
-    constructor() {
-        this.currentLanguage = 'ru';
+    constructor(lang = 'ru') {
+        this.currentLanguage = lang;
         this.translations = {};
-        this.fallbackLanguage = 'ru';
+        this.fallbackLanguage = lang;
         this.loaded = false;
+        this.init(lang);
     }
 
     /**
@@ -171,35 +172,4 @@ class Lang {
                  this.translations[this.fallbackLanguage]?.[key]);
     }
 }
-
-// Глобальный экземпляр
 window.lang = new Lang();
-lang.init('ru');
-
-/*
-// Автоматическая инициализация при загрузке DOM
-$(document).ready(() => {
-    // Определяем язык из URL, localStorage или браузера
-    let preferredLanguage = 'ru';
-    
-    try {
-        // Из URL параметра
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('lang')) {
-            preferredLanguage = urlParams.get('lang');
-        }
-        // Из localStorage
-        else if (localStorage.getItem('preferred_language')) {
-            preferredLanguage = localStorage.getItem('preferred_language');
-        }
-        // Из браузера
-        else {
-            const browserLang = navigator.language.split('-')[0];
-            if (['ru', 'en', 'de', 'fr', 'hi'].includes(browserLang)) {
-                preferredLanguage = browserLang;
-            }
-        }
-    } catch (e) {}
-
-    lang.init(preferredLanguage);
-});*/

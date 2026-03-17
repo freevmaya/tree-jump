@@ -239,9 +239,7 @@
   <script src="<?=SCRIPTURL . $script?>.js?v=<?=$v?>"></script>
   <?}?>
 
-  <?if ($is_developer) {?>
-  <script src="<?=SCRIPTURL?>language-switcher.js?v=<?=$v?>"></script>
-  <?}?>
+  <!--<script src="<?=SCRIPTURL?>language-switcher.js?v=<?=$v?>"></script>-->
 
   <?if ($is_developer) {?>
     <script type="module" src="<?=BASEURL?>/scripts/test-unit.js?v=<?=$v?>"></script>

@@ -172,4 +172,5 @@ class Lang {
                  this.translations[this.fallbackLanguage]?.[key]);
     }
 }
-window.lang = new Lang();
+
+window.lang = new Lang(localStorage.getItem('preferred_language', 'ru'));

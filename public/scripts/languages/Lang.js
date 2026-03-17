@@ -173,4 +173,29 @@ class Lang {
     }
 }
 
-window.lang = new Lang(localStorage.getItem('preferred_language', 'ru'));
+function getPreferrerLang() {
+     let preferredLanguage = 'ru';
+    
+    try {
+        // Из URL параметра
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('lang')) {
+            preferredLanguage = urlParams.get('lang');
+        }
+        // Из localStorage
+        else if (localStorage.getItem('preferred_language')) {
+            preferredLanguage = localStorage.getItem('preferred_language');
+        }
+        // Из браузера
+        else {
+            const browserLang = navigator.language.split('-')[0];
+            if (['ru', 'en', 'de', 'fr', 'hi'].includes(browserLang)) {
+                preferredLanguage = browserLang;
+            }
+        }
+    } catch (e) {}
+
+    return preferredLanguage;
+}
+
+window.lang = new Lang(getPreferrerLang());

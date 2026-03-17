@@ -33,7 +33,9 @@ class Lang {
 
             // Загружаем файл с переводами
             const script = document.createElement('script');
-            script.src = `./scripts/languages/${language}.js?v=${Date.now()}`;
+            const version = getScriptParam('v');
+
+            script.src = `./scripts/languages/${language}.js?v=${version}`;
             script.onload = () => {
                 if (window[`LANG_${language.toUpperCase()}`]) {
                     this.translations[language] = window[`LANG_${language.toUpperCase()}`];

@@ -204,3 +204,14 @@ function delayAnimation(ms, callback) {
   
   requestAnimationFrame(check);
 }
+
+function getScriptParam(paramName) {
+  const scripts = document.getElementsByTagName('script');
+  const currentScript = document.currentScript || scripts[scripts.length - 1];
+  
+  if (currentScript && currentScript.src) {
+    const url = new URL(currentScript.src, window.location.href);
+    return url.searchParams.get(paramName);
+  }
+  return null;
+}

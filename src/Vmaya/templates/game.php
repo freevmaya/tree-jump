@@ -2,9 +2,8 @@
     $v = SCRIPTS_VERSION;
     $is_developer = Page::isDev();
     $scripts =  [
+      'utils/Utils',
       'languages/Lang',
-      'languages/ru',
-      'languages/en',
       'constants',
       'GameState',
       'core/RendererManager',
@@ -27,7 +26,6 @@
       'utils/TextureLoader',
       'utils/MathUtils',
       'utils/crypto-js.min',
-      'utils/Utils',
       'effects/SparkEffect',
       'effects/BounceEffect',
       'physics/BallPhysics',

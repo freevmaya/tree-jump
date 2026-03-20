@@ -152,7 +152,6 @@ class VKApp {
 	}
 
 	onNewTitle(key) {
-		/*
 		if (TITLE_MISSION_IDS[key]) {
 			Ajax({
 				action: 'vk_apiCall',
@@ -163,7 +162,7 @@ class VKApp {
 			}, (data)=>{
 				tracer.log(data);
 			});
-		}*/
+		}
 	}
 
 	shareApp(message) {

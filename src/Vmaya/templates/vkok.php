@@ -7,9 +7,9 @@
     <title><?=Lang('app_name');?></title>
   
 	<!-- Bootstrap CSS -->
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="<?=BASEURL?>/styles/bootstrap.min.css" rel="stylesheet">
 	<!-- Bootstrap Icons -->
-	<link rel="stylesheet" href="./styles/bootstrap-icons.css">
+	<link rel="stylesheet" href="<?=BASEURL?>/styles/bootstrap-icons.css">
 	<!-- Custom CSS -->
 	<link rel="stylesheet" href="<?=BASEURL?>/styles/main.css?v=<?=$v?>">
 	<link rel="stylesheet" href="<?=BASEURL?>/styles/dialog.css?v=<?=$v?>">

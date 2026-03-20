@@ -16,6 +16,7 @@ class VKApp {
 		this.source_user_id = source_user_id;
 		this.sharedSession = false;
 		this.haveAdv = false;
+		this.haveBanner = false;
 
 		$('body').addClass('vk_layout');
 
@@ -49,8 +50,17 @@ class VKApp {
 		  	})
 		  	.catch((error) => { 
 		  		tracer.log(error);
-		  		resolve(false);
 		  	});
+
+		vkBridge.send('VKWebAppShowBannerAd', {
+				banner_location: 'bottom'
+			})
+			.then((data) => { 
+				this.haveBanner = data.result;
+			})
+			.catch((error) => {
+				tracer.log(error);
+			});
 
 	  	this.initListeners();
 	}

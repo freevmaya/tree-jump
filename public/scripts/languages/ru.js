@@ -140,5 +140,7 @@ window.LANG_RU = {
     'status_paused': 'Пауза',
     'status_game_over': 'Поражение',
     'status_victory': 'Победа',
-    'status_loading': 'Загрузка'
+    'status_loading': 'Загрузка',
+
+    'liders_button': 'Лидеры'
 };

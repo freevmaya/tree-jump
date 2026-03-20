@@ -20,6 +20,13 @@ class VKApp {
 
 		$('body').addClass('vk_layout');
 
+		this.lidersBtn = $('<button type="button" class="btn" id="ligersButton" data-lang="liders_button">Лидеры</button>');
+		$('#startModal').find('.buttons').append(this.lidersBtn);
+
+		this.lidersBtn.click(()=>{
+			this.showLiders();
+		});
+
 		vkBridge.send('VKWebAppGetUserInfo', {})
 			.then(((user) => { 
 				if (user) {
@@ -63,6 +70,15 @@ class VKApp {
 			});
 
 	  	this.initListeners();
+	}
+
+	showLiders() {
+		vkBridge.send('VKWebAppShowLeaderBoardBox', {
+				user_results: 10
+			})
+			.catch( (e) => {
+				tracer.log(e);
+			})
 	}
 
 	getToken(scope, callback) {

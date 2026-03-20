@@ -111,7 +111,7 @@
                 <span data-lang="gpu_speed">GPU speed:</span> <span id="testResult"></span>. 
                 <span data-lang="version">Version:</span> <span><?=APP_VERSION?></span>
               </p>
-              <div class="text-center">
+              <div class="text-center buttons">
                 <button type="button" class="btn" id="startGameButton" data-lang="start_button">Начать</button>
               </div>
             </div>

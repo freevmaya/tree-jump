@@ -27,8 +27,6 @@ class VKApp {
 			this.showLiders();
 		});
 
-		this.toFavorite();
-
 		vkBridge.send('VKWebAppGetUserInfo', {})
 			.then(((user) => { 
 				if (user) {
@@ -72,6 +70,15 @@ class VKApp {
 			});
 
 	  	this.initListeners();
+
+
+	  	When(()=>{
+	  		return window.game && window.game.stateManager;
+	  	})
+	  	.then(()=>{
+			this.toFavorite();
+			this.toHomeScreen();
+	  	});
 	}
 
 	showLiders() {
@@ -84,14 +91,33 @@ class VKApp {
 	}
 
 	toFavorite() {
-		vkBridge.send('VKWebAppAddToFavorites')
-		  .then((data) => { 
-		    if (data.result) {
-		    }
-		  })
-		  .catch((error) => {
-		    tracer.log(error);
-		  });
+		if (!window.game.stateManager.get('isFavorite'))
+			vkBridge.send('VKWebAppAddToFavorites')
+			.then((data) => { 
+				if (data.result)
+				  	window.game.stateManager.set('isFavorite', true);
+			})
+			.catch((error) => {
+				tracer.log(error);
+			});
+	}
+
+	toHomeScreen() {
+		function showDialog() {
+			if (!window.game.stateManager.get('isHomeScreen')) {
+				vkBridge.send('VKWebAppAddToHomeScreen')
+				.then((data) => { 
+					if (data.result)
+					  	window.game.stateManager.set('isHomeScreen', true);
+				})
+				.catch((error) => {
+					tracer.log(error);
+				});
+			}
+		}
+
+	    window.game.gameState.on(GAME_STATE.VICTORY, showDialog);
+	    window.game.gameState.on(GAME_STATE.PAUSED, showDialog);
 	}
 
 	getToken(scope, callback) {

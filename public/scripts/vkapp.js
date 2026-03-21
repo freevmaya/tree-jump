@@ -27,6 +27,8 @@ class VKApp {
 			this.showLiders();
 		});
 
+		this.toFavorite();
+
 		vkBridge.send('VKWebAppGetUserInfo', {})
 			.then(((user) => { 
 				if (user) {
@@ -79,6 +81,17 @@ class VKApp {
 			.catch( (e) => {
 				tracer.log(e);
 			})
+	}
+
+	toFavorite() {
+		vkBridge.send('VKWebAppAddToFavorites')
+		  .then((data) => { 
+		    if (data.result) {
+		    }
+		  })
+		  .catch((error) => {
+		    tracer.log(error);
+		  });
 	}
 
 	getToken(scope, callback) {

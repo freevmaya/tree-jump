@@ -74,7 +74,7 @@ class VKApp {
 
 	showLiders() {
 		vkBridge.send('VKWebAppShowLeaderBoardBox', {
-				user_results: 10
+				global: 1
 			})
 			.catch( (e) => {
 				tracer.log(e);

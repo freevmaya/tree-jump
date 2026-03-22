@@ -163,7 +163,7 @@ class VKApp {
 				return new Promise((resolve, reject)=>{
 					let current = performance.now();
 					let dt = (current - this.last_show_adv) / 1000;
-					if (dt > 30) {
+					if (dt > 50) {
 						this.last_show_adv = current;
 						this.showAd()
 							.then((result) => {

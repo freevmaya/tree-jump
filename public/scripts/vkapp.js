@@ -71,14 +71,16 @@ class VKApp {
 
 	  	this.initListeners();
 
+	  	setTimeout(()=>{
 
-	  	When(()=>{
-	  		return window.game && window.game.stateManager;
-	  	})
-	  	.then(()=>{
-			this.toFavorite();
-			this.toHomeScreen();
-	  	});
+		  	When(()=>{
+		  		return window.game && window.game.stateManager && window.game.stateManager.config.use_server;
+		  	})
+		  	.then(()=>{
+				this.toFavorite();
+				this.toHomeScreen();
+		  	});
+		  }, 2000);
 	}
 
 	showLiders() {

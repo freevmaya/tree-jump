@@ -241,8 +241,6 @@
   <?if ($is_developer) {?>
     <script type="module" src="<?=BASEURL?>/scripts/test-unit.js?v=<?=$v?>"></script>
     <!-- Eruda is console for mobile browsers-->
-    <!--
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>eruda.init();</script>
-    -->
   <?}?>

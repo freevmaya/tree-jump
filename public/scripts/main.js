@@ -663,7 +663,7 @@ class Game {
       if (this.bounceEffect && this.ball) {
 
         let r = Math.abs(this.tree.getDelta()) * 50;
-        console.log(r);
+        //console.log(r);
         if (r > 1) {
           this.bounceEffect.createBounceEffect(this.ball.getPosition(), {
             particleCount: Math.floor(Math.random() * r + 10)
@@ -877,9 +877,6 @@ class Game {
     const time = performance.now();
     const dt = (time - this.lastTime) / 1000;
     this.lastTime = time;
-
-    if (dt > 0.1)
-      console.log(dt);
 
     return Math.min(dt, 0.1);
   }
